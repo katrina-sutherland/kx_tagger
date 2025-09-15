@@ -1,0 +1,781 @@
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox
+import csv
+from datetime import datetime
+import sys
+import os
+
+# Main application class for the GUI
+class KXTaggerApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Kayak Cross Tagger")
+        self.bg_color = "#212121"
+        self.root.resizable(True, True)
+        self.root.configure(bg=self.bg_color)
+
+        # --- WIDGET STYLING ---
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
+        self.style.configure('TFrame', background=self.bg_color)
+        self.style.configure('TLabel', background=self.bg_color, foreground='black', font=('Space Mono', 10, 'bold'))
+
+        # Standard Button Styles
+        self.style.configure('TButton', font=('Space Mono', 14, 'bold'), padding=10)
+        self.style.map('TButton', background=[('!active', '#CCCCCC'), ('active', '#AAAAAA')], foreground=[('!active', 'black')])
+        self.style.configure('Small.TButton', font=('Space Mono', 12, 'bold'), padding=5)
+        self.style.map('Small.TButton', background=[('!active', '#CCCCCC'), ('active', '#AAAAAA')], foreground=[('!active', 'black')])
+
+        # Action Button Styles
+        self.style.configure('Small.Red.TButton', font=('Space Mono', 12, 'bold'), padding=5)
+        self.style.map('Small.Red.TButton', background=[('!active', '#B22222'), ('active', '#8B0000')], foreground=[('!active', 'white')])
+        self.style.configure('Small.Green.TButton', font=('Space Mono', 12, 'bold'), padding=5)
+        self.style.map('Small.Green.TButton', background=[('!active', '#228B22'), ('active', '#006400')], foreground=[('!active', 'white')])
+
+        # Style for selected/active buttons
+        self.style.configure('Active.TButton', font=('Space Mono', 14, 'bold'), padding=10, background='#FF8C00')
+        self.style.configure('Small.Active.TButton', font=('Space Mono', 12, 'bold'), padding=5, background='#FF8C00')
+
+        # New smaller style for action buttons
+        self.style.configure('ExtraSmall.TButton', font=('Space Mono', 10, 'bold'), padding=4)
+        self.style.map('ExtraSmall.TButton', background=[('!active', '#CCCCCC'), ('active', '#AAAAAA')], foreground=[('!active', 'black')])
+
+        # Up/Down buttons always red/green
+        self.style.configure('ExtraSmall.Red.TButton', font=('Space Mono', 10, 'bold'), padding=4, background='#B22222', foreground='white')
+        self.style.map('ExtraSmall.Red.TButton', background=[('!active', '#B22222')], foreground=[('!active', 'white')])
+
+        self.style.configure('ExtraSmall.Green.TButton', font=('Space Mono', 10, 'bold'), padding=4, background='#228B22', foreground='white')
+        self.style.map('ExtraSmall.Green.TButton', background=[('!active', '#228B22')], foreground=[('!active', 'white')])
+
+        # Active styles
+        self.style.configure('ExtraSmall.Active.TButton', font=('Space Mono', 10, 'bold'), padding=4, background='#FF8C00')
+        self.style.configure('ExtraSmall.Red.Active.TButton', font=('Space Mono', 10, 'bold'), padding=4, background='#DC143C', foreground='white')
+        self.style.configure('ExtraSmall.Green.Active.TButton', font=('Space Mono', 10, 'bold'), padding=4, background='#32CD32', foreground='white')
+
+        # Combobox Style
+        self.style.configure('TCombobox', font=('Space Mono', 9), padding=3)
+        self.root.option_add('*TCombobox*Listbox.background', 'white')
+        self.root.option_add('*TCombobox*Listbox.foreground', 'black')
+        self.root.option_add('*TCombobox*Listbox.selectBackground', '#ddd')
+        self.root.option_add('*TCombobox*Listbox.selectForeground', 'black')
+        self.style.map('TCombobox', fieldbackground=[('readonly', 'white')],
+                       selectbackground=[('readonly', 'white')], selectforeground=[('readonly', 'black')],
+                       foreground=[('readonly', 'black')])
+
+        # --- DATA & STATE MANAGEMENT ---
+        self.tagged_data = []
+        self.num_paddlers_var = tk.IntVar(value=4)
+        self.paddler_ramp_positions = {}
+        self.disabled_positions = set()
+        self.faulted_bibs = set()
+        self.selected_paddler_setup = None
+        self.selected_gate = None
+        self.selected_actions = set()
+        self.paddler_order_sequence = []
+        self.finish_line_sequence = []
+        self.phase_final_positions = {}
+        self.upstream_tactic_actions = []
+        self.paddler_buttons = {}
+        self.ramp_position_buttons = {}
+        self.gate_buttons = {}
+        self.action_buttons = {}
+        
+        # Bib data mapping internal P-number to UI name, color, and CSV character
+        self.bib_data = {
+            "P1": {"name": "RED", "color": "#E5296B", "csv_char": "R"},
+            "P2": {"name": "GREEN", "color": "#0BC2A3", "csv_char": "G"},
+            "P3": {"name": "BLUE", "color": "#095cd9", "csv_char": "B"},
+            "P4": {"name": "YELLOW", "color": "#FEEA63", "csv_char": "Y"}
+        }
+
+
+        # path for autosave - More robust path in user's home directory
+        home_dir = os.path.expanduser("~")
+        app_data_dir = os.path.join(home_dir, "/Users/katrinasutherland/Documents/pa_analysis/analysis_software/kx_tagger")
+        os.makedirs(app_data_dir, exist_ok=True) # Ensure the directory exists
+        self.autosave_path = os.path.join(app_data_dir, "kx_race_analysis.csv")
+
+        # CRITICAL FIX: UI must be set up BEFORE trying to load data into it.
+        self.setup_ui()
+        self._load_existing_data()
+
+    def _load_existing_data(self):
+        """Loads data from the autosave CSV if it exists."""
+        if not os.path.isfile(self.autosave_path):
+            self.log_to_display(f"No existing data file found. A new one will be created at:\n{self.autosave_path}")
+            return
+        
+        try:
+            with open(self.autosave_path, 'r', newline='') as f:
+                # Check if file is empty
+                if os.path.getsize(self.autosave_path) == 0:
+                    self.log_to_display("Autosave file is empty. Starting fresh.")
+                    return
+
+                reader = csv.DictReader(f)
+                self.tagged_data = list(reader)
+                self.log_to_display(f"Loaded {len(self.tagged_data)} existing tags from {self.autosave_path}")
+        except Exception as e:
+            messagebox.showerror("Load Error", f"Could not read autosave file: {self.autosave_path}\nError: {e}")
+            self.tagged_data = []
+
+    # Autosave method
+    def autosave_csv(self):
+        """Rewrites the entire CSV file with the current in-memory data."""
+        headers = ["Year", "Competition", "Gender", "Phase", "Gate", "BIB", "Ramp Position", "Action", "Order", "Final Position", "Upstream Tactic"]
+        
+        try:
+            with open(self.autosave_path, 'w', newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=headers)
+                writer.writeheader()
+                writer.writerows(self.tagged_data)
+        except IOError as e:
+            messagebox.showerror("Autosave Error", f"Could not write to file: {self.autosave_path}\nError: {e}")
+
+    # --- UI BUILDING ---
+    def setup_ui(self):
+        # Header
+        header_label = tk.Label(self.root, text="Kayak Cross Tagger", font=("Space Mono", 24, 'bold'),
+                                bg=self.bg_color, fg="white", pady=10)
+        header_label.pack(pady=(5, 10))
+
+        # Race Details Frame
+        details_frame = ttk.Frame(self.root, style='TFrame')
+        details_frame.pack(pady=5, fill='x', padx=50)
+
+        tk.Label(details_frame, text="YEAR", bg=self.bg_color, fg="white", font=("Space Mono", 14, 'bold')).grid(row=0,
+                                                                                                               column=0,
+                                                                                                               padx=5,
+                                                                                                               pady=5)
+        self.year_var = tk.StringVar(self.root)
+        years = [str(y) for y in range(datetime.now().year, datetime.now().year - 21, -1)]
+        self.year_var.set(years[0])
+        year_menu = ttk.Combobox(details_frame, textvariable=self.year_var, values=years, state='readonly', width=8)
+        year_menu.grid(row=1, column=0, padx=5, pady=5)
+
+        tk.Label(details_frame, text="COMPETITION", bg=self.bg_color, fg="white", font=("Space Mono", 14, 'bold')).grid(
+            row=0, column=1, padx=5, pady=5)
+        self.comp_var = tk.StringVar(self.root)
+        competitions = ["WC1", "WC2", "WC3", "WC4", "WC5", "WCh", "OLY", "CCh", "NCh", "WRR"]
+        self.comp_var.set(competitions[0])
+        comp_menu = ttk.Combobox(details_frame, textvariable=self.comp_var, values=competitions, state='readonly', width=10)
+        comp_menu.grid(row=1, column=1, padx=5, pady=5)
+
+        tk.Label(details_frame, text="PHASE", bg=self.bg_color, fg="white", font=("Space Mono", 14, 'bold')).grid(row=0,
+                                                                                                                 column=2,
+                                                                                                                 padx=5,
+                                                                                                                 pady=5)
+        self.phase_var = tk.StringVar(self.root)
+
+        # phases can changhe depending on the event structure, but this is the olympic format. 
+        phases = [f"R{i}" for i in range(1, 12)] + [f"Rep{i}" for i in range(1, 6)]+ [f"H{i}" for i in range(1, 11)] + [f"QF{i}" for i in range(1, 5)] + ["SF1", "SF2", "Final"]
+        self.phase_var.set(phases[0])
+        phase_menu = ttk.Combobox(details_frame, textvariable=self.phase_var, values=phases, state='readonly', width=10)
+        phase_menu.grid(row=1, column=2, padx=5, pady=5)
+        phase_menu.bind('<<ComboboxSelected>>', self.on_phase_change)
+
+
+        tk.Label(details_frame, text="GENDER", bg=self.bg_color, fg="white", font=("Space Mono", 14, 'bold')).grid(row=0,
+                                                                                                                  column=3,
+                                                                                                                  padx=5,
+                                                                                                                  pady=5)
+        self.gender_var = tk.StringVar(self.root, value="M")
+        gender_toggle_btn = ttk.Button(details_frame, textvariable=self.gender_var, command=self.toggle_gender,
+                                       style='Small.TButton')
+        gender_toggle_btn.grid(row=1, column=3, padx=5, pady=5, sticky='ew')
+
+        tk.Label(details_frame, text="BIBS", bg=self.bg_color, fg="white", font=("Space Mono", 14, 'bold')).grid(row=0,
+                                                                                                                   column=4,
+                                                                                                                   padx=5,
+                                                                                                                   pady=5)
+        paddler_count_menu = ttk.Combobox(details_frame, textvariable=self.num_paddlers_var, values=[4, 3, 2], state='readonly', width=5)
+        paddler_count_menu.grid(row=1, column=4, padx=5, pady=5)
+        paddler_count_menu.bind('<<ComboboxSelected>>', self.on_paddler_count_change)
+
+        details_frame.columnconfigure((0, 1, 2, 3, 4), weight=1)
+
+        # --- Paddlers and Positions Frame ---
+        paddlers_frame = ttk.Frame(self.root, style='TFrame')
+        paddlers_frame.pack(pady=10, fill='x', padx=50)
+        paddlers_frame.columnconfigure((0, 2), weight=1)
+        paddlers_frame.columnconfigure(1, weight=0)
+
+        # --- Bib Selection (Left)---
+        paddlers_buttons_frame = ttk.Frame(paddlers_frame, style='TFrame')
+        paddlers_buttons_frame.grid(row=0, column=0, sticky='n')
+        tk.Label(paddlers_buttons_frame, text="BIB", font=("Space Mono", 14, 'bold'),
+                 bg=self.bg_color, fg="white").pack(pady=(0, 10))
+        paddler_grid = ttk.Frame(paddlers_buttons_frame, style='TFrame')
+        paddler_grid.pack()
+        for i, (p_key, bib_info) in enumerate(self.bib_data.items()):
+            color = bib_info["color"]
+            name = bib_info["name"]
+            lbl = tk.Label(paddler_grid, text=name, bg=color, fg="#010101", font=('Space Mono', 14, 'bold'),
+                           relief=tk.RAISED, width=6, height=3, bd=2)
+            lbl.bind("<Button-1>", lambda e, n=p_key: self.on_paddler_press(n))
+            lbl.grid(row=i // 2, column=i % 2, padx=5, pady=5)
+            self.paddler_buttons[p_key] = lbl
+
+        # --- Control Buttons (Middle) ---
+        clear_frame = ttk.Frame(paddlers_frame, style='TFrame')
+        clear_frame.grid(row=0, column=1, sticky='ns', padx=20, pady=(10, 0))
+        clear_btn = ttk.Button(clear_frame, text="CLEAR ALL", command=self.clear_all_assignments, style='Small.TButton')
+        clear_btn.pack(pady=2, fill='x')
+        clear_selection_btn = ttk.Button(clear_frame, text="CLEAR CURRENT", command=self.clear_tag_selection,
+                                         style='Small.TButton')
+        clear_selection_btn.pack(pady=2, fill='x')
+        undo_btn = ttk.Button(clear_frame, text="UNDO LAST", command=self.undo_last_paddler, style='Small.TButton')
+        undo_btn.pack(pady=2, fill='x')
+        dns_tag_btn = ttk.Button(clear_frame, text="DNS", command=self.save_dns_tag, style='Small.TButton')
+        dns_tag_btn.pack(pady=10, fill='x')
+        fault_tag_btn = ttk.Button(clear_frame, text="FAULT", command=self.save_fault_tag, style='Small.Red.TButton')
+        fault_tag_btn.pack(pady=2, fill='x')
+
+        # --- Ramp Position Assignment (Right) ---
+        position_frame = ttk.Frame(paddlers_frame, style='TFrame')
+        position_frame.grid(row=0, column=2, sticky='n')
+        tk.Label(position_frame, text="RAMP POSITION", font=("Space Mono", 14, 'bold'), bg=self.bg_color,
+                 fg="white").pack(pady=(0, 10))
+        position_grid = ttk.Frame(position_frame, style='TFrame')
+        position_grid.pack()
+        positions = [1, 2, 3, 4]
+        for i, pos in enumerate(positions):
+            lbl = tk.Label(position_grid, text=str(pos), width=6, height=3, font=('Space Mono', 14, 'bold'), bg="#CCCCCC",
+                           fg="black", relief=tk.RAISED, bd=2)
+            lbl.bind("<Button-1>", lambda e, p=pos: self.assign_ramp_position(p))
+            lbl.grid(row=i // 2, column=i % 2, padx=5, pady=5)
+            self.ramp_position_buttons[pos] = lbl
+
+        # --- Gate Buttons Frame ---
+        segments_frame = ttk.Frame(self.root, style='TFrame')
+        segments_frame.pack(pady=5, fill='x', padx=50)
+        tk.Label(segments_frame, text="GATE", font=("Space Mono", 14, 'bold'), bg=self.bg_color,
+                 fg="white").pack(pady=(0, 10))
+        segments_grid = ttk.Frame(segments_frame, style='TFrame')
+        segments_grid.pack(fill='x')
+        for i in range(1, 9):
+            gate_name = f"Gate {i}"
+            btn = ttk.Button(segments_grid, text=str(i), command=lambda s=gate_name: self.select_gate(s))
+            btn.grid(row=0, column=i - 1, padx=5, pady=5, sticky='ew')
+            self.gate_buttons[gate_name] = btn
+            segments_grid.columnconfigure(i - 1, weight=1)
+
+        # --- Action Buttons Frame ---
+        actions_frame = ttk.Frame(segments_frame, style='TFrame')
+        actions_frame.pack(fill='x', pady=(10, 0))
+        action_defs = [
+            ("Roll", 'ExtraSmall.TButton'),
+            ("Through", 'ExtraSmall.TButton'),
+            ("Left", 'ExtraSmall.TButton'),
+            ("Right", 'ExtraSmall.TButton'),
+            ("Up", 'ExtraSmall.Red.TButton'),
+            ("Down", 'ExtraSmall.Green.TButton'),
+            ("Finish", 'ExtraSmall.TButton')
+        ]
+        for i, (name, style) in enumerate(action_defs):
+            btn = ttk.Button(actions_frame, text=name, style=style, command=lambda a=name: self.select_action(a))
+            btn.grid(row=0, column=i, padx=2, pady=2, sticky='ew')
+            self.action_buttons[name] = btn
+            actions_frame.columnconfigure(i, weight=1)
+
+        # --- Log and Download Frame ---
+        log_frame = ttk.Frame(self.root, style='TFrame')
+        log_frame.pack(pady=10, fill='both', expand=True, padx=50)
+        tk.Label(log_frame, text="TAGS", font=("Space Mono", 14, 'bold'), bg=self.bg_color,
+                 fg="white").pack(pady=(0, 10))
+        self.log_display = tk.Text(log_frame, height=8, state=tk.DISABLED, bg=self.bg_color, fg="white", bd=1,
+                                   relief=tk.SOLID, font=('Space Mono', 10), insertbackground='white')
+        self.log_display.pack(fill='both', expand=True, pady=5)
+
+        download_btn = ttk.Button(self.root, text="DOWNLOAD TAGS AS CSV", command=self.download_csv)
+        download_btn.pack(pady=(0, 10), ipadx=20, ipady=10)
+
+        # --- HOTKEY BINDING ---
+        self.root.bind("<Key>", self.handle_keypress)
+
+    # --- LOGGING ---
+    def log_to_display(self, message):
+        self.log_display.config(state=tk.NORMAL)
+        self.log_display.insert(tk.END, message + "\n")
+        self.log_display.see(tk.END)
+        self.log_display.config(state=tk.DISABLED)
+
+    # --- HOTKEY HANDLER ---
+    def handle_keypress(self, event):
+        char = event.char
+        keysym = event.keysym
+        if char in ['1', '2', '3', '4']:
+            self.on_paddler_press(f"P{char}")
+        elif keysym.startswith('F') and keysym[1:].isdigit():
+            gate_num = int(keysym[1:])
+            if 1 <= gate_num <= 8:
+                self.select_gate(f"Gate {gate_num}")
+        elif keysym == 'BackSpace':
+            self.save_dns_tag()
+        elif char.lower() == 'z':
+            self.undo_last_paddler()
+        elif char.lower() == 'd':
+            self.select_action("Down")
+        elif char.lower() == 'f':
+            self.select_action("Finish")
+        elif char.lower() == 'l':
+            self.select_action("Left")
+        elif char.lower() == 'o':
+            self.select_action("Roll")
+        elif char.lower() == 'r':
+            self.select_action("Right")
+        elif char.lower() == 't':
+            self.select_action("Through")
+        elif char.lower() == 'u':
+            self.select_action("Up")
+
+    def on_paddler_count_change(self, event=None):
+        """Called when the number of paddlers in the heat is changed."""
+        num_paddlers = self.num_paddlers_var.get()
+        disabled_color = "#404040"
+
+        # Enable/disable paddler bib buttons based on the count
+        for i in range(1, 5):
+            p_key = f"P{i}"
+            p_button = self.paddler_buttons[p_key]
+
+            if i <= num_paddlers:
+                p_button.config(bg=self.bib_data[p_key]["color"])
+                p_button.bind("<Button-1>", lambda e, n=p_key: self.on_paddler_press(n))
+            else:
+                p_button.config(bg=disabled_color)
+                p_button.unbind("<Button-1>")
+        
+        # Always ensure all ramp position buttons are enabled
+        for i in range(1, 5):
+            r_button = self.ramp_position_buttons[i]
+            r_button.config(bg="#CCCCCC")
+            r_button.bind("<Button-1>", lambda e, p=i: self.assign_ramp_position(p))
+
+        self.clear_all_assignments()
+
+    def on_phase_change(self, event=None):
+        """Called when the phase is changed, signaling a new heat."""
+        self.log_to_display(f"--- NEW PHASE: {self.phase_var.get()}. Clearing assignments. ---")
+        self.finish_line_sequence.clear()
+        self.faulted_bibs.clear()
+        self.phase_final_positions.clear()
+        self.upstream_tactic_actions.clear()
+        self.clear_all_assignments()
+
+    def _backfill_final_position(self, bib_key, final_pos):
+        """Finds all previous tags for a bib in the current phase and updates their final position."""
+        bib_csv_char = self.bib_data[bib_key]["csv_char"]
+        current_phase = self.phase_var.get()
+        
+        # Update master dictionary for the current phase
+        self.phase_final_positions[bib_csv_char] = final_pos
+        
+        # Update all existing in-memory records for this bib in this phase
+        for row in self.tagged_data:
+            if row["BIB"] == bib_csv_char and row["Phase"] == current_phase:
+                row["Final Position"] = final_pos
+
+    # --- Paddler selection and setup ---
+    def on_paddler_press(self, name):
+        if name in self.faulted_bibs:
+            self.log_to_display(f"NOTE: {self.bib_data[name]['name']} has FAULTED and cannot be tagged further.")
+            return
+
+        num_paddlers = self.num_paddlers_var.get()
+        if len(self.paddler_ramp_positions) < num_paddlers:
+            self.select_paddler_for_setup(name)
+        else:
+            self.add_paddler_to_sequence(name)
+
+    def select_paddler_for_setup(self, name):
+        if self.selected_paddler_setup:
+            if self.selected_paddler_setup not in self.paddler_ramp_positions:
+                self.paddler_buttons[self.selected_paddler_setup].config(relief=tk.RAISED)
+        self.selected_paddler_setup = name
+        self.paddler_buttons[name].config(relief=tk.SUNKEN)
+
+    def assign_ramp_position(self, position):
+        if not self.selected_paddler_setup:
+            messagebox.showwarning("No BIB Selected", "Please select a BIB before assigning a position.")
+            return
+        if position in self.disabled_positions:
+            messagebox.showwarning("Position Taken", f"Position {position} is already assigned.")
+            return
+        paddler_name = self.selected_paddler_setup
+        
+        if paddler_name in self.paddler_ramp_positions:
+            old_pos = self.paddler_ramp_positions[paddler_name]
+            self.ramp_position_buttons[old_pos].config(bg="#CCCCCC") 
+            self.ramp_position_buttons[old_pos].bind("<Button-1>", lambda e, p=old_pos: self.assign_ramp_position(p))
+            self.disabled_positions.remove(old_pos)
+
+        paddler_color = self.bib_data[paddler_name]["color"]
+        self.paddler_ramp_positions[paddler_name] = position
+        self.ramp_position_buttons[position].config(bg=paddler_color) 
+        self.ramp_position_buttons[position].unbind("<Button-1>")
+        self.disabled_positions.add(position)
+        self.paddler_buttons[paddler_name].config(relief=tk.SUNKEN)
+        
+        entry = {
+            "Year": self.year_var.get(),
+            "Competition": self.comp_var.get(),
+            "Gender": self.gender_var.get(),
+            "Phase": self.phase_var.get(),
+            "Gate": "Ramp",
+            "BIB": self.bib_data[paddler_name]["csv_char"],
+            "Ramp Position": position,
+            "Action": "Assigned",
+            "Order": "",
+            "Final Position": "",
+            "Upstream Tactic": ""
+        }
+        self.tagged_data.append(entry)
+        self.autosave_csv()
+        log_msg = f"--> SAVED: Ramp, {self.bib_data[paddler_name]['name']}[{entry['Ramp Position']}], {entry['Action']}"
+        self.log_to_display(log_msg)
+        self.selected_paddler_setup = None
+
+    def clear_all_assignments(self):
+        self.paddler_ramp_positions.clear()
+        self.selected_paddler_setup = None
+        self.disabled_positions.clear()
+        self.faulted_bibs.clear()
+        self.phase_final_positions.clear()
+        
+        num_paddlers = self.num_paddlers_var.get()
+
+        for i in range(1, 5): # Always reset all 4 buttons regardless of selection
+            p_key = f"P{i}"
+            if i <= num_paddlers:
+                 self.paddler_buttons[p_key].config(bg=self.bib_data[p_key]["color"])
+            pos_button = self.ramp_position_buttons[i]
+            pos_button.config(bg="#CCCCCC")
+            pos_button.bind("<Button-1>", lambda e, p=i: self.assign_ramp_position(p))
+
+            paddler_button = self.paddler_buttons[p_key]
+            paddler_button.config(relief=tk.RAISED)
+        
+        self.on_paddler_count_change() # Re-apply disabled state if needed
+        self.clear_tag_selection()
+        self.log_to_display("--- All ramp positions cleared ---")
+
+    # --- Gate & Action selection ---
+    def select_gate(self, gate_name):
+        # If we were in a roll sequence, selecting a gate cancels it.
+        if "Roll" in self.selected_actions:
+            self.selected_actions.remove("Roll")
+            self.action_buttons["Roll"].config(style='ExtraSmall.TButton')
+            self.log_to_display("--- Roll sequence cancelled by gate selection. ---")
+            self.paddler_order_sequence.clear()
+            self.update_paddler_sequence_ui()
+
+        if self.selected_gate:
+            self.gate_buttons[self.selected_gate].config(style='TButton')
+        
+        self.upstream_tactic_actions.clear()
+        self.selected_gate = gate_name
+        self.gate_buttons[gate_name].config(style='Active.TButton')
+        self.log_to_display(f"Selected Gate: {gate_name}")
+
+    def select_action(self, action_name):
+        if action_name in ["Up", "Down"]:
+            self.selected_actions.add(action_name)
+            self.log_to_display(f"Selected Action: {action_name}")
+            return
+        current_style = self.action_buttons[action_name].cget('style')
+        is_active = 'Active' in current_style
+
+        if is_active:
+            self.selected_actions.remove(action_name)
+            self.log_to_display(f"Deselected Action: {action_name}")
+            new_style = current_style.replace('.Active', '')
+            self.action_buttons[action_name].config(style=new_style)
+
+            # If the user deselects "Roll", treat it as the end of a roll sequence.
+            if action_name == "Roll" and self.paddler_order_sequence:
+                self.log_to_display("--- Roll sequence ended manually. Clearing selections. ---")
+                self.clear_tag_selection(keep_context=False)
+        else:  # Logic for ACTIVATING a button
+            if action_name == "Roll":
+                # Start of a new, exclusive Roll sequence. Clear everything else first.
+                self.log_to_display("--- Starting new Roll sequence. Clearing other selections. ---")
+                
+                if self.selected_gate:
+                    self.gate_buttons[self.selected_gate].config(style='TButton')
+                    self.selected_gate = None
+                
+                for other_action in list(self.selected_actions):
+                    if other_action not in ["Up", "Down"]:
+                        style = self.action_buttons[other_action].cget('style').replace('.Active', '')
+                        self.action_buttons[other_action].config(style=style)
+                
+                self.selected_actions.clear()
+                self.paddler_order_sequence.clear()
+                self.upstream_tactic_actions.clear()
+                self.update_paddler_sequence_ui()
+
+            else:
+                if "Roll" in self.selected_actions:
+                    self.selected_actions.remove("Roll")
+                    self.action_buttons["Roll"].config(style='ExtraSmall.TButton')
+                    self.log_to_display("--- Roll sequence cancelled by other action selection. ---")
+                    self.paddler_order_sequence.clear()
+                    self.update_paddler_sequence_ui()
+
+            # Enforce mutual exclusivity for Left/Right when Up is selected
+            if "Up" in self.selected_actions:
+                if action_name == "Left" and "Right" in self.selected_actions:
+                    self.selected_actions.remove("Right")
+                    style = self.action_buttons["Right"].cget('style').replace('.Active', '')
+                    self.action_buttons["Right"].config(style=new_style)
+                    self.log_to_display("Deselected: Right (exclusive with Left on Upstream)")
+                elif action_name == "Right" and "Left" in self.selected_actions:
+                    self.selected_actions.remove("Left")
+                    style = self.action_buttons["Left"].cget('style').replace('.Active', '')
+                    self.action_buttons["Left"].config(style=new_style)
+                    self.log_to_display("Deselected: Left (exclusive with Right on Upstream)")
+
+            # Now, activate the newly selected button
+            self.selected_actions.add(action_name)
+            self.log_to_display(f"Selected Action: {action_name}")
+            new_style = current_style.replace('.TButton', '.Active.TButton')
+            self.action_buttons[action_name].config(style=new_style)
+
+
+    # --- Paddler sequence tagging ---
+    def add_paddler_to_sequence(self, paddler_name):
+        if not self.selected_actions:
+            messagebox.showwarning("Action Needed", "Please select at least one action before tagging a BIB.")
+            return
+
+        is_roll_only = ("Roll" in self.selected_actions) and (len(self.selected_actions) == 1)
+        is_finish = "Finish" in self.selected_actions
+        is_upstream_gate = "Up" in self.selected_actions
+
+        if not self.selected_gate and not is_roll_only and not is_finish:
+            messagebox.showwarning("Gate Needed", "A gate must be selected for this action or combination of actions.")
+            return
+
+        if paddler_name in self.paddler_order_sequence:
+            self.log_to_display(f"NOTE: {self.bib_data[paddler_name]['name']} is already in the current sequence.")
+            return
+        
+        num_paddlers = self.num_paddlers_var.get()
+        active_paddlers = num_paddlers - len(self.faulted_bibs)
+
+        if len(self.paddler_order_sequence) >= active_paddlers:
+            self.log_to_display(f"NOTE: Sequence is full ({active_paddlers} active BIBs). Please select a new gate or action.")
+            return
+
+        self.paddler_order_sequence.append(paddler_name)
+        order_num = len(self.paddler_order_sequence)
+        
+        action_string = "-".join(sorted(list(self.selected_actions)))
+        gate_value = self.selected_gate if self.selected_gate else "Course"
+        if is_finish:
+            gate_value = "Finish"
+
+        bib_csv_char = self.bib_data[paddler_name]["csv_char"]
+        final_pos = self.phase_final_positions.get(bib_csv_char, "")
+
+        if is_finish:
+            if paddler_name not in self.finish_line_sequence:
+                self.finish_line_sequence.append(paddler_name)
+            
+            new_final_pos = self.finish_line_sequence.index(paddler_name) + 1
+            if final_pos != new_final_pos:
+                final_pos = new_final_pos
+                self._backfill_final_position(paddler_name, new_final_pos)
+
+        upstream_tactic = ""
+
+        if is_upstream_gate:
+            count = len(self.upstream_tactic_actions)
+
+            if count == 0:
+                # First paddler (P1) → always return their action_string
+                upstream_tactic = action_string
+            else:
+                # Everyone else (P2, P3, P4, …) → compare to the paddler immediately before
+                previous_action = self.upstream_tactic_actions[-1]
+                if action_string == previous_action:
+                    upstream_tactic = "FOLLOW"
+                else:
+                    upstream_tactic = "SPLIT"
+
+            # Record only the action string (used for comparisons, not for display)
+            self.upstream_tactic_actions.append(action_string)
+
+        entry = {
+            "Year": self.year_var.get(),
+            "Competition": self.comp_var.get(),
+            "Gender": self.gender_var.get(),
+            "Phase": self.phase_var.get(),
+            "Gate": gate_value,
+            "BIB": bib_csv_char,
+            "Ramp Position": self.paddler_ramp_positions.get(paddler_name, "N/A"),
+            "Action": action_string,
+            "Order": order_num,
+            "Final Position": final_pos,
+            "Upstream Tactic": ""
+        }
+        self.tagged_data.append(entry)
+        self.autosave_csv()
+        
+        self.update_paddler_sequence_ui()
+        suffix = self.get_ordinal_suffix(order_num)
+        log_msg = f"--> SAVED: {gate_value}, {self.bib_data[paddler_name]['name']} ({order_num}{suffix}), Action: {action_string}"
+        if is_finish:
+            log_msg += f" [Final Pos: {final_pos}]"
+        if is_upstream_gate:
+             log_msg += f" [Tactic: {upstream_tactic}]"
+        self.log_to_display(log_msg)
+
+        if len(self.paddler_order_sequence) >= active_paddlers:
+            self.log_to_display(f"--- Sequence complete ({active_paddlers} active BIBs). Clearing selections. ---")
+            self.clear_tag_selection(keep_context=False)
+
+    def undo_last_paddler(self):
+        if not self.paddler_order_sequence:
+            self.log_to_display("No BIBs in sequence to undo.")
+            return
+        last_paddler = self.paddler_order_sequence.pop()
+
+        if "Finish" in self.selected_actions and last_paddler in self.finish_line_sequence:
+            self.finish_line_sequence.remove(last_paddler)
+        
+        if "Up" in self.selected_actions and self.upstream_tactic_actions:
+            self.upstream_tactic_actions.pop()
+
+        self.log_to_display(f"UNDO: Removed {self.bib_data[last_paddler]['name']} from sequence.")
+        self.update_paddler_sequence_ui()
+
+    def get_ordinal_suffix(self, num):
+        if 10 <= num % 100 <= 20:
+            return 'th'
+        else:
+            return {1: 'st', 2: 'nd', 3: 'rd'}.get(num % 10, 'th')
+
+    def update_paddler_sequence_ui(self):
+        for p_key, bib_info in self.bib_data.items():
+            if p_key in self.paddler_order_sequence:
+                order_num = self.paddler_order_sequence.index(p_key) + 1
+                suffix = self.get_ordinal_suffix(order_num)
+                self.paddler_buttons[p_key].config(text=f"{bib_info['name']}\n({order_num}{suffix})")
+            else:
+                self.paddler_buttons[p_key].config(text=bib_info['name'])
+
+    def save_dns_tag(self):
+        paddler_to_mark = self.selected_paddler_setup
+        if not paddler_to_mark:
+            messagebox.showwarning("No BIB Selected", "Please select a BIB from the left to mark as DNS.")
+            return
+        entry = {
+            "Year": self.year_var.get(),
+            "Competition": self.comp_var.get(),
+            "Gender": self.gender_var.get(),
+            "Phase": self.phase_var.get(),
+            "Gate": "Start",
+            "BIB": self.bib_data[paddler_to_mark]["csv_char"],
+            "Ramp Position": self.paddler_ramp_positions.get(paddler_to_mark, "N/A"),
+            "Action": "DNS",
+            "Order": 0,
+            "Final Position": "DNS",
+            "Upstream Tactic": ""
+        }
+        self.tagged_data.append(entry)
+        self.autosave_csv()
+        log_msg = f"--> SAVED: {self.bib_data[paddler_to_mark]['name']} Did Not Start"
+        self.log_to_display(log_msg)
+        self.paddler_buttons[paddler_to_mark].config(relief=tk.RAISED)
+        self.selected_paddler_setup = None
+
+    #this creates a tag that is for all faults for the time being. This includes DNF, DSQ, REL(FLT + GATE)    
+    def save_fault_tag(self):
+        bib_to_mark = self.selected_paddler_setup
+        if not bib_to_mark:
+            messagebox.showwarning("No BIB Selected", "Please select a BIB from the left to mark with a FAULT.")
+            return
+        
+        if bib_to_mark in self.faulted_bibs:
+            self.log_to_display(f"NOTE: {self.bib_data[bib_to_mark]['name']} has already been faulted.")
+            return
+
+        self.faulted_bibs.add(bib_to_mark)
+        
+        num_paddlers = self.num_paddlers_var.get()
+        
+        # Assign rank based on when fault occurred relative to finishers
+        faulted = len(self.faulted_bibs)
+        final_pos = num_paddlers - (faulted - 1)
+        
+        # Back-fill the final position for all previous entries of this bib
+        self._backfill_final_position(bib_to_mark, final_pos)
+        
+        entry = {
+            "Year": self.year_var.get(),
+            "Competition": self.comp_var.get(),
+            "Gender": self.gender_var.get(),
+            "Phase": self.phase_var.get(),
+            "Gate": self.selected_gate if self.selected_gate else "Course",
+            "BIB": self.bib_data[bib_to_mark]["csv_char"],
+            "Ramp Position": self.paddler_ramp_positions.get(bib_to_mark, "N/A"),
+            "Action": "FLT",
+            "Order": "",
+            "Final Position": final_pos,
+            "Upstream Tactic": ""
+        }
+        self.tagged_data.append(entry)
+        self.autosave_csv()
+        
+        log_msg = f"--> SAVED: {self.bib_data[bib_to_mark]['name']} FAULTED. Final Position: {final_pos}"
+        self.log_to_display(log_msg)
+        self.paddler_buttons[bib_to_mark].config(bg="#808080") 
+        self.paddler_buttons[bib_to_mark].unbind("<Button-1>")
+        self.selected_paddler_setup = None
+
+    def clear_tag_selection(self, keep_context=False):
+        self.paddler_order_sequence.clear()
+        self.update_paddler_sequence_ui()
+        if not keep_context:
+            self.upstream_tactic_actions.clear()
+            if self.selected_gate:
+                self.gate_buttons[self.selected_gate].config(style='TButton')
+            for action_name in list(self.selected_actions):
+                if action_name in ["Up", "Down"]:
+                    continue
+                current_style = self.action_buttons[action_name].cget('style')
+                new_style = current_style.replace('.Active', '')
+                self.action_buttons[action_name].config(style=new_style)
+            self.selected_gate = None
+            self.selected_actions.clear()
+    #this is what recalls the csv if there has been one already saved with previous data.
+    def download_csv(self):
+        if not self.tagged_data:
+            messagebox.showinfo("No Data", "There are no tags to download.")
+            return
+        filepath = filedialog.asksaveasfilename(defaultextension=".csv", filetypes=[("CSV files", "*.csv")])
+        if not filepath:
+            return
+        with open(filepath, 'w', newline='') as f:
+            headers = ["Year", "Competition", "Gender", "Phase", "Gate", "BIB", "Ramp Position", "Action", "Order", "Final Position", "Upstream Tactic"]
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writeheader()
+            writer.writerows(self.tagged_data)
+        messagebox.showinfo("Success", "Tags have been successfully saved to CSV.")
+
+    # Allows you to toggle between M and W for each race
+    def toggle_gender(self):
+        self.gender_var.set("W" if self.gender_var.get() == "M" else "M")
+
+
+# --- Main Execution ---
+def main():
+    root = tk.Tk()
+    app = KXTaggerApp(root)
+    root.mainloop()
+
+
+if __name__ == "__main__":
+    main()
