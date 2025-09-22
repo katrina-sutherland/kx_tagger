@@ -32,6 +32,11 @@
         .domain {
             display: none;
         }
+        .dark-select {
+            background-color: #1e293b; /* slate-800 */
+            border-color: #475569; /* slate-600 */
+            color: #e2e8f0; /* slate-200 */
+        }
         .tooltip {
             position: absolute;
             text-align: left;
@@ -45,17 +50,10 @@
             opacity: 0;
             transition: opacity 0.2s;
         }
-        .dark-select {
-            background-color: #1e293b; /* slate-800 */
-            border-color: #475569; /* slate-600 */
-            color: #e2e8f0; /* slate-200 */
-        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 antialiased">
-    <!-- Tooltip container -->
     <div class="tooltip"></div>
-
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-slate-100">Kayak Cross Race Analysis</h1>
@@ -95,9 +93,9 @@
 
 
         <!-- Main Content Grid -->
-        <div id="charts-area" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 hidden">
+        <div id="charts-area" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 hidden">
             <!-- Left Column: Line Chart -->
-            <div class="lg:col-span-2 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
+            <div class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                 <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
                 <div id="legend" class="flex justify-center space-x-4 mb-4"></div>
                 <div id="chart-container" class="w-full h-[600px]">
@@ -106,14 +104,26 @@
             </div>
 
             <!-- Right Column: Pie Charts -->
-            <div class="space-y-8">
-                <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
-                    <h3 class="text-lg font-semibold text-slate-100 mb-8 text-center">Overall Win % by Bib Color</h3>
-                    <div id="pie-chart-bib" class="w-full h-64 flex items-center justify-center"></div>
+            <div class="lg:col-span-2 grid grid-cols-2 gap-4">
+                <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by Bib Color</h3>
+                    <div id="pie-chart-bib" class="w-full h-40 flex items-center justify-center"></div>
+                    <div id="pie-legend-bib" class="flex flex-col items-center gap-y-2 mt-4"></div>
                 </div>
-                <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
-                    <h3 class="text-lg font-semibold text-slate-100 mb-8 text-center">Rank Finish Position % when Leading at 1st Upstream</h3>
-                     <div id="pie-chart-gate2" class="w-full h-64 flex items-center justify-center"></div>
+                <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd Place % by Bib Color</h3>
+                    <div id="pie-chart-bib-second" class="w-full h-40 flex items-center justify-center"></div>
+                    <div id="pie-legend-bib-second" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                </div>
+                <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish Position % when Leading at 1st Upstream</h3>
+                     <div id="pie-chart-gate2" class="w-full h-40 flex items-center justify-center"></div>
+                     <div id="pie-legend-gate2" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                </div>
+                 <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st Upstream When Overall Finish 2nd</h3>
+                     <div id="pie-chart-gate2-second" class="w-full h-40 flex items-center justify-center"></div>
+                     <div id="pie-legend-gate2-second" class="flex flex-col items-center gap-y-2 mt-4"></div>
                 </div>
             </div>
         </div>
@@ -135,9 +145,9 @@
         };
 
         const medalColors = {
-            gold: '#F9A602',
+            gold: '#D4AF37',
             silver: '#C0C0C0',
-            bronze: '#CD7F32'
+            bronze: '#A97142'
         };
         
         // --- DOM SELECTORS ---
@@ -151,6 +161,7 @@
         const filterControls = d3.select("#filter-controls");
         const chartsArea = d3.select("#charts-area");
         const tooltip = d3.select(".tooltip");
+
 
         // --- FILE HANDLING ---
         fileUpload.on("change", function(event) {
@@ -235,52 +246,74 @@
         }
 
         // --- GENERIC PIE CHART DRAWER ---
-        function drawPieChart(selector, data, colorScale) {
-            const container = d3.select(selector);
-            container.selectAll("*").remove();
+        function drawPieChartAndLegend(chartSelector, legendSelector, data, colorScale) {
+            const chartContainer = d3.select(chartSelector);
+            const legendContainer = d3.select(legendSelector);
+            chartContainer.selectAll("*").remove();
+            legendContainer.selectAll("*").remove();
 
-            if (!data || data.length === 0 || data.every(d => d.value === 0)) {
-                container.append("p").attr("class", "text-slate-500 text-center").text("No data for this selection.");
-                return;
+            const dataForPie = data.filter(d => d.value > 0);
+            const totalValue = d3.sum(data, d => d.value);
+
+            if (totalValue === 0) {
+                chartContainer.append("p").attr("class", "text-slate-500 text-center text-sm").text("No data.");
+            } else {
+                const svg = chartContainer.append("svg").attr("viewBox", "0 0 250 250");
+                const width = 250, height = 250;
+                const radius = Math.min(width, height) / 2 - 15; 
+                
+                const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+                const pie = d3.pie().value(d => d.value).sort(null);
+                const arc = d3.arc().innerRadius(0).outerRadius(radius);
+
+                g.selectAll("path")
+                    .data(pie(dataForPie))
+                    .join("path")
+                    .attr("d", arc)
+                    .attr("fill", d => colorScale(d.data.label))
+                    .attr("stroke", "#1e293b")
+                    .style("stroke-width", "3px")
+                    .on("mouseover", (event, d) => {
+                        tooltip.transition().duration(200).style("opacity", .9);
+                        const percent = ((d.data.value / totalValue) * 100).toFixed(2);
+                        tooltip.html(`<strong>${d.data.label}</strong><br>${d.data.value} times (${percent}%)`)
+                            .style("left", (event.pageX + 10) + "px")
+                            .style("top", (event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", () => {
+                        tooltip.transition().duration(500).style("opacity", 0);
+                    });
+
+                const labelArc = d3.arc().innerRadius(radius * 0.6).outerRadius(radius * 0.6);
+                g.selectAll('text.label')
+                    .data(pie(dataForPie))
+                    .join('text')
+                    .attr('class', 'label text-xs font-bold pointer-events-none')
+                    .attr('transform', d => `translate(${labelArc.centroid(d)})`)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', d => d.data.label === 'Finished 4th' || d.data.label === '4th at Gate 2' ? '#000000' : '#FFFFFF')
+                    .text(d => {
+                        const percent = (d.data.value / totalValue) * 100;
+                        return percent > 5 ? `${percent.toFixed(0)}%` : '';
+                    });
             }
 
-            const svg = container.append("svg").attr("viewBox", "0 0 250 250");
-            const width = 250, height = 250;
-            const radius = Math.min(width, height) / 2 - 25; 
+            // Draw Legend using original data array
+            const legendItems = legendContainer.selectAll('div')
+                .data(data)
+                .join('div')
+                .attr('class', 'flex items-center space-x-2');
             
-            const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
+            legendItems.append('div')
+                .attr('class', 'w-3 h-3 rounded-sm')
+                .style('background-color', d => colorScale(d.label));
 
-            const pie = d3.pie().value(d => d.value).sort(null);
-            const arc = d3.arc().innerRadius(0).outerRadius(radius);
-            const total = d3.sum(data, d => d.value);
-
-            g.selectAll("path")
-                .data(pie(data))
-                .join("path")
-                .attr("d", arc)
-                .attr("fill", d => colorScale(d.data.label))
-                .attr("stroke", "#1e293b")
-                .style("stroke-width", "3px")
-                .on("mouseover", (event, d) => {
-                    tooltip.transition().duration(200).style("opacity", .9);
-                    const percent = ((d.data.value / total) * 100).toFixed(1);
-                    tooltip.html(`<strong>${d.data.label}</strong><br>${d.data.value} times (${percent}%)`)
-                        .style("left", (event.pageX + 10) + "px")
-                        .style("top", (event.pageY - 28) + "px");
-                })
-                .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
-            
-            const labelArc = d3.arc().innerRadius(radius * 0.5).outerRadius(radius * 0.5);
-            g.selectAll('text.label')
-                .data(pie(data))
-                .join('text')
-                .attr('class', 'label text-sm font-bold pointer-events-none')
-                .attr('transform', d => `translate(${labelArc.centroid(d)})`)
-                .attr('text-anchor', 'middle')
-                .attr('fill', 'white')
+            legendItems.append('span')
+                .attr('class', 'text-xs text-slate-300')
                 .text(d => {
-                    const percent = (d.data.value / total) * 100;
-                    return percent > 4 ? `${percent.toFixed(0)}%` : '';
+                    const percent = totalValue > 0 ? (d.value / totalValue) * 100 : 0;
+                    return `${d.label} (${percent.toFixed(2)}%)`;
                 });
         }
 
@@ -298,7 +331,7 @@
             const container = d3.select("#chart-container");
             const width = container.node().getBoundingClientRect().width;
             const height = container.node().getBoundingClientRect().height;
-            const margin = { top: 50, right: 20, bottom: 20, left: 60 };
+            const margin = { top: 50, right: 20, bottom: 20, left: 90 };
             const chartWidth = width - margin.left - margin.right;
             const chartHeight = height - margin.top - margin.bottom;
 
@@ -313,7 +346,7 @@
                 .style("fill", d => ({'1':'#228B22','3':'#228B22','4':'#228B22','5':'#228B22','6':'#228B22','7':'#228B22','2':'#DC143C','8':'#DC143C','Roll':'#eab308'}[d] || '#94a3b8'));
 
             const yAxis = chart.append("g").attr("class", "y-axis")
-                .call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4, 5]).tickFormat(d => d === 5 ? 'Ramp' : `${d}`).tickSize(-chartWidth));
+                .call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4, 5]).tickFormat(d => d === 5 ? '' : d).tickSize(-chartWidth));
 
             yAxis.selectAll(".tick text")
                 .style("fill", d => {
@@ -322,17 +355,31 @@
                     if (d === 3) return medalColors.bronze;
                     return '#94a3b8';
                 });
-                
-            yAxis.selectAll(".tick").filter(d => d === 5)
-                .on("mouseover", (event) => {
-                    tooltip.transition().duration(200).style("opacity", .9);
-                    let tooltipHtml = Array.from(rampPositions).sort((a,b) => a[1] - b[1])
-                        .map(([bib, pos]) => `<span style="color:${bibColors[bib]}; font-weight: 600;">${bibFullNames[bib]}</span>: ${pos}`).join("<br>");
-                    tooltip.html(tooltipHtml || "No ramp data").style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                })
-                .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0))
-                .style("cursor", "pointer");
 
+            if (rampPositions.size > 0) {
+                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                
+                chart.append("text")
+                     .attr("x", -10)
+                     .attr("y", yScale(5) - (sortedRamps.length * 6) - 2)
+                     .attr("text-anchor", "end")
+                     .style("font-size", "10px")
+                     .style("font-weight", "bold")
+                     .style("fill", "#94a3b8")
+                     .text("Ramp Pos:");
+
+                sortedRamps.forEach(([bib, pos], i) => {
+                    chart.append("text")
+                        .attr("x", -10)
+                        .attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12))
+                        .attr("text-anchor", "end")
+                        .style("fill", bibColors[bib])
+                        .style("font-size", "10px")
+                        .style("font-weight", "bold")
+                        .text(`${bibFullNames[bib]}: ${pos}`);
+                });
+            }
+                
             svg.append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 0)
@@ -340,7 +387,7 @@
                 .attr("dy", "1em")
                 .style("text-anchor", "middle")
                 .attr("class", "fill-slate-400 text-sm font-medium")
-                .text("Athlete/ Bib");
+                .text("Position in Race");
 
             svg.append("text")
                 .attr("x", (width / 2) + (margin.left / 2))
@@ -363,14 +410,21 @@
                 chart.selectAll(`.dot-${key}`).data(values).join("circle")
                     .attr("class", `dot-${key}`).attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position))
                     .attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a").attr("stroke-width", 2)
-                    .style("cursor", d => (d.Gate === '2' || d.Gate === '8') ? 'pointer' : 'default')
-                    .on("mouseover", (event, d) => {
-                        if (d.Gate === '2' || d.Gate === '8') {
-                            tooltip.transition().duration(200).style("opacity", .9);
-                            tooltip.html(`Tactic: <strong>${d.UpstreamTactic || 'N/A'}</strong>`).style("left", (event.pageX + 10) + "px").style("top", (event.pageY - 28) + "px");
-                        }
-                    })
-                    .on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
+            });
+            
+            groupedData.forEach((values, key) => {
+                values.forEach(d => {
+                    if ((d.Gate === '2' || d.Gate === '8') && d.UpstreamTactic) {
+                        chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yScale(d.Position) - 12)
+                            .attr("text-anchor", "middle")
+                            .style("fill", bibColors[key] || '#94a3b8')
+                            .style("font-size", "10px")
+                            .style("font-weight", "bold")
+                            .text(d.UpstreamTactic);
+                    }
+                });
             });
             
             const legendContainer = d3.select("#legend");
@@ -427,43 +481,101 @@
                 d.Gender === selected.gender
             );
 
-            const winnersData = pieChartAggregateData.filter(d => d.FinalPosition === 1);
-            const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => d.BIB);
-            const bibWinnerPieData = Array.from(bibWinnerCounts, ([key, value]) => ({ label: bibFullNames[key], value: value }));
-            const bibColorScale = d3.scaleOrdinal().domain(Object.values(bibFullNames)).range(Object.values(bibColors));
-            drawPieChart("#pie-chart-bib", bibWinnerPieData, bibColorScale);
+            // --- DATA DEDUPLICATION ---
+            const finalPositionEntries = pieChartAggregateData.filter(d => d.FinalPosition > 0);
+            const uniqueFinalPositions = [];
+            const seenEntries = new Set();
+            finalPositionEntries.forEach(d => {
+                const key = `${d.Phase}-${d.BIB}`;
+                if (!seenEntries.has(key)) {
+                    seenEntries.add(key);
+                    uniqueFinalPositions.push(d);
+                }
+            });
 
-            // Logic for "Rank Finish Position % when Leading at 1st Upstream"
+            const allBibLabels = Object.values(bibFullNames).sort();
+            const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => {
+                const bibKey = Object.keys(bibFullNames).find(key => bibFullNames[key] === label);
+                return bibColors[bibKey];
+            }));
+            
+            // Bib Winner Pie
+            const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
+            const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibWinnerPieData = allBibLabels.map(label => ({
+                label: label,
+                value: bibWinnerCounts.get(label) || 0
+            }));
+            drawPieChartAndLegend("#pie-chart-bib", "#pie-legend-bib", bibWinnerPieData, bibColorScale);
+            
+            // Bib Second Place Pie
+            const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const bibSecondPlaceCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibSecondPlacePieData = allBibLabels.map(label => ({
+                label: label,
+                value: bibSecondPlaceCounts.get(label) || 0
+            }));
+            drawPieChartAndLegend("#pie-chart-bib-second", "#pie-legend-bib-second", bibSecondPlacePieData, bibColorScale);
+
+
+            // Finish Position % when Leading at 1st Upstream
             const gate2Leaders = pieChartAggregateData.filter(d => d.Gate === '2' && d.Position === 1);
-            const finishPositionsOfLeaders = { 1: 0, 2: 0, 3: 0, 4: 0 };
+            const finishPositionsOfLeaders = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
 
             gate2Leaders.forEach(leader => {
-                const finalResult = pieChartAggregateData.find(d => 
+                const finalResult = uniqueFinalPositions.find(d => 
                     d.Phase === leader.Phase && 
-                    d.BIB === leader.BIB && 
-                    d.FinalPosition
+                    d.BIB === leader.BIB
                 );
-                if (finalResult && finalResult.FinalPosition in finishPositionsOfLeaders) {
-                    finishPositionsOfLeaders[finalResult.FinalPosition]++;
+                if (finalResult && finishPositionsOfLeaders.has(finalResult.FinalPosition)) {
+                    finishPositionsOfLeaders.set(finalResult.FinalPosition, finishPositionsOfLeaders.get(finalResult.FinalPosition) + 1);
                 }
             });
 
             const gate2PieData = [
-                { label: 'Finished 1st', value: finishPositionsOfLeaders[1] },
-                { label: 'Finished 2nd', value: finishPositionsOfLeaders[2] },
-                { label: 'Finished 3rd', value: finishPositionsOfLeaders[3] },
-                { label: 'Finished 4th', value: finishPositionsOfLeaders[4] }
+                { label: 'Finished 1st', value: finishPositionsOfLeaders.get(1) },
+                { label: 'Finished 2nd', value: finishPositionsOfLeaders.get(2) },
+                { label: 'Finished 3rd', value: finishPositionsOfLeaders.get(3) },
+                { label: 'Finished 4th', value: finishPositionsOfLeaders.get(4) }
             ];
             const gate2ColorScale = d3.scaleOrdinal()
                 .domain(['Finished 1st', 'Finished 2nd', 'Finished 3rd', 'Finished 4th'])
-                .range([medalColors.gold, medalColors.silver, medalColors.bronze, '#64748b']);
-            drawPieChart("#pie-chart-gate2", gate2PieData, gate2ColorScale);
+                .range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
+            drawPieChartAndLegend("#pie-chart-gate2", "#pie-legend-gate2", gate2PieData, gate2ColorScale);
+
+            // Finish 2nd, Position up 1st Upstream
+            const secondPlaceFinishers = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const secondPlaceGate2Positions = new Map([[1,0], [2,0], [3,0], [4,0]]);
+
+            secondPlaceFinishers.forEach(finisher => {
+                const gate2Performance = pieChartAggregateData.find(d => 
+                    d.Phase === finisher.Phase &&
+                    d.BIB === finisher.BIB &&
+                    d.Gate === '2'
+                );
+                if (gate2Performance && secondPlaceGate2Positions.has(gate2Performance.Position)) {
+                    secondPlaceGate2Positions.set(gate2Performance.Position, secondPlaceGate2Positions.get(gate2Performance.Position) + 1);
+                }
+            });
+
+            const gate2SecondPieData = [
+                { label: '1st at Gate 2', value: secondPlaceGate2Positions.get(1) },
+                { label: '2nd at Gate 2', value: secondPlaceGate2Positions.get(2) },
+                { label: '3rd at Gate 2', value: secondPlaceGate2Positions.get(3) },
+                { label: '4th at Gate 2', value: secondPlaceGate2Positions.get(4) }
+            ];
+             const gate2SecondColorScale = d3.scaleOrdinal()
+                .domain(['1st at Gate 2', '2nd at Gate 2', '3rd at Gate 2', '4th at Gate 2'])
+                .range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
+            drawPieChartAndLegend("#pie-chart-gate2-second", "#pie-legend-gate2-second", gate2SecondPieData, gate2SecondColorScale);
         }
         
         // --- INITIALIZE PAGE ---
         showInitialMessage("#chart", "Please upload a CSV file to begin.");
         showInitialMessage("#pie-chart-bib", "");
+        showInitialMessage("#pie-chart-bib-second", "");
         showInitialMessage("#pie-chart-gate2", "");
+        showInitialMessage("#pie-chart-gate2-second", "");
     </script>
 </body>
 </html>
