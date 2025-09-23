@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </div>
-            <div id="charts-area-full" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 hidden">
+            <div id="charts-area-full" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
                 <div class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                     <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
                     <div id="legend-full" class="flex justify-center space-x-4 mb-4"></div>
@@ -242,14 +242,20 @@
 
         // --- INITIALIZATION ---
         async function loadInitialData() {
+            // Make chart areas visible so loading messages can be seen
+            chartsAreaFull.classed("hidden", false);
+            chartsAreaCompact.classed("hidden", false);
+            showInitialMessage("#chart-full", "Loading data...");
+            showInitialMessage("#chart-compact", "Loading data...");
+
             try {
                 const [responseFull, responseCompact] = await Promise.all([
                     fetch('data/Kayak_Cross_Data.csv'),
-                    fetch('data/Kayak_Cross_Data_IN_COMPETITION.csv') // Corrected filename
+                    fetch('data/Kayak_Cross_Data_IN_COMPETITION.csv') 
                 ]);
 
-                if (!responseFull.ok) throw new Error(`Failed to load Full Report data (Kayak_Cross_Data.csv)`);
-                if (!responseCompact.ok) throw new Error(`Failed to load In-Competition data (Kayak_Cross_Data_IN_COMPETITION.csv)`);
+                if (!responseFull.ok) throw new Error(`Failed to load: Kayak_Cross_Data.csv`);
+                if (!responseCompact.ok) throw new Error(`Failed to load: Kayak_Cross_Data_IN_COMPETITION.csv`);
 
                 const csvStringFull = await responseFull.text();
                 const csvStringCompact = await responseCompact.text();
@@ -258,12 +264,10 @@
                 masterDataCompact = parseCsvData(csvStringCompact);
 
                 filterControlsFull.classed("hidden", false);
-                chartsAreaFull.classed("hidden", false);
                 populateFilters(masterDataFull, selectorsFull);
                 updateAllChartsFull();
                 
                 filterControlsCompact.classed("hidden", false);
-                chartsAreaCompact.classed("hidden", false);
                 populateFilters(masterDataCompact, selectorsCompact);
                 updateAllChartsCompact();
 
@@ -274,8 +278,8 @@
 
             } catch (error) {
                 console.error('Error loading initial CSV files:', error);
-                showInitialMessage("#chart-full", `Error: ${error.message}`);
-                showInitialMessage("#chart-compact", `Error: ${error.message}`);
+                showInitialMessage("#chart-full", `Error: ${error.message}. Check file name and path.`);
+                showInitialMessage("#chart-compact", `Error: ${error.message}. Check file name and path.`);
             }
         }
 
