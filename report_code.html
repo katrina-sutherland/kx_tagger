@@ -245,11 +245,11 @@
             try {
                 const [responseFull, responseCompact] = await Promise.all([
                     fetch('data/Kayak_Cross_Data.csv'),
-                    fetch('data/Kayak_Cross_Data IN_COMPETITION.csv')
+                    fetch('data/Kayak_Cross_Data_IN_COMPETITION.csv') // Corrected filename
                 ]);
 
-                if (!responseFull.ok) throw new Error(`Failed to load Full Report data`);
-                if (!responseCompact.ok) throw new Error(`Failed to load In-Competition data`);
+                if (!responseFull.ok) throw new Error(`Failed to load Full Report data (Kayak_Cross_Data.csv)`);
+                if (!responseCompact.ok) throw new Error(`Failed to load In-Competition data (Kayak_Cross_Data_IN_COMPETITION.csv)`);
 
                 const csvStringFull = await responseFull.text();
                 const csvStringCompact = await responseCompact.text();
@@ -274,8 +274,8 @@
 
             } catch (error) {
                 console.error('Error loading initial CSV files:', error);
-                showInitialMessage("#chart-full", "Error: Could not load data.");
-                showInitialMessage("#chart-compact", "Error: Could not load data.");
+                showInitialMessage("#chart-full", `Error: ${error.message}`);
+                showInitialMessage("#chart-compact", `Error: ${error.message}`);
             }
         }
 
