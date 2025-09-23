@@ -18,7 +18,7 @@
         <div class="w-full max-w-md p-8 space-y-8 bg-slate-800 rounded-xl shadow-lg border border-slate-700">
             <div class="text-center">
                 <h1 class="text-3xl font-bold text-slate-100">Kayak Cross Analysis</h1>
-                <p class="mt-2 text-slate-400">Please log in to view the report.</p>
+                <p class="mt-2 text-slate-400">Please log in to view the reports.</p>
             </div>
 
             <form id="login-form" class="space-y-6">
@@ -58,42 +58,29 @@
         const passwordInput = document.getElementById('password');
         const errorMessage = document.getElementById('error-message');
 
-        // The URL of the report to redirect to on successful login
         const reportUrl = 'report_code.html';
-
-        // The path to the credentials file
         const credentialsUrl = 'info_doc.json';
 
         loginForm.addEventListener('submit', async (event) => {
-            // Prevent the default form submission behavior
             event.preventDefault();
-            errorMessage.classList.add('hidden'); // Hide any previous error messages
-
+            errorMessage.classList.add('hidden'); 
             const username = usernameInput.value;
             const password = passwordInput.value;
-
             try {
-                // Fetch the credentials from the info_doc.json file
                 const response = await fetch(credentialsUrl);
-                
                 if (!response.ok) {
-                    throw new Error('Could not load credentials file. Make sure info_doc.json is in the same directory.');
+                    throw new Error('Could not load credentials file.');
                 }
-                
                 const credentials = await response.json();
-
-                // Check if the entered username and password match the credentials
                 if (username === credentials.username && password === credentials.password) {
-                    // If they match, redirect to the report page
                     window.location.href = reportUrl;
                 } else {
-                    // If they don't match, show an error message
                     errorMessage.textContent = 'Invalid username or password.';
                     errorMessage.classList.remove('hidden');
                 }
             } catch (error) {
                 console.error('Login error:', error);
-                errorMessage.textContent = 'An error occurred during login. Please check the console for details.';
+                errorMessage.textContent = 'An error occurred during login. Please check the console.';
                 errorMessage.classList.remove('hidden');
             }
         });
