@@ -89,26 +89,26 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,H1,Ramp,R,2,Assigned,,1,
 2024,OLY,W,H1,Ramp,G,3,Assigned,,4,
 2024,OLY,W,H1,Ramp,Y,4,Assigned,,3,
-2024,OLY,W,H2,Finish,G,1,Finish,1,1,
-2024,OLY,W,H2,Finish,B,3,Finish,2,2,
-2024,OLY,W,H2,Finish,R,2,Finish,3,3,
-2024,OLY,W,H2,Finish,Y,4,Finish,4,4,
-2024,OLY,W,H2,Gate 1,G,1,Down-Left,1,1,
-2024,OLY,W,H2,Gate 1,B,3,Down-Left,2,2,
-2024,OLY,W,H2,Gate 1,R,2,Down-Left,3,3,
-2024,OLY,W,H2,Gate 1,Y,4,Down-Left,4,4,
-2024,OLY,W,H2,Gate 2,G,1,Right-Up,1,1,Right-Up
-2024,OLY,W,H2,Gate 2,B,3,Left-Up,2,2,SPLIT
-2024,OLY,W,H2,Gate 2,R,2,Right-Up,3,3,SPLIT
-2024,OLY,W,H2,Gate 2,Y,4,Right-Up,4,4,FOLLOW
-2024,OLY,W,H2,Gate 3,G,1,Down-Right,1,1,
-2024,OLY,W,H2,Gate 3,B,3,Down-Right,2,2,
-2024,OLY,W,H2,Gate 3,Y,4,Down-Right,3,4,
-2024,OLY,W,H2,Gate 3,R,2,Down-Right,4,3,
-2024,OLY,W,H2,Ramp,G,1,Assigned,,1,
-2024,OLY,W,H2,Ramp,R,2,Assigned,,3,
-2024,OLY,W,H2,Ramp,B,3,Assigned,,2,
-2024,OLY,W,H2,Ramp,Y,4,Assigned,,4,
+2024,OLY,W,H2,Finish,G,1,Finish,1,4,
+2024,OLY,W,H2,Finish,B,3,Finish,2,3,
+2024,OLY,W,H2,Finish,R,2,Finish,3,1,
+2024,OLY,W,H2,Finish,Y,4,Finish,4,2,
+2024,OLY,W,H2,Gate 1,G,1,Down-Left,1,4,
+2024,OLY,W,H2,Gate 1,B,3,Down-Left,2,3,
+2024,OLY,W,H2,Gate 1,R,2,Down-Left,3,1,
+2024,OLY,W,H2,Gate 1,Y,4,Down-Left,4,2,
+2024,OLY,W,H2,Gate 2,G,1,Right-Up,1,4,Right-Up
+2024,OLY,W,H2,Gate 2,B,3,Left-Up,2,3,SPLIT
+2024,OLY,W,H2,Gate 2,R,2,Right-Up,3,1,SPLIT
+2024,OLY,W,H2,Gate 2,Y,4,Right-Up,4,2,FOLLOW
+2024,OLY,W,H2,Gate 3,G,1,Down-Right,1,4,
+2024,OLY,W,H2,Gate 3,B,3,Down-Right,2,3,
+2024,OLY,W,H2,Gate 3,Y,4,Down-Right,3,2,
+2024,OLY,W,H2,Gate 3,R,2,Down-Right,4,1,
+2024,OLY,W,H2,Ramp,G,1,Assigned,,4,
+2024,OLY,W,H2,Ramp,R,2,Assigned,,1,
+2024,OLY,W,H2,Ramp,B,3,Assigned,,3,
+2024,OLY,W,H2,Ramp,Y,4,Assigned,,2,
 2024,OLY,W,H3,Finish,R,1,Finish,1,1,
 2024,OLY,W,H3,Finish,Y,4,Finish,2,2,
 2024,OLY,W,H3,Finish,B,3,Finish,3,3,
@@ -897,8 +897,27 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,M,H1,Finish,B,3,Finish,2,2,
 2024,OLY,M,H1,Finish,Y,4,Finish,3,3,
 2024,OLY,M,H1,Finish,G,2,Finish,4,4,
-2024,OLY,M,H2,Ramp,G,1,Assigned,,,
-2024,OLY,M,H2,Ramp,R,2,Assigned,,,
-2024,OLY,M,H2,Ramp,B,3,Assigned,,,
-2024,OLY,M,H2,Ramp,Y,4,Assigned,,,
-2024,OLY,M,H2,Gate 1,R,2,Down-Left,1,,
+2024,OLY,M,H2,Ramp,G,1,Assigned,,4,
+2024,OLY,M,H2,Ramp,R,2,Assigned,,1,
+2024,OLY,M,H2,Ramp,B,3,Assigned,,3,
+2024,OLY,M,H2,Ramp,Y,4,Assigned,,2,
+2024,OLY,M,H2,Gate 1,R,2,Down-Left,1,1,
+2024,OLY,M,H2,Gate 1,G,1,Down-Left,2,4,
+2024,OLY,M,H2,Gate 1,Y,4,Down-Left,3,2,
+2024,OLY,M,H2,Gate 1,B,3,Down-Left,4,3,
+2024,OLY,M,H2,Gate 2,R,2,Right-Up,1,1,Right-Up
+2024,OLY,M,H2,Gate 2,G,1,Right-Up,2,4,FOLLOW
+2024,OLY,M,H2,Gate 2,Y,4,Left-Up,3,2,SPLIT
+2024,OLY,M,H2,Gate 2,B,3,Right-Up,4,3,SPLIT
+2024,OLY,M,H2,Gate 3,R,2,Down-Right,1,1,
+2024,OLY,M,H2,Gate 3,Y,4,Down-Right,2,2,
+2024,OLY,M,H2,Gate 3,G,1,Down-Right,3,4,
+2024,OLY,M,H2,Gate 3,B,3,Down-Right,4,3,
+2024,OLY,M,H2,Gate 8,R,2,Down-Left-Up,1,1,Down-Left-Up
+2024,OLY,M,H2,Gate 8,Y,4,Down-Right-Up,2,2,SPLIT
+2024,OLY,M,H2,Gate 8,G,1,Down-Right-Up,3,4,FOLLOW
+2024,OLY,M,H2,Gate 8,B,3,Down-Right-Up,4,3,FOLLOW
+2024,OLY,M,H2,Finish,R,2,Finish,1,1,
+2024,OLY,M,H2,Finish,Y,4,Finish,2,2,
+2024,OLY,M,H2,Finish,B,3,Finish,3,3,
+2024,OLY,M,H2,Finish,G,1,Finish,4,4,
