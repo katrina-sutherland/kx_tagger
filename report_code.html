@@ -216,6 +216,7 @@
             tabCompact.classed("text-indigo-400 border-indigo-500", false).classed("text-slate-400 border-transparent", true);
             reportFull.classed("hidden", false);
             reportCompact.classed("hidden", true);
+            if (masterDataFull.length > 0) updateAllChartsFull();
         });
 
         tabCompact.on("click", () => {
@@ -223,6 +224,7 @@
             tabFull.classed("text-indigo-400 border-indigo-500", false).classed("text-slate-400 border-transparent", true);
             reportCompact.classed("hidden", false);
             reportFull.classed("hidden", true);
+            if (masterDataCompact.length > 0) updateAllChartsCompact();
         });
 
         // --- DATA PARSING ---
@@ -352,6 +354,11 @@
         function drawLineChartFull(raceData, rampPositions, upstreamTactics) {
             const svg = d3.select("#chart-full");
             svg.selectAll("*").remove();
+            const defs = svg.append('defs');
+            const pattern = defs.append('pattern').attr('id', 'checkered-flag-full').attr('width', 8).attr('height', 8).attr('patternUnits', 'userSpaceOnUse');
+            pattern.append('rect').attr('width', 8).attr('height', 8).attr('fill', 'white');
+            pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
+            pattern.append('rect').attr('x', 4).attr('y', 4).attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
             if (raceData.length === 0) {
                 showInitialMessage("#chart-full", "No data for this selection.");
                 d3.select("#legend-full").selectAll("*").remove();
@@ -364,25 +371,19 @@
             const lineSortOrderFull = ['Start', ...courseDisplayOrderFull];
             const xScale = d3.scalePoint().domain(lineSortOrderFull).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
-            chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues(courseDisplayOrderFull).tickSize(-(height - margin.top - margin.bottom))).selectAll(".tick text").style("fill", d => ({'1':'#228B22','3':'#228B22','4':'#228B22','5':'#228B22','6':'#228B22','7':'#228B22','2':'#DC143C','8':'#DC143C','Roll':'#eab308'}[d] || '#94a3b8'));
+            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues(courseDisplayOrderFull).tickSize(-(height - margin.top - margin.bottom)));
+            xAxis.selectAll(".tick text").style("fill", d => ({'1':'#228B22','3':'#228B22','4':'#228B22','5':'#228B22','6':'#228B22','7':'#228B22','2':'#DC143C','8':'#DC143C','Roll':'#eab308'}[d] || '#94a3b8'));
+            const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
+            if (!finishTick.empty()) {
+                const finishTextNode = finishTick.select('text').node();
+                if (finishTextNode) {
+                    const bbox = finishTextNode.getBBox();
+                    finishTick.insert('rect', 'text').attr('x', bbox.x - 4).attr('y', bbox.y + bbox.height + 2).attr('width', bbox.width + 8).attr('height', 4).attr('fill', 'url(#checkered-flag-full)');
+                }
+            }
             chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4, 5]).tickFormat(d => d === 5 ? '' : d).tickSize(-(width - margin.left - margin.right))).selectAll(".tick text").style("fill", d => d === 1 ? medalColors.gold : d === 2 ? medalColors.silver : d === 3 ? medalColors.bronze : '#94a3b8');
-            
-            svg.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .attr("class", "fill-slate-400 text-sm font-medium")
-                .text("Position in Race");
-
-            svg.append("text")
-                .attr("x", (width / 2) + (margin.left / 2))
-                .attr("y", margin.top / 2)
-                .attr("text-anchor", "middle")
-                .attr("class", "fill-slate-400 text-sm font-medium")
-                .text("Course/ Gate");
-
+            svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
+            svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
                 chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
@@ -390,8 +391,8 @@
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
-            groupedData.forEach((values, key) => chart.append("path").datum(values.sort((a, b) => lineSortOrderFull.indexOf(a.Gate) - lineSortOrderFull.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line));
             groupedData.forEach((values, key) => {
+                chart.append("path").datum(values.sort((a, b) => lineSortOrderFull.indexOf(a.Gate) - lineSortOrderFull.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
                     if ((d.Gate === '2' || d.Gate === '8') && d.UpstreamTactic) {
@@ -411,7 +412,7 @@
             const svg = d3.select("#chart-compact");
             svg.selectAll("*").remove();
             const defs = svg.append('defs');
-            const pattern = defs.append('pattern').attr('id', 'checkered-flag').attr('width', 8).attr('height', 8).attr('patternUnits', 'userSpaceOnUse');
+            const pattern = defs.append('pattern').attr('id', 'checkered-flag-compact').attr('width', 8).attr('height', 8).attr('patternUnits', 'userSpaceOnUse');
             pattern.append('rect').attr('width', 8).attr('height', 8).attr('fill', 'white');
             pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
             pattern.append('rect').attr('x', 4).attr('y', 4).attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
@@ -432,26 +433,11 @@
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const bbox = finishTick.select('text').node().getBBox();
-                finishTick.insert('rect', 'text').attr('x', bbox.x - 4).attr('y', bbox.y + bbox.height + 2).attr('width', bbox.width + 8).attr('height', 4).attr('fill', 'url(#checkered-flag)');
+                finishTick.insert('rect', 'text').attr('x', bbox.x - 4).attr('y', bbox.y + bbox.height + 2).attr('width', bbox.width + 8).attr('height', 4).attr('fill', 'url(#checkered-flag-compact)');
             }
             chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4]).tickFormat(d3.format("d")).tickSize(-(width - margin.left - margin.right))).selectAll(".tick text").style("fill", d => d === 1 ? medalColors.gold : d === 2 ? medalColors.silver : d === 3 ? medalColors.bronze : '#94a3b8');
-            
-            svg.append("text")
-                .attr("transform", "rotate(-90)")
-                .attr("y", 0)
-                .attr("x", 0 - (height / 2))
-                .attr("dy", "1em")
-                .style("text-anchor", "middle")
-                .attr("class", "fill-slate-400 text-sm font-medium")
-                .text("Position in Race");
-
-            svg.append("text")
-                .attr("x", (width / 2) + (margin.left / 2))
-                .attr("y", margin.top / 2)
-                .attr("text-anchor", "middle")
-                .attr("class", "fill-slate-400 text-sm font-medium")
-                .text("Course/ Gate");
-
+            svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
+            svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
                 chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
@@ -503,7 +489,7 @@
                 lineChartReadyDataFull.push(...athleteRaceData);
                 if (finalPositions.has(bib)) lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
-            drawLineChartFull(lineChartReadyDataFull, rampPositions);
+            drawLineChartFull(lineChartReadyDataFull, rampPositions, upstreamTactics);
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
