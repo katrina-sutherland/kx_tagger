@@ -740,10 +740,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,M,R10,Gate 1,B,3,Down-Left,2,2,
 2024,OLY,M,R10,Gate 1,Y,4,Down-Left,3,3,
 2024,OLY,M,R10,Gate 1,G,1,Down-Left,4,4,
-2024,OLY,M,R10,Gate 2,R,2,Down-Right-Up,1,1,Down-Right-Up
-2024,OLY,M,R10,Gate 2,B,3,Down-Right-Up,2,2,FOLLOW
-2024,OLY,M,R10,Gate 2,Y,4,Down-Left-Up,3,3,SPLIT
-2024,OLY,M,R10,Gate 2,G,1,Down-Left-Up,4,4,FOLLOW
+2024,OLY,M,R10,Gate 2,R,2,Right-Up,1,1,Right-Up
+2024,OLY,M,R10,Gate 2,B,3,Right-Up,2,2,FOLLOW
+2024,OLY,M,R10,Gate 2,Y,4,Left-Up,3,3,SPLIT
+2024,OLY,M,R10,Gate 2,G,1,Left-Up,4,4,FOLLOW
 2024,OLY,M,R10,Gate 3,R,2,Down-Right,1,1,
 2024,OLY,M,R10,Gate 3,B,3,Down-Right,2,2,
 2024,OLY,M,R10,Gate 3,Y,4,Down-Right,3,3,
