@@ -408,7 +408,7 @@
         }
         
         // --- COMPACT REPORT CHARTING ---
-        function drawLineChartCompact(raceData, rampPositions) {
+        function drawLineChartCompact(raceData, rampPositions, upstreamTactics) {
             const svg = d3.select("#chart-compact");
             svg.selectAll("*").remove();
             const defs = svg.append('defs');
@@ -424,12 +424,12 @@
             const { width, height } = d3.select("#chart-container-compact").node().getBoundingClientRect();
             const margin = { top: 50, right: 20, bottom: 20, left: 90 };
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-            const courseDisplayOrderCompact = ['Ramp', '1', '2', '3', 'Finish'];
-            const lineSortOrderCompact = ['Start', 'Ramp', '1', '2', '3', 'Finish'];
+            const courseDisplayOrderCompact = ['Ramp', '1', '2', '3', '8', 'Finish'];
+            const lineSortOrderCompact = ['Start', ...courseDisplayOrderCompact];
             const xScale = d3.scalePoint().domain(lineSortOrderCompact).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues(courseDisplayOrderCompact).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => ({'Ramp': '#eab308', '1': '#22c55e', '3': '#22c55e', '2': '#DC143C'}[d] || '#94a3b8'));
+            xAxis.selectAll(".tick text").style("fill", d => ({'Ramp': '#eab308', '1': '#22c55e', '3': '#22c55e', '2': '#DC143C', '8': '#DC143C'}[d] || '#94a3b8'));
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const bbox = finishTick.select('text').node().getBBox();
@@ -449,7 +449,7 @@
                 chart.append("path").datum(values.sort((a, b) => lineSortOrderCompact.indexOf(a.Gate) - lineSortOrderCompact.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    if (d.Gate === '2' && d.UpstreamTactic) {
+                    if ((d.Gate === '2' || d.Gate === '8') && d.UpstreamTactic) {
                         chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold").text(d.UpstreamTactic);
                     }
                 });
@@ -556,7 +556,7 @@
                 lineChartReadyDataCompact.push(...athleteRaceData);
                 if (finalPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
-            drawLineChartCompact(lineChartReadyDataCompact, rampPositions);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, upstreamTactics);
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
@@ -583,3 +583,5 @@
     </script>
 </body>
 </html>
+
+
