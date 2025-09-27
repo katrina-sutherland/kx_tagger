@@ -351,7 +351,7 @@
         }
 
         // --- FULL REPORT CHARTING ---
-        function drawLineChartFull(raceData, rampPositions, upstreamTactics) {
+        function drawLineChartFull(raceData, rampPositions) {
             const svg = d3.select("#chart-full");
             svg.selectAll("*").remove();
             const defs = svg.append('defs');
@@ -395,8 +395,15 @@
                 chart.append("path").datum(values.sort((a, b) => lineSortOrderFull.indexOf(a.Gate) - lineSortOrderFull.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    if ((d.Gate === '2' || d.Gate === '8') && d.UpstreamTactic) {
-                        chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold").text(d.UpstreamTactic);
+                    if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
+                        const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        if (d.displayTactic.includes(' - ')) {
+                            const parts = d.displayTactic.split(' - ');
+                            textEl.append("tspan").text(parts[0] + ' - ');
+                            textEl.append("tspan").style("font-size", "8px").style("font-weight", "normal").text(parts[1]);
+                        } else {
+                            textEl.text(d.displayTactic);
+                        }
                     }
                 });
             });
@@ -449,8 +456,15 @@
                 chart.append("path").datum(values.sort((a, b) => lineSortOrderCompact.indexOf(a.Gate) - lineSortOrderCompact.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    if ((d.Gate === '2' || d.Gate === '8') && d.UpstreamTactic) {
-                        chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold").text(d.UpstreamTactic);
+                    if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
+                         const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        if (d.displayTactic.includes(' - ')) {
+                            const parts = d.displayTactic.split(' - ');
+                            textEl.append("tspan").text(parts[0] + ' - ');
+                            textEl.append("tspan").style("font-size", "8px").style("font-weight", "normal").text(parts[1]);
+                        } else {
+                            textEl.text(d.displayTactic);
+                        }
                     }
                 });
             });
@@ -471,25 +485,37 @@
                 phase: selectorsFull.phase.property("value")
             };
             const currentRaceAllData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            
+            const firstSplitters = {};
+            const sortedByRamp = currentRaceAllData.slice().sort((a, b) => a.RampPosition - b.RampPosition);
+            sortedByRamp.forEach(d => {
+                if (d.UpstreamTactic) {
+                    d.displayTactic = d.UpstreamTactic;
+                    if (d.UpstreamTactic === 'SPLIT') {
+                        if (!firstSplitters[d.Gate]) {
+                            firstSplitters[d.Gate] = d.BIB;
+                            d.displayTactic = 'SPLIT - Left';
+                        } else {
+                            d.displayTactic = 'SPLIT - Right';
+                        }
+                    }
+                }
+            });
+
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map(), rampPositions = new Map(), upstreamTactics = new Map();
+            const finalPositions = new Map(), rampPositions = new Map();
             currentRaceAllData.forEach(d => {
                 if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
                 if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition);
-                if (d.UpstreamTactic) upstreamTactics.set(`${d.BIB}-${d.Gate}`, d.UpstreamTactic);
             });
             let lineChartReadyDataFull = [];
             bibsInRace.forEach(bib => {
                 lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
                 const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Gate !== 'Ramp' && d.Position);
-                athleteRaceData.forEach(d => {
-                    const key = `${d.BIB}-${d.Gate}`;
-                    if(upstreamTactics.has(key)) d.UpstreamTactic = upstreamTactics.get(key);
-                });
                 lineChartReadyDataFull.push(...athleteRaceData);
                 if (finalPositions.has(bib)) lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
-            drawLineChartFull(lineChartReadyDataFull, rampPositions, upstreamTactics);
+            drawLineChartFull(lineChartReadyDataFull, rampPositions);
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
@@ -537,26 +563,38 @@
                 phase: selectorsCompact.phase.property("value")
             };
             const currentRaceAllData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            
+            const firstSplitters = {};
+            const sortedByRamp = currentRaceAllData.slice().sort((a, b) => a.RampPosition - b.RampPosition);
+             sortedByRamp.forEach(d => {
+                if (d.UpstreamTactic) {
+                    d.displayTactic = d.UpstreamTactic;
+                    if (d.UpstreamTactic === 'SPLIT') {
+                        if (!firstSplitters[d.Gate]) {
+                            firstSplitters[d.Gate] = d.BIB;
+                            d.displayTactic = 'SPLIT - Left';
+                        } else {
+                            d.displayTactic = 'SPLIT - Right';
+                        }
+                    }
+                }
+            });
+
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map(), rampPositions = new Map(), upstreamTactics = new Map();
+            const finalPositions = new Map(), rampPositions = new Map();
             currentRaceAllData.forEach(d => {
                 if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
                 if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition);
-                if (d.UpstreamTactic) upstreamTactics.set(`${d.BIB}-${d.Gate}`, d.UpstreamTactic);
             });
             let lineChartReadyDataCompact = [];
             bibsInRace.forEach(bib => {
                 lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
                 if (rampPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Ramp', Position: rampPositions.get(bib) });
                 const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Position);
-                 athleteRaceData.forEach(d => {
-                    const key = `${d.BIB}-${d.Gate}`;
-                    if(upstreamTactics.has(key)) d.UpstreamTactic = upstreamTactics.get(key);
-                });
                 lineChartReadyDataCompact.push(...athleteRaceData);
                 if (finalPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
-            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, upstreamTactics);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions);
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
@@ -583,5 +621,3 @@
     </script>
 </body>
 </html>
-
-
