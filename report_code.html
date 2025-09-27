@@ -415,7 +415,7 @@
         }
         
         // --- COMPACT REPORT CHARTING ---
-        function drawLineChartCompact(raceData, rampPositions, upstreamTactics) {
+        function drawLineChartCompact(raceData, rampPositions) {
             const svg = d3.select("#chart-compact");
             svg.selectAll("*").remove();
             const defs = svg.append('defs');
