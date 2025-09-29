@@ -239,7 +239,8 @@
                 Position: +d.Order,
                 RampPosition: +d['Ramp Position'],
                 FinalPosition: +d['Final Position'],
-                UpstreamTactic: d['Upstream Tactic']
+                UpstreamTactic: d['Upstream Tactic'],
+                AthleteName: d['Athlete Name']
             }));
         }
 
@@ -448,7 +449,7 @@
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
                 chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
-                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibFullNames[bib]}: ${pos}`));
+                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibToNameMap.get(bib) || bibFullNames[bib]}: ${pos}`));
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
@@ -472,7 +473,7 @@
             legendContainer.selectAll("*").remove();
             const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
-            legendItems.append("span").text(d => bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
+            legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
 
         // --- UPDATE ALL CHARTS (FULL) ---
@@ -581,10 +582,11 @@
             });
 
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map(), rampPositions = new Map();
+            const finalPositions = new Map(), rampPositions = new Map(), bibToNameMap = new Map();
             currentRaceAllData.forEach(d => {
                 if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
                 if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition);
+                if (d.AthleteName && d.BIB) bibToNameMap.set(d.BIB, d.AthleteName);
             });
             let lineChartReadyDataCompact = [];
             bibsInRace.forEach(bib => {
@@ -594,7 +596,7 @@
                 lineChartReadyDataCompact.push(...athleteRaceData);
                 if (finalPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
-            drawLineChartCompact(lineChartReadyDataCompact, rampPositions);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap);
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
