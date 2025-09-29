@@ -233,10 +233,10 @@
             const parts = name.trim().split(/\s+/);
             if (parts.length >= 2) {
                 const lastName = parts[0].toUpperCase();
-                const firstName = parts.slice(1).join(' ').toLowerCase().replace(/\b\w/g, char => char.toUpperCase());
+                const firstName = parts.slice(1).map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(' ');
                 return `${lastName} ${firstName}`;
             }
-            return name.toUpperCase(); // Fallback for single names
+            return name.toUpperCase();
         }
 
         function parseCsvData(csvString) {
@@ -590,12 +590,13 @@
             const rampPositions = new Map();
             currentRaceAllData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
-                if (d.AthleteName && d.BIB) bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
+                const nameEntry = masterDataCompact.find(nameD => nameD.BIB === d.BIB && nameD.AthleteName);
+                if (nameEntry) bibToNameMap.set(d.BIB, formatAthleteName(nameEntry.AthleteName));
             });
 
             const firstSplitters = {};
             const sortedBibsByRamp = [...rampPositions.entries()].sort((a,b) => a[1] - b[1]).map(entry => entry[0]);
-            sortedBibsByRamp.forEach(bib => {
+             sortedBibsByRamp.forEach(bib => {
                 const athleteEvents = currentRaceAllData.filter(d => d.BIB === bib);
                 athleteEvents.forEach(event => {
                     if (event.UpstreamTactic) {
