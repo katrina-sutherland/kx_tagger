@@ -1,0 +1,7 @@
+Info doc
+
+- report_code.html is the latest up to date code that runs the current workign report with names included in the In Competition report only for the time being. 
+
+- data folder is where all the csv's live
+
+- automatic updating code is not uploaded to git just because it is now a public repo and the csv's it looks at to update first are the ones on my computer first
