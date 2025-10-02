@@ -126,8 +126,8 @@
                     </div>
                      <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st Upstream When Overall Finish 2nd</h3>
-                         <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
-                         <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                          <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                          <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                 </div>
             </div>
@@ -227,6 +227,11 @@
         const bibColors = { 'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308' };
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
+        const round1SeedingPattern = [
+            [1, 12, 33], [2, 13, 32], [3, 14, 31, 42], [4, 15, 30, 41],
+            [5, 16, 29, 40], [6, 17, 28, 39], [7, 18, 27, 38], [8, 19, 26, 37],
+            [9, 20, 25, 36], [10, 21, 24, 35], [11, 22, 23, 34]
+        ];
 
         // --- DOM SELECTORS ---
         const tooltip = d3.select(".tooltip");
@@ -861,4 +866,5 @@
     </script>
 </body>
 </html>
+
 
