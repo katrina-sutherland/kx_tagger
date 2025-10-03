@@ -658,19 +658,14 @@
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
-            const labelYPositions = { '2': [], '8': [] };
+
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineSortOrderFull.indexOf(a.Gate) - lineSortOrderFull.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
                     if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
                         const yBase = yScale(d.Position);
-                        let yPos = yBase - 12; 
-                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
-                        if (collision) {
-                            yPos = yBase + 20; 
-                        }
-                        labelYPositions[d.Gate].push(yPos);
+                        const yPos = (d.Position % 2 !== 0) ? yBase - 12 : yBase + 20;
 
                         const textEl = chart.append("text")
                             .attr("x", xScale(d.Gate))
@@ -753,26 +748,18 @@
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
-            const labelYPositions = { '2': [], '8': [] };
+
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineSortOrderCompact.indexOf(a.Gate) - lineSortOrderCompact.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
                     if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
                         const yBase = yScale(d.Position);
-                        let yPos = yBase - 12; // Default: above the point
-
-                        // Check if this position is too close to an existing label
-                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
-                        if (collision) {
-                            yPos = yBase + 20; // Move below the point
-                        }
+                        const yPos = (d.Position % 2 !== 0) ? yBase - 12 : yBase + 20;
                         
-                        labelYPositions[d.Gate].push(yPos); // Record the new position
-
                         const textEl = chart.append("text")
                             .attr("x", xScale(d.Gate))
-                            .attr("y", yPos) // Use the calculated yPos
+                            .attr("y", yPos)
                             .attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
                         
                         if (d.displayTactic.includes(' - ')) {
@@ -932,8 +919,6 @@
         });
     </script>
 </body>
-</html>
-
 </html>
 
 
