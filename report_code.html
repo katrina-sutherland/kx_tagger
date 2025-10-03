@@ -658,12 +658,25 @@
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
+            const labelYPositions = { '2': [], '8': [] };
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineSortOrderFull.indexOf(a.Gate) - lineSortOrderFull.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
                     if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
-                        const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        const yBase = yScale(d.Position);
+                        let yPos = yBase - 12; 
+                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
+                        if (collision) {
+                            yPos = yBase + 20; 
+                        }
+                        labelYPositions[d.Gate].push(yPos);
+
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos)
+                            .attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        
                         if (d.displayTactic.includes(' - ')) {
                             const parts = d.displayTactic.split(' - ');
                             textEl.append("tspan").text(parts[0] + ' - ');
@@ -718,16 +731,50 @@
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
                 chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
-                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibToNameMap.get(bib) || bibFullNames[bib]}: ${pos}`));
+                sortedRamps.forEach(([bib, pos], i) => {
+                    const fullName = bibToNameMap.get(bib);
+                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+                    
+                    const textNode = chart.append("text")
+                        .attr("x", -10)
+                        .attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12))
+                        .attr("text-anchor", "end")
+                        .style("fill", bibColors[bib])
+                        .style("font-size", "10px");
+                    
+                    textNode.append("tspan")
+                        .style("font-weight", "bold")
+                        .text(`${lastName}: `);
+                    
+                    textNode.append("tspan")
+                        .style("font-weight", "normal")
+                        .text(pos);
+                });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
+            const labelYPositions = { '2': [], '8': [] };
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineSortOrderCompact.indexOf(a.Gate) - lineSortOrderCompact.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
                     if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
-                         const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        const yBase = yScale(d.Position);
+                        let yPos = yBase - 12; // Default: above the point
+
+                        // Check if this position is too close to an existing label
+                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
+                        if (collision) {
+                            yPos = yBase + 20; // Move below the point
+                        }
+                        
+                        labelYPositions[d.Gate].push(yPos); // Record the new position
+
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos) // Use the calculated yPos
+                            .attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        
                         if (d.displayTactic.includes(' - ')) {
                             const parts = d.displayTactic.split(' - ');
                             textEl.append("tspan").text(parts[0] + ' - ');
@@ -885,6 +932,8 @@
         });
     </script>
 </body>
+</html>
+
 </html>
 
 
