@@ -126,8 +126,8 @@
                     </div>
                      <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st Upstream When Overall Finish 2nd</h3>
-                          <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
-                          <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                           <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                           <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                 </div>
             </div>
@@ -575,6 +575,48 @@
             legendItems.append('span').attr('class', 'text-xs text-slate-300').text(d => `${d.label} (${(totalValue > 0 ? (d.value / totalValue) * 100 : 0).toFixed(2)}%)`);
         }
 
+        // --- CORRECTED TACTIC LOGIC ---
+        function calculateTacticLogic(raceData) {
+            const upstreamGates = ['2', '8'];
+            upstreamGates.forEach(gate => {
+                // Get all events for this gate and sort by position AT THE GATE.
+                const gateEvents = raceData
+                    .filter(d => d.Gate === gate)
+                    .sort((a, b) => a.Position - b.Position);
+
+                if (gateEvents.length === 0) return;
+
+                // The leader's tactic is their own action (e.g., Left-Up).
+                const leader = gateEvents[0];
+                leader.displayTactic = leader.UpstreamTactic;
+
+                // Iterate from 2nd place onwards.
+                for (let i = 1; i < gateEvents.length; i++) {
+                    const currentAthlete = gateEvents[i];
+                    const athleteAhead = gateEvents[i - 1];
+
+                    if (currentAthlete.Action && athleteAhead.Action) {
+                        // Compare path with the athlete directly ahead.
+                        if (currentAthlete.Action === athleteAhead.Action) {
+                            currentAthlete.displayTactic = 'FOLLOW';
+                        } else {
+                            currentAthlete.displayTactic = `SPLIT - ${currentAthlete.Action}`;
+                        }
+                    } else {
+                         // Fallback if Action data is missing
+                         currentAthlete.displayTactic = currentAthlete.UpstreamTactic;
+                    }
+                }
+            });
+            // All other events (non-upstream gates) get their original tactic.
+            raceData.forEach(d => {
+                if (!upstreamGates.includes(d.Gate)) {
+                    d.displayTactic = d.UpstreamTactic;
+                }
+            });
+        }
+
+
         // --- FULL REPORT CHARTING ---
         function drawLineChartFull(raceData, rampPositions) {
             const svg = d3.select("#chart-full");
@@ -714,35 +756,19 @@
             };
             const currentRaceAllData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
-            const bibRampPositions = new Map();
+            calculateTacticLogic(currentRaceAllData); // Use corrected logic
+
+            const rampPositions = new Map();
             currentRaceAllData.forEach(d => {
-                if(d.RampPosition && d.BIB) bibRampPositions.set(d.BIB, d.RampPosition);
-            });
-            const firstSplitters = {};
-            const sortedBibsByRamp = [...bibRampPositions.entries()].sort((a,b) => a[1] - b[1]).map(entry => entry[0]);
-            sortedBibsByRamp.forEach(bib => {
-                const athleteEvents = currentRaceAllData.filter(d => d.BIB === bib);
-                athleteEvents.forEach(event => {
-                    if (event.UpstreamTactic) {
-                        event.displayTactic = event.UpstreamTactic;
-                        if (event.UpstreamTactic === 'SPLIT') {
-                            if (!firstSplitters[event.Gate]) {
-                                firstSplitters[event.Gate] = event.BIB;
-                                event.displayTactic = 'SPLIT - Left';
-                            } else {
-                                event.displayTactic = 'SPLIT - Right';
-                            }
-                        }
-                    }
-                });
+                if(d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
 
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map(), rampPositions = new Map();
+            const finalPositions = new Map();
             currentRaceAllData.forEach(d => {
                 if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
-                if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition);
             });
+
             let lineChartReadyDataFull = [];
             bibsInRace.forEach(bib => {
                 lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
@@ -751,6 +777,8 @@
                 if (finalPositions.has(bib)) lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
             drawLineChartFull(lineChartReadyDataFull, rampPositions);
+            
+            // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
@@ -799,32 +827,22 @@
             };
             const currentRaceAllData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
+            calculateTacticLogic(currentRaceAllData);
+
             const bibToNameMap = new Map();
             const rampPositions = new Map();
-            currentRaceAllData.forEach(d => {
-                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
-                const nameEntry = masterDataCompact.find(nameD => nameD.BIB === d.BIB && nameD.AthleteName);
-                if (nameEntry) bibToNameMap.set(d.BIB, formatAthleteName(nameEntry.AthleteName));
+            
+            // CORRECTED LOGIC: Create the name map from the *currently filtered* race data's "Ramp" entries.
+            const rampEntriesForCurrentRace = currentRaceAllData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            rampEntriesForCurrentRace.forEach(d => {
+                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
 
-            const firstSplitters = {};
-            const sortedBibsByRamp = [...rampPositions.entries()].sort((a,b) => a[1] - b[1]).map(entry => entry[0]);
-             sortedBibsByRamp.forEach(bib => {
-                const athleteEvents = currentRaceAllData.filter(d => d.BIB === bib);
-                athleteEvents.forEach(event => {
-                    if (event.UpstreamTactic) {
-                        event.displayTactic = event.UpstreamTactic;
-                        if (event.UpstreamTactic === 'SPLIT') {
-                            if (!firstSplitters[event.Gate]) {
-                                firstSplitters[event.Gate] = event.BIB;
-                                event.displayTactic = 'SPLIT - Left';
-                            } else {
-                                event.displayTactic = 'SPLIT - Right';
-                            }
-                        }
-                    }
-                });
+            // Populate ramp positions separately.
+            currentRaceAllData.forEach(d => {
+                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
+
 
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
             const finalPositions = new Map();
@@ -840,6 +858,8 @@
                 if (finalPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
             drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap);
+            
+            // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
