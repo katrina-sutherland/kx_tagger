@@ -19,5 +19,23 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R1,Finish,G,3,Finish,1,1,
 2025,WCh,W,R1,Finish,R,4,Finish,2,2,
 2025,WCh,W,R1,Finish,B,2,Finish,3,3,
-2025,WCh,W,R2,Ramp,R,4,Assigned,,,
-2025,WCh,W,R2,Ramp,G,2,Assigned,,,
+2025,WCh,W,R2,Ramp,R,4,Assigned,,2,
+2025,WCh,W,R2,Ramp,G,2,Assigned,,1,
+2025,WCh,W,R2,Ramp,R,4,Assigned,,2,
+2025,WCh,W,R2,Ramp,G,3,Assigned,,1,
+2025,WCh,W,R2,Ramp,B,2,Assigned,,3,
+2025,WCh,W,R2,Gate 1,R,4,Down-Through,1,2,
+2025,WCh,W,R2,Gate 1,G,3,Down-Through,2,1,
+2025,WCh,W,R2,Gate 1,B,2,Down-Through,3,3,
+2025,WCh,W,R2,Gate 2,R,4,Left-Up,1,2,Left-Up
+2025,WCh,W,R2,Gate 2,G,3,Right-Up,2,1,SPLIT
+2025,WCh,W,R2,Gate 2,B,2,Left-Up,3,3,SPLIT
+2025,WCh,W,R2,Gate 3,R,4,Down-Left,1,2,
+2025,WCh,W,R2,Gate 3,G,3,Down-Left,2,1,
+2025,WCh,W,R2,Gate 3,B,2,Down-Left,3,3,
+2025,WCh,W,R2,Gate 8,R,4,Right-Up,1,2,Right-Up
+2025,WCh,W,R2,Gate 8,G,3,Left-Up,2,1,SPLIT
+2025,WCh,W,R2,Gate 8,B,2,Left-Up,3,3,FOLLOW
+2025,WCh,W,R2,Finish,G,3,Finish,1,1,
+2025,WCh,W,R2,Finish,R,4,Finish,2,2,
+2025,WCh,W,R2,Finish,B,2,Finish,3,3,
