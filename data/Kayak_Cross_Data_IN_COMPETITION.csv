@@ -738,8 +738,8 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,M,Rep5,Finish,R,4,Finish,4,4,,
 2025,WCh,M,H1,Ramp,R,4,Assigned,,1,,Llorente David
 2025,WCh,M,H1,Ramp,G,3,Assigned,,4,,Baldoni Alex
-2025,WCh,M,H1,Ramp,B,1,Assigned,,2,,Delfour Lucien
-2025,WCh,M,H1,Ramp,Y,2,Assigned,,3,,Leaver Sam
+2025,WCh,M,H1,Ramp,Y,1,Assigned,,3,,Delfour Lucien
+2025,WCh,M,H1,Ramp,B,2,Assigned,,2,,Leaver Sam
 2025,WCh,M,H1,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,M,H1,Gate 1,B,1,Down-Through,2,2,,
 2025,WCh,M,H1,Gate 1,G,3,Down-Through,3,4,,
