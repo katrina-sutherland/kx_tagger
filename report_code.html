@@ -618,7 +618,7 @@
 
 
         // --- FULL REPORT CHARTING ---
-        function drawLineChartFull(raceData, rampPositions) {
+        function drawLineChartFull(raceData, rampPositions, bibToNameMap) {
             const svg = d3.select("#chart-full");
             svg.selectAll("*").remove();
             const defs = svg.append('defs');
@@ -653,8 +653,25 @@
             svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
-                chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
-                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibFullNames[bib]}: ${pos}`));
+                chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 10) - 4).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
+                sortedRamps.forEach(([bib, pos], i) => {
+                    const fullName = bibToNameMap.get(bib);
+                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+                     const textNode = chart.append("text")
+                        .attr("x", -10)
+                        .attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12))
+                        .attr("text-anchor", "end")
+                        .style("fill", bibColors[bib])
+                        .style("font-size", "10px");
+                    
+                    textNode.append("tspan")
+                        .style("font-weight", "bold")
+                        .text(`${lastName}: `);
+                    
+                    textNode.append("tspan")
+                        .style("font-weight", "normal")
+                        .text(pos);
+                });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
@@ -696,7 +713,7 @@
             legendContainer.selectAll("*").remove();
             const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
-            legendItems.append("span").text(d => bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
+            legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
         
         // --- COMPACT REPORT CHARTING ---
@@ -816,7 +833,14 @@
             
             calculateTacticLogic(currentRaceAllData); // Use corrected logic
 
+            const bibToNameMap = new Map();
             const rampPositions = new Map();
+
+            const rampEntriesForCurrentRace = currentRaceAllData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            rampEntriesForCurrentRace.forEach(d => {
+                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
+            });
+            
             currentRaceAllData.forEach(d => {
                 if(d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
@@ -834,7 +858,7 @@
                 lineChartReadyDataFull.push(...athleteRaceData);
                 if (finalPositions.has(bib)) lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
-            drawLineChartFull(lineChartReadyDataFull, rampPositions);
+            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap);
             
             // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
