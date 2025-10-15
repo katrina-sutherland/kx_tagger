@@ -126,8 +126,8 @@
                     </div>
                      <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st Upstream When Overall Finish 2nd</h3>
-                             <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
-                             <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                              <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                              <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                 </div>
             </div>
@@ -171,11 +171,11 @@
                               <div id="pie-chart-bib-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
                               <div id="pie-legend-bib-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
                           </div>
-                        <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
-                            <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp Position</h3>
-                            <div id="pie-chart-ramp-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
-                            <div id="pie-legend-ramp-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
-                        </div>
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                        <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp Position</h3>
+                        <div id="pie-chart-ramp-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
+                        <div id="pie-legend-ramp-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -184,7 +184,7 @@
         <div id="report-athlete" class="hidden">
             <div class="max-w-4xl mx-auto space-y-8">
                 <div id="athlete-search-controls" class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
-                           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label for="year-select-athlete" class="block text-sm font-medium text-slate-300 mb-2">Year</label>
                                     <select id="year-select-athlete" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
@@ -371,11 +371,11 @@
         }
 
         function showInitialMessage(containerSelector, message) {
-              const svg = d3.select(containerSelector);
-              if (svg.empty()) return;
-              svg.selectAll("*").remove();
-              const { width, height } = svg.node().getBoundingClientRect();
-              svg.append("text").attr("x", width / 2).attr("y", height / 2).attr("text-anchor", "middle").attr("class", "text-slate-500 text-lg select-none").text(message);
+             const svg = d3.select(containerSelector);
+             if (svg.empty()) return;
+             svg.selectAll("*").remove();
+             const { width, height } = svg.node().getBoundingClientRect();
+             svg.append("text").attr("x", width / 2).attr("y", height / 2).attr("text-anchor", "middle").attr("class", "text-slate-500 text-lg select-none").text(message);
         }
         
         function populateFilters(data, selectorGroup) {
@@ -831,7 +831,7 @@
             };
             const currentRaceAllData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
-            calculateTacticLogic(currentRaceAllData); // Use corrected logic
+            calculateTacticLogic(currentRaceAllData);
 
             const bibToNameMap = new Map();
             const rampPositions = new Map();
@@ -846,18 +846,23 @@
             });
 
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map();
-            currentRaceAllData.forEach(d => {
-                if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
+            let lineChartReadyDataFull = [];
+
+            bibsInRace.forEach(bib => {
+                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
+
+                lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
+
+                const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
+                lineChartReadyDataFull.push(...gateData);
+
+                if (finalPosition) {
+                    lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
+                }
             });
 
-            let lineChartReadyDataFull = [];
-            bibsInRace.forEach(bib => {
-                lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Gate !== 'Ramp' && d.Position);
-                lineChartReadyDataFull.push(...athleteRaceData);
-                if (finalPositions.has(bib)) lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
-            });
             drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap);
             
             // --- PIE CHART LOGIC (UNCHANGED) ---
@@ -914,30 +919,33 @@
             const bibToNameMap = new Map();
             const rampPositions = new Map();
             
-            // CORRECTED LOGIC: Create the name map from the *currently filtered* race data's "Ramp" entries.
             const rampEntriesForCurrentRace = currentRaceAllData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
             rampEntriesForCurrentRace.forEach(d => {
                 bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
 
-            // Populate ramp positions separately.
             currentRaceAllData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
-
-
+            
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map();
-            currentRaceAllData.forEach(d => {
-                if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
-            });
             let lineChartReadyDataCompact = [];
+
             bibsInRace.forEach(bib => {
+                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
+
                 lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Position && d.Gate !== 'Ramp');
-                lineChartReadyDataCompact.push(...athleteRaceData);
-                if (finalPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
+
+                const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
+                lineChartReadyDataCompact.push(...gateData);
+
+                if (finalPosition) {
+                    lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
+                }
             });
+
             drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap);
             
             // --- PIE CHART LOGIC (UNCHANGED) ---
