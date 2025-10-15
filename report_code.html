@@ -327,25 +327,47 @@
 
         // --- DYNAMIC COURSE LAYOUT ---
         function getCourseLayout(competitionName, gatesPresent) {
-            // Default order of numeric gates
+            // Get numeric gates and sort them
             let orderedGates = gatesPresent
                 .filter(g => !isNaN(parseInt(g, 10)))
                 .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
-            if (gatesPresent.includes('Roll')) {
-                // Default position for Roll is after Gate 1
-                let rollIndex = orderedGates.indexOf('1') + 1;
-                if (rollIndex === 0) rollIndex = 1; // Fallback if gate 1 isn't present
-
-                // Specific layout rules based on competition name
-                if (competitionName && competitionName.toLowerCase().includes('wch')) { // World Champs
-                     const gate7Index = orderedGates.indexOf('7');
-                     if(gate7Index > -1) rollIndex = gate7Index + 1;
-                }
-                // Add more specific rules here for other competitions like OLY if needed
-                
-                orderedGates.splice(rollIndex, 0, 'Roll');
+            // If 'Roll' is not present, we are done
+            if (!gatesPresent.includes('Roll')) {
+                return orderedGates;
             }
+
+            // Determine where to insert 'Roll' based on competition
+            let rollIndex = -1;
+            const compNameLower = competitionName.toLowerCase();
+
+            if (compNameLower.includes('wch')) {
+                const gate7Index = orderedGates.indexOf('7');
+                if (gate7Index > -1) {
+                    rollIndex = gate7Index + 1;
+                }
+            } else if (compNameLower.includes('oly')) {
+                 const gate1Index = orderedGates.indexOf('1');
+                 if (gate1Index > -1) {
+                     rollIndex = gate1Index + 1;
+                 }
+            }
+
+            // If no specific rule applied, use the default (after Gate 1)
+            if (rollIndex === -1) {
+                 const gate1Index = orderedGates.indexOf('1');
+                 if (gate1Index > -1) {
+                     rollIndex = gate1Index + 1;
+                 } else if (orderedGates.length > 0) {
+                     rollIndex = 1; // Fallback: place it second
+                 } else {
+                     orderedGates.push('Roll'); // Only roll is present
+                     return orderedGates;
+                 }
+            }
+            
+            // Insert 'Roll' at the determined position
+            orderedGates.splice(rollIndex, 0, 'Roll');
 
             return orderedGates;
         }
