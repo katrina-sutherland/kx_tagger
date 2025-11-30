@@ -61,7 +61,6 @@
             <h1 class="text-3xl font-bold text-slate-100">Kayak Cross Analysis</h1>
         </header>
 
-        <!-- Tab Navigation -->
         <div class="max-w-7xl mx-auto mb-8 border-b border-slate-700">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button id="tab-full" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
@@ -76,7 +75,6 @@
             </nav>
         </div>
 
-        <!-- Full Report Content -->
         <div id="report-full">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-full" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
@@ -133,7 +131,6 @@
             </div>
         </div>
 
-        <!-- In-Competition Report Content -->
         <div id="report-compact" class="hidden">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-compact" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
@@ -180,7 +177,6 @@
             </div>
         </div>
 
-        <!-- Athlete Profile Content -->
         <div id="report-athlete" class="hidden">
             <div class="max-w-4xl mx-auto space-y-8">
                 <div id="athlete-search-controls" class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
@@ -214,8 +210,7 @@
                             </div>
                 </div>
                 <div id="athlete-profile-area" class="mt-8 space-y-8">
-                    <!-- Athlete profiles will be appended here -->
-                </div>
+                    </div>
             </div>
         </div>
     </div>
@@ -273,7 +268,7 @@
             tabs.forEach(tab => {
                 const isActive = tab.node() === activeTab.node();
                 tab.classed("text-indigo-400 border-indigo-500", isActive)
-                   .classed("text-slate-400 border-transparent", !isActive);
+                    .classed("text-slate-400 border-transparent", !isActive);
             });
 
             reports.forEach((report, index) => {
@@ -378,10 +373,14 @@
             showInitialMessage("#chart-full", "Loading data...");
             showInitialMessage("#chart-compact", "Loading data...");
 
+            // Create a timestamp to force the browser to ignore the cache
+            const cacheBuster = new Date().getTime();
+
             try {
                 const [responseFull, responseCompact] = await Promise.all([
-                    fetch('https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv'),
-                    fetch('https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv') 
+                    // Appended ?t=${cacheBuster} to bypass GitHub caching
+                    fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`),
+                    fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`) 
                 ]);
 
                 if (!responseFull.ok) throw new Error(`Failed to load: kx_race_analysis_git.csv`);
@@ -586,7 +585,7 @@
                 const row = tbody.append("tr").attr("class", "border-t border-slate-700");
                 row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.phase);
                 row.append("td").attr("class", "p-3")
-                   .html(`<div class="w-4 h-4 rounded-sm inline-block" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
+                    .html(`<div class="w-4 h-4 rounded-sm inline-block" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
                 row.append("td").attr("class", "p-3").text(d.rampPos);
                 row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.direction);
                 row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.tactic);
