@@ -8,50 +8,19 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .x-axis path, .y-axis path {
-            display: none;
-        }
-        .x-axis .tick line, .y-axis .tick line {
-            stroke: #334155; /* slate-700 */
-            stroke-dasharray: 2,2;
-        }
-        .x-axis .tick text {
-            fill: #94a3b8; /* slate-400 */
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .y-axis .tick text {
-             fill: #94a3b8; /* slate-400 */
-             font-size: 14px;
-             font-weight: 700; /* bold */
-        }
-        .domain {
-            display: none;
-        }
-        .dark-select, .dark-input {
-            background-color: #1e293b; /* slate-800 */
-            border-color: #475569; /* slate-600 */
-            color: #e2e8f0; /* slate-200 */
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .x-axis path, .y-axis path { display: none; }
+        .x-axis .tick line, .y-axis .tick line { stroke: #334155; stroke-dasharray: 2,2; }
+        .x-axis .tick text { fill: #94a3b8; font-size: 12px; font-weight: 600; }
+        .y-axis .tick text { fill: #94a3b8; font-size: 14px; font-weight: 700; }
+        .domain { display: none; }
+        .dark-select, .dark-input { background-color: #1e293b; border-color: #475569; color: #e2e8f0; }
         .tooltip {
-            position: absolute;
-            text-align: left;
-            padding: 8px;
-            font: 12px sans-serif;
-            background: #1e293b; /* slate-800 */
-            color: white;
-            border: 1px solid #334155; /* slate-700 */
-            border-radius: 8px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
+            position: absolute; text-align: left; padding: 8px; font: 12px sans-serif;
+            background: #1e293b; color: white; border: 1px solid #334155; border-radius: 8px;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s;
         }
-        .chart-card {
-            transition: border-color 0.3s ease-in-out;
-        }
+        .chart-card { transition: border-color 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 antialiased">
@@ -222,11 +191,14 @@
         const bibColors = { 'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308' };
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
-        const round1SeedingPattern = [
-            [1, 12, 33], [2, 13, 32], [3, 14, 31, 42], [4, 15, 30, 41],
-            [5, 16, 29, 40], [6, 17, 28, 39], [7, 18, 27, 38], [8, 19, 26, 37],
-            [9, 20, 25, 36], [10, 21, 24, 35], [11, 22, 23, 34]
-        ];
+        
+        // --- COURSE CONFIGURATION ---
+        const COURSE_CONFIGS = {
+            '2025_WC1': {
+                rollAfterGate: '5',
+                upstreamGates: ['2', '6']
+            }
+        };
 
         // --- DOM SELECTORS ---
         const tooltip = d3.select(".tooltip");
@@ -321,46 +293,47 @@
         }
 
         // --- DYNAMIC COURSE LAYOUT ---
-        function getCourseLayout(competitionName, gatesPresent) {
-            // Get numeric gates and sort them
+        function getCourseLayout(year, competitionName, gatesPresent) {
+            // 1. Get numeric gates and sort them
             let orderedGates = gatesPresent
                 .filter(g => !isNaN(parseInt(g, 10)))
                 .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
 
-            // If 'Roll' is not present, we are done
+            // If 'Roll' is not present in data, we are done
             if (!gatesPresent.includes('Roll')) {
                 return orderedGates;
             }
 
-            // Determine where to insert 'Roll' based on competition
+            // 2. Check for Specific Configuration in COURSE_CONFIGS
+            const configKey = `${year}_${competitionName}`;
+            const specificConfig = COURSE_CONFIGS[configKey];
+
             let rollIndex = -1;
-            const compNameLower = competitionName.toLowerCase();
 
-            if (compNameLower.includes('wch')) {
-                const gate7Index = orderedGates.indexOf('7');
-                if (gate7Index > -1) {
-                    rollIndex = gate7Index + 1;
+            if (specificConfig && specificConfig.rollAfterGate) {
+                // Find the index of the gate specified in config
+                const gateIndex = orderedGates.indexOf(specificConfig.rollAfterGate);
+                if (gateIndex > -1) {
+                    rollIndex = gateIndex + 1;
                 }
-            } else if (compNameLower.includes('oly')) {
-                 const gate1Index = orderedGates.indexOf('1');
-                 if (gate1Index > -1) {
-                     rollIndex = gate1Index + 1;
-                 }
+            } else {
+                // 3. Fallback logic
+                const compNameLower = competitionName.toLowerCase();
+                if (compNameLower.includes('wch')) {
+                    const gate7Index = orderedGates.indexOf('7');
+                    if (gate7Index > -1) rollIndex = gate7Index + 1;
+                } else if (compNameLower.includes('oly')) {
+                    const gate1Index = orderedGates.indexOf('1');
+                    if (gate1Index > -1) rollIndex = gate1Index + 1;
+                }
+                
+                // Final default: Place after Gate 1 if nothing else matched
+                if (rollIndex === -1) {
+                    const gate1Index = orderedGates.indexOf('1');
+                    rollIndex = (gate1Index > -1) ? gate1Index + 1 : 1;
+                }
             }
 
-            // If no specific rule applied, use the default (after Gate 1)
-            if (rollIndex === -1) {
-                 const gate1Index = orderedGates.indexOf('1');
-                 if (gate1Index > -1) {
-                     rollIndex = gate1Index + 1;
-                 } else if (orderedGates.length > 0) {
-                     rollIndex = 1; // Fallback: place it second
-                 } else {
-                     orderedGates.push('Roll'); // Only roll is present
-                     return orderedGates;
-                 }
-            }
-            
             // Insert 'Roll' at the determined position
             orderedGates.splice(rollIndex, 0, 'Roll');
 
@@ -373,12 +346,10 @@
             showInitialMessage("#chart-full", "Loading data...");
             showInitialMessage("#chart-compact", "Loading data...");
 
-            // Create a timestamp to force the browser to ignore the cache
             const cacheBuster = new Date().getTime();
 
             try {
                 const [responseFull, responseCompact] = await Promise.all([
-                    // Appended ?t=${cacheBuster} to bypass GitHub caching
                     fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`),
                     fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`) 
                 ]);
@@ -402,7 +373,6 @@
                 
                 setupAthleteProfileTab();
 
-                // Set up auto-refresh
                 setInterval(loadInitialData, 90000); 
 
                 window.addEventListener('resize', () => {
@@ -659,7 +629,7 @@
 
 
         // --- FULL REPORT CHARTING ---
-        function drawLineChartFull(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain) {
+        function drawLineChartFull(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
             const svg = d3.select("#chart-full");
             svg.selectAll("*").remove();
             const defs = svg.append('defs');
@@ -679,7 +649,15 @@
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => ({'1':'#228B22','3':'#228B22','4':'#228B22','5':'#228B22','6':'#228B22','7':'#228B22','2':'#DC143C','8':'#DC143C','Roll':'#eab308'}[d] || '#94a3b8'));
+            
+            // DYNAMIC COLORING
+            xAxis.selectAll(".tick text").style("fill", d => {
+                 if (d === 'Finish' || d === 'Start') return '#94a3b8'; // Slate-400
+                 if (d === 'Roll') return '#eab308'; // Yellow
+                 if (upstreamGates.includes(d)) return '#DC143C'; // Red (Upstream)
+                 return '#22c55e'; // Green (Downstream) - Default
+            });
+
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const finishTextNode = finishTick.select('text').node();
@@ -716,7 +694,10 @@
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
 
-            const labelYPositions = { '2': [], '8': [] };
+            const labelYPositions = { };
+            // Initialize labelYPositions based on upstream gates
+            upstreamGates.forEach(g => labelYPositions[g] = []);
+
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 
@@ -724,7 +705,9 @@
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 
                 values.forEach(d => {
-                    if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
+                    if (upstreamGates.includes(d.Gate) && d.displayTactic) {
+                        if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = []; // Safety check
+
                         const yBase = yScale(d.Position);
                         let yPos = yBase - 12; 
 
@@ -757,7 +740,7 @@
         }
         
         // --- COMPACT REPORT CHARTING ---
-        function drawLineChartCompact(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain) {
+        function drawLineChartCompact(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
             const svg = d3.select("#chart-compact");
             svg.selectAll("*").remove();
             
@@ -782,7 +765,13 @@
             
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
             
-            xAxis.selectAll(".tick text").style("fill", d => ({'1': '#22c55e', '3': '#22c55e', '2': '#DC143C', '8': '#DC143C'}[d] || '#94a3b8'));
+             // DYNAMIC COLORING
+            xAxis.selectAll(".tick text").style("fill", d => {
+                 if (d === 'Finish' || d === 'Start') return '#94a3b8'; // Slate-400
+                 if (d === 'Roll') return '#eab308'; // Yellow
+                 if (upstreamGates.includes(d)) return '#DC143C'; // Red (Upstream)
+                 return '#22c55e'; // Green (Downstream) - Default
+            });
             
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
@@ -818,7 +807,10 @@
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
 
-            const labelYPositions = { '2': [], '8': [] };
+            const labelYPositions = { };
+             // Initialize labelYPositions based on upstream gates
+             upstreamGates.forEach(g => labelYPositions[g] = []);
+
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 
@@ -826,7 +818,9 @@
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 
                 values.forEach(d => {
-                    if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
+                    if (upstreamGates.includes(d.Gate) && d.displayTactic) {
+                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
+
                         const yBase = yScale(d.Position);
                         let yPos = yBase - 12; 
 
@@ -885,8 +879,22 @@
 
             // --- DYNAMIC AXIS LOGIC ---
             const gatesPresentInRace = [...new Set(currentRaceAllData.map(d => d.Gate).filter(g => g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish'))];
-            const courseDisplayOrder = getCourseLayout(selected.competition, gatesPresentInRace);
+            const courseDisplayOrder = getCourseLayout(selected.year, selected.competition, gatesPresentInRace);
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
+
+            // Determine Upstream Gates
+            const configKey = `${selected.year}_${selected.competition}`;
+            let upstreamGates = ['2', '8']; // Default fallback
+
+            if (COURSE_CONFIGS[configKey] && COURSE_CONFIGS[configKey].upstreamGates) {
+                upstreamGates = COURSE_CONFIGS[configKey].upstreamGates;
+            } else {
+                 // Auto-detect from data if specific config doesn't exist
+                 const detectedUpstream = [...new Set(currentRaceAllData
+                    .filter(d => (d.UpstreamTactic && d.UpstreamTactic.trim() !== '') || (d.Action && d.Action.includes('Up')))
+                    .map(d => d.Gate))];
+                 if(detectedUpstream.length > 0) upstreamGates = detectedUpstream;
+            }
 
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
             let lineChartReadyDataFull = [];
@@ -906,7 +914,7 @@
                 }
             });
 
-            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain);
+            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates);
             
             // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
@@ -973,10 +981,19 @@
 
             // --- DYNAMIC AXIS LOGIC ---
             const gatesPresentInRace = [...new Set(currentRaceAllData.map(d => d.Gate).filter(g => g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish'))];
-            const fullCourseDisplayOrder = getCourseLayout(selected.competition, gatesPresentInRace);
+            const fullCourseDisplayOrder = getCourseLayout(selected.year, selected.competition, gatesPresentInRace);
             
             // Filter the full layout for the compact view's specific gates
             const compactGatesToShow = new Set(['1', '2', '3', '8', 'Roll']);
+            // Add any other upstream gates detected in config to the compact view so they don't disappear
+            const configKey = `${selected.year}_${selected.competition}`;
+            let upstreamGates = ['2', '8']; 
+
+            if (COURSE_CONFIGS[configKey] && COURSE_CONFIGS[configKey].upstreamGates) {
+                upstreamGates = COURSE_CONFIGS[configKey].upstreamGates;
+                upstreamGates.forEach(g => compactGatesToShow.add(g));
+            }
+
             const courseDisplayOrder = fullCourseDisplayOrder.filter(gate => compactGatesToShow.has(gate));
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
             
@@ -998,7 +1015,7 @@
                 }
             });
 
-            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates);
             
             // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
