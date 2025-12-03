@@ -192,14 +192,6 @@
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
         
-        // --- COURSE CONFIGURATION ---
-        const COURSE_CONFIGS = {
-            '2025_WC1': {
-                rollAfterGate: '5',
-                upstreamGates: ['2', '6']
-            }
-        };
-
         // --- DOM SELECTORS ---
         const tooltip = d3.select(".tooltip");
         const tabFull = d3.select("#tab-full");
@@ -276,11 +268,14 @@
         }
 
         function parseCsvData(csvString) {
-            return d3.csvParse(csvString, d => ({
+            // NOTE: We now explicitly parse the row index (Order) carefully if it's missing or named differently
+            // but your CSV uses 'Order' for position.
+            return d3.csvParse(csvString, (d, i) => ({
                 Year: +d.Year,
                 Competition: d.Competition,
                 Gender: d.Gender,
                 Phase: d.Phase,
+                // Normalize "Course" to "Roll" immediately
                 Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : d.Gate),
                 BIB: d.BIB,
                 Position: +d.Order,
@@ -292,52 +287,131 @@
             }));
         }
 
-        // --- DYNAMIC COURSE LAYOUT ---
-        function getCourseLayout(year, competitionName, gatesPresent) {
-            // 1. Get numeric gates and sort them
-            let orderedGates = gatesPresent
-                .filter(g => !isNaN(parseInt(g, 10)))
-                .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
-
-            // If 'Roll' is not present in data, we are done
-            if (!gatesPresent.includes('Roll')) {
-                return orderedGates;
+        // --- GLOBAL COMPETITION SCANNER ---
+        // This function scans ALL data for a specific competition/year to build the "truth" of the course.
+        function scanCompetitionStructure(year, competition, allData) {
+            
+            // 1. Filter data to ONLY this competition (ignore gender/phase for structure detection)
+            const compData = allData.filter(d => d.Year === year && d.Competition === competition);
+            
+            if (compData.length === 0) {
+                // Fallback default if no data found
+                return { 
+                    orderedGates: ['1','2','3','4','5','6','Roll','7','8'], 
+                    upstreamGates: ['2', '8'] 
+                };
             }
 
-            // 2. Check for Specific Configuration in COURSE_CONFIGS
-            const configKey = `${year}_${competitionName}`;
-            const specificConfig = COURSE_CONFIGS[configKey];
+            // 2. Detect Upstream Gates
+            // Scan every single row. If ANY row has "Up" in Action or UpstreamTactic for a gate, that gate is Upstream.
+            const detectedUpstreams = new Set();
+            compData.forEach(d => {
+                const gate = d.Gate;
+                if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
 
-            let rollIndex = -1;
-
-            if (specificConfig && specificConfig.rollAfterGate) {
-                // Find the index of the gate specified in config
-                const gateIndex = orderedGates.indexOf(specificConfig.rollAfterGate);
-                if (gateIndex > -1) {
-                    rollIndex = gateIndex + 1;
-                }
-            } else {
-                // 3. Fallback logic
-                const compNameLower = competitionName.toLowerCase();
-                if (compNameLower.includes('wch')) {
-                    const gate7Index = orderedGates.indexOf('7');
-                    if (gate7Index > -1) rollIndex = gate7Index + 1;
-                } else if (compNameLower.includes('oly')) {
-                    const gate1Index = orderedGates.indexOf('1');
-                    if (gate1Index > -1) rollIndex = gate1Index + 1;
-                }
+                const isUpstreamAction = (d.Action && d.Action.includes('Up'));
+                const isUpstreamTactic = (d.UpstreamTactic && d.UpstreamTactic.trim() !== '');
                 
-                // Final default: Place after Gate 1 if nothing else matched
-                if (rollIndex === -1) {
-                    const gate1Index = orderedGates.indexOf('1');
-                    rollIndex = (gate1Index > -1) ? gate1Index + 1 : 1;
+                if (isUpstreamAction || isUpstreamTactic) {
+                    detectedUpstreams.add(gate);
+                }
+            });
+
+            // 3. Detect Course Order
+            // We can calculate the average 'Position' (Order) for each Gate label across the competition.
+            // This assumes the CSV 'Order' column roughly corresponds to chronological race order.
+            // If 'Order' isn't chronological, we might need another proxy, but usually CSVs are sorted.
+            // Alternatively, we can just look at the unique gates and attempt to sort them numerically, 
+            // but we need to know where 'Roll' fits.
+            
+            // Let's create a "Gate Index" map. We'll find the first time each gate appears in a "Run" 
+            // and average its index.
+            const gateOrderSums = {};
+            const gateOrderCounts = {};
+
+            // Group by unique Race (Phase + Gender + maybe Heat number if we had it, but Phase+Gender+Bib is a unique run)
+            // We just need to iterate rows. Since your CSV is "long format" (one row per gate event), 
+            // we can trust the 'Order' field if it represents the sequence.
+            // IF 'Order' is actually "Position in Race" (1st place, 2nd place), that's not time. 
+            // We need to assume the data *import* order or Gate numeric value implies order.
+            
+            // BETTER APPROACH FOR ORDER:
+            // 1. Get all unique numeric gates. Sort them.
+            // 2. Find "Roll". Check if "Roll" usually happens before or after specific gates.
+            //    We can check adjacent rows in the CSV. If we often see "Gate 5" then "Roll", Roll is after 5.
+            
+            const numericGates = new Set();
+            let hasRoll = false;
+
+            // Create a simple adjacency map: Gate A -> Gate B (how many times A is followed by B in the CSV)
+            // This requires the CSV to be sorted by race. Assuming the CSV comes sorted by Year/Comp/Phase/Heat/Bib/Order.
+            
+            const uniqueGates = new Set(compData.map(d => d.Gate).filter(g => g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish'));
+            uniqueGates.forEach(g => {
+                if (g === 'Roll') hasRoll = true;
+                else if (!isNaN(parseInt(g))) numericGates.add(g);
+            });
+
+            const sortedNumericGates = Array.from(numericGates).sort((a, b) => parseInt(a) - parseInt(b));
+            
+            // Determine Roll Position:
+            // We'll infer it by finding the numeric gate that most frequently precedes 'Roll' in the raw data.
+            // We iterate through the raw rows.
+            let precedingGateCounts = {};
+            
+            for (let i = 1; i < compData.length; i++) {
+                const curr = compData[i];
+                const prev = compData[i-1];
+                
+                // Check if they belong to the same athlete run
+                if (curr.BIB === prev.BIB && curr.Phase === prev.Phase && curr.Gender === prev.Gender) {
+                    if (curr.Gate === 'Roll') {
+                        const pGate = prev.Gate;
+                        if (pGate && pGate !== 'Start' && pGate !== 'Ramp') {
+                            precedingGateCounts[pGate] = (precedingGateCounts[pGate] || 0) + 1;
+                        }
+                    }
                 }
             }
 
-            // Insert 'Roll' at the determined position
-            orderedGates.splice(rollIndex, 0, 'Roll');
+            let rollAfterGate = null;
+            let maxCount = -1;
+            for (const [gate, count] of Object.entries(precedingGateCounts)) {
+                if (count > maxCount) {
+                    maxCount = count;
+                    rollAfterGate = gate;
+                }
+            }
 
-            return orderedGates;
+            // Construct Final Order
+            let finalOrder = [];
+            // If we never found a 'Roll' (maybe it's not in data), just return numerics
+            if (!hasRoll) {
+                finalOrder = sortedNumericGates;
+            } else {
+                // If we found a predecessor, insert Roll after it. 
+                // If no predecessor found (Roll is first), insert at 0.
+                if (!rollAfterGate) {
+                    finalOrder = ['Roll', ...sortedNumericGates];
+                } else {
+                    finalOrder = [];
+                    let inserted = false;
+                    for (const g of sortedNumericGates) {
+                        finalOrder.push(g);
+                        if (g === rollAfterGate) {
+                            finalOrder.push('Roll');
+                            inserted = true;
+                        }
+                    }
+                    // Fallback: if predecessor was somehow not in sorted list (rare), put Roll at end or based on config logic
+                    if (!inserted) finalOrder.push('Roll'); 
+                }
+            }
+
+            return {
+                orderedGates: finalOrder,
+                upstreamGates: Array.from(detectedUpstreams)
+            };
         }
 
 
@@ -512,7 +586,7 @@
             athleteRampEntries.sort((a, b) => {
                 const regex = /^([A-Za-z]+)(\d*)$/;
                 const matchA = a.Phase.match(regex) || [a.Phase, a.Phase, ''];
-                const matchB = b.Phase.match(regex) || [b.Phase, b.Phase, ''];
+                const matchB = b.Phase.match(regex) || [b, b, ''];
                 const orderA = phaseSortOrder[matchA[1]] || 99;
                 const orderB = phaseSortOrder[matchB[1]] || 99;
                 if (orderA !== orderB) return orderA - orderB;
@@ -593,8 +667,7 @@
         }
 
         // --- CORRECTED TACTIC LOGIC ---
-        function calculateTacticLogic(raceData) {
-            const upstreamGates = ['2', '8'];
+        function calculateTacticLogic(raceData, upstreamGates) {
             upstreamGates.forEach(gate => {
                 const gateEvents = raceData
                     .filter(d => d.Gate === gate)
@@ -861,46 +934,38 @@
                 gender: selectorsFull.gender.property("value"),
                 phase: selectorsFull.phase.property("value")
             };
-            const currentRaceAllData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
-            calculateTacticLogic(currentRaceAllData);
+            // 1. SCAN COMPETITION STRUCTURE GLOBALLY
+            const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
+
+            // 2. Filter for specific Race (Phase + Gender)
+            const currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            
+            // 3. Calculate Tactics using the SCANNED upstream gates
+            calculateTacticLogic(currentRaceData, structure.upstreamGates);
 
             const bibToNameMap = new Map();
             const rampPositions = new Map();
 
-            const rampEntriesForCurrentRace = currentRaceAllData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
             rampEntriesForCurrentRace.forEach(d => {
                 bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
             
-            currentRaceAllData.forEach(d => {
+            currentRaceData.forEach(d => {
                 if(d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
 
             // --- DYNAMIC AXIS LOGIC ---
-            const gatesPresentInRace = [...new Set(currentRaceAllData.map(d => d.Gate).filter(g => g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish'))];
-            const courseDisplayOrder = getCourseLayout(selected.year, selected.competition, gatesPresentInRace);
+            // Use the scanned structure for the layout
+            const courseDisplayOrder = structure.orderedGates;
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
 
-            // Determine Upstream Gates
-            const configKey = `${selected.year}_${selected.competition}`;
-            let upstreamGates = ['2', '8']; // Default fallback
-
-            if (COURSE_CONFIGS[configKey] && COURSE_CONFIGS[configKey].upstreamGates) {
-                upstreamGates = COURSE_CONFIGS[configKey].upstreamGates;
-            } else {
-                 // Auto-detect from data if specific config doesn't exist
-                 const detectedUpstream = [...new Set(currentRaceAllData
-                    .filter(d => (d.UpstreamTactic && d.UpstreamTactic.trim() !== '') || (d.Action && d.Action.includes('Up')))
-                    .map(d => d.Gate))];
-                 if(detectedUpstream.length > 0) upstreamGates = detectedUpstream;
-            }
-
-            const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataFull = [];
 
             bibsInRace.forEach(bib => {
-                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib);
+                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
                 const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
                 const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
 
@@ -914,7 +979,7 @@
                 }
             });
 
-            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates);
+            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
             
             // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
@@ -963,45 +1028,44 @@
                 gender: selectorsCompact.gender.property("value"),
                 phase: selectorsCompact.phase.property("value")
             };
-            const currentRaceAllData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+
+            // 1. SCAN COMPETITION STRUCTURE GLOBALLY
+            const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataCompact);
+
+            // 2. Filter for specific Race
+            const currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
-            calculateTacticLogic(currentRaceAllData);
+            // 3. Calculate Tactics
+            calculateTacticLogic(currentRaceData, structure.upstreamGates);
 
             const bibToNameMap = new Map();
             const rampPositions = new Map();
             
-            const rampEntriesForCurrentRace = currentRaceAllData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
             rampEntriesForCurrentRace.forEach(d => {
                 bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
 
-            currentRaceAllData.forEach(d => {
+            currentRaceData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
 
             // --- DYNAMIC AXIS LOGIC ---
-            const gatesPresentInRace = [...new Set(currentRaceAllData.map(d => d.Gate).filter(g => g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish'))];
-            const fullCourseDisplayOrder = getCourseLayout(selected.year, selected.competition, gatesPresentInRace);
+            const fullCourseDisplayOrder = structure.orderedGates;
             
             // Filter the full layout for the compact view's specific gates
             const compactGatesToShow = new Set(['1', '2', '3', '8', 'Roll']);
             // Add any other upstream gates detected in config to the compact view so they don't disappear
-            const configKey = `${selected.year}_${selected.competition}`;
-            let upstreamGates = ['2', '8']; 
-
-            if (COURSE_CONFIGS[configKey] && COURSE_CONFIGS[configKey].upstreamGates) {
-                upstreamGates = COURSE_CONFIGS[configKey].upstreamGates;
-                upstreamGates.forEach(g => compactGatesToShow.add(g));
-            }
+            structure.upstreamGates.forEach(g => compactGatesToShow.add(g));
 
             const courseDisplayOrder = fullCourseDisplayOrder.filter(gate => compactGatesToShow.has(gate));
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
             
-            const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataCompact = [];
 
             bibsInRace.forEach(bib => {
-                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib);
+                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
                 const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
                 const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
 
@@ -1015,7 +1079,7 @@
                 }
             });
 
-            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
             
             // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
