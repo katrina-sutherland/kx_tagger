@@ -203,38 +203,9 @@
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
         
-        // --- DOM SELECTORS ---
-        const tooltip = d3.select(".tooltip");
-        const tabFull = d3.select("#tab-full");
-        const tabCompact = d3.select("#tab-compact");
-        const tabAthlete = d3.select("#tab-athlete");
-        const reportFull = d3.select("#report-full");
-        const reportCompact = d3.select("#report-compact");
-        const reportAthlete = d3.select("#report-athlete");
-        const lastUpdatedEl = d3.select("#last-updated");
-        
-        const selectorsFull = {
-            year: d3.select("#year-select-full"),
-            competition: d3.select("#competition-select-full"),
-            gender: d3.select("#gender-select-full"),
-            phase: d3.select("#phase-select-full")
-        };
-        const filterControlsFull = d3.select("#filter-controls-full");
-
-        const selectorsCompact = {
-            year: d3.select("#year-select-compact"),
-            competition: d3.select("#competition-select-compact"),
-            gender: d3.select("#gender-select-compact"),
-            phase: d3.select("#phase-select-compact")
-        };
-        const filterControlsCompact = d3.select("#filter-controls-compact");
-        
-        const selectorsAthlete = {
-            year: d3.select("#year-select-athlete"),
-            competition: d3.select("#competition-select-athlete"),
-            gender: d3.select("#gender-select-athlete")
-        };
-
+        // Declare DOM variables (to be selected after load)
+        let tooltip, tabFull, tabCompact, tabAthlete, reportFull, reportCompact, reportAthlete, lastUpdatedEl;
+        let selectorsFull, filterControlsFull, selectorsCompact, filterControlsCompact, selectorsAthlete;
 
         // --- TAB HANDLING ---
         function setActiveTab(activeTab) {
@@ -252,22 +223,7 @@
             });
         }
 
-        tabFull.on("click", () => {
-            setActiveTab(tabFull);
-            if (masterDataFull.length > 0) updateAllChartsFull();
-        });
-
-        tabCompact.on("click", () => {
-            setActiveTab(tabCompact);
-            if (masterDataCompact.length > 0) updateAllChartsCompact();
-        });
-        
-        tabAthlete.on("click", () => {
-            setActiveTab(tabAthlete);
-        });
-
-
-        // --- DATA PARSING & FORMATTING ---
+        // --- DATA PARSING ---
         function formatAthleteName(name) {
             if (!name || typeof name !== 'string') return '';
             const parts = name.trim().split(/\s+/);
@@ -285,10 +241,8 @@
                 Competition: d.Competition,
                 Gender: d.Gender,
                 Phase: d.Phase,
-                // Ensure nice gate names
                 Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : d.Gate),
                 BIB: d.BIB,
-                // Order is "Rank" (Y-axis)
                 Position: +d.Order,
                 RampPosition: +d['Ramp Position'],
                 FinalPosition: +d['Final Position'],
@@ -300,42 +254,27 @@
 
         // --- GLOBAL COMPETITION SCANNER ---
         function scanCompetitionStructure(year, competition, allData) {
-            
-            // 1. Filter data to ONLY this competition/year
             const compData = allData.filter(d => d.Year === year && d.Competition === competition);
             
             if (compData.length === 0) {
-                return { 
-                    orderedGates: ['1','2','3','4','5','6','Roll','7','8'], 
-                    upstreamGates: ['2', '8'] 
-                };
+                return { orderedGates: ['1','2','3','4','5','6','Roll','7','8'], upstreamGates: ['2', '8'] };
             }
 
-            // 2. Detect Upstream Gates
-            // If ANY athlete in the competition has "Up" action or tactic at a gate, it's Upstream
             const detectedUpstreams = new Set();
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
-
                 const isUpstreamAction = (d.Action && (d.Action.includes('Up') || d.Action.includes('up')));
                 const isUpstreamTactic = (d.UpstreamTactic && d.UpstreamTactic.trim().length > 0);
-                
                 if (isUpstreamAction || isUpstreamTactic) {
                     detectedUpstreams.add(gate);
                 }
             });
 
-            // 3. Detect Course Order (X-Axis)
-            const runs = {}; // Key: Unique Run ID, Value: Array of Gates
-            
+            const runs = {}; 
             compData.forEach(d => {
-                // Create a unique ID for a specific run
                 const runId = `${d.Phase}-${d.Gender}-${d.BIB}`; 
-                
                 if (!runs[runId]) runs[runId] = [];
-                
-                // Only collect actual obstacles, ignore Start/Finish/Ramp for sequence detection
                 if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp') {
                     runs[runId].push(d.Gate);
                 }
@@ -343,42 +282,60 @@
 
             let longestSequence = [];
             Object.values(runs).forEach(seq => {
-                if (seq.length > longestSequence.length) {
-                    longestSequence = seq;
-                }
+                if (seq.length > longestSequence.length) longestSequence = seq;
             });
 
             const finalOrder = [...new Set(longestSequence)];
 
-            // Fallback
             if (finalOrder.length === 0) {
                 const uniqueGates = [...new Set(compData.map(d => d.Gate))].filter(g => g && g !== 'Start' && g !== 'Finish' && g !== 'Ramp');
                 uniqueGates.sort((a,b) => {
                       if (a === 'Roll') return 0;
                       return parseInt(a) - parseInt(b);
                 });
-                return {
-                    orderedGates: uniqueGates,
-                    upstreamGates: Array.from(detectedUpstreams)
-                };
+                return { orderedGates: uniqueGates, upstreamGates: Array.from(detectedUpstreams) };
             }
 
-            return {
-                orderedGates: finalOrder,
-                upstreamGates: Array.from(detectedUpstreams)
-            };
+            return { orderedGates: finalOrder, upstreamGates: Array.from(detectedUpstreams) };
         }
 
 
         // --- INITIALIZATION ---
         async function loadInitialData() {
-            // Update UI to show we are fetching
-            const now = new Date();
-            lastUpdatedEl.html(`
-                <span class="w-2 h-2 rounded-full bg-green-500 live-indicator"></span>
-                Refreshing...
-            `);
+            // Re-select DOM elements to be safe
+            tooltip = d3.select(".tooltip");
+            tabFull = d3.select("#tab-full");
+            tabCompact = d3.select("#tab-compact");
+            tabAthlete = d3.select("#tab-athlete");
+            reportFull = d3.select("#report-full");
+            reportCompact = d3.select("#report-compact");
+            reportAthlete = d3.select("#report-athlete");
+            lastUpdatedEl = d3.select("#last-updated");
+            
+            selectorsFull = {
+                year: d3.select("#year-select-full"),
+                competition: d3.select("#competition-select-full"),
+                gender: d3.select("#gender-select-full"),
+                phase: d3.select("#phase-select-full")
+            };
+            filterControlsFull = d3.select("#filter-controls-full");
 
+            selectorsCompact = {
+                year: d3.select("#year-select-compact"),
+                competition: d3.select("#competition-select-compact"),
+                gender: d3.select("#gender-select-compact"),
+                phase: d3.select("#phase-select-compact")
+            };
+            filterControlsCompact = d3.select("#filter-controls-compact");
+            
+            selectorsAthlete = {
+                year: d3.select("#year-select-athlete"),
+                competition: d3.select("#competition-select-athlete"),
+                gender: d3.select("#gender-select-athlete")
+            };
+
+            const now = new Date();
+            lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-green-500 live-indicator"></span> Refreshing...`);
             const cacheBuster = now.getTime();
 
             try {
@@ -397,25 +354,29 @@
                 masterDataCompact = parseCsvData(csvStringCompact);
 
                 filterControlsFull.classed("hidden", false);
+                // Populate filters and FORCE DEFAULT if needed
                 populateFilters(masterDataFull, selectorsFull);
+                forceDefaults(selectorsFull, masterDataFull);
                 updateAllChartsFull();
                 
                 filterControlsCompact.classed("hidden", false);
                 populateFilters(masterDataCompact, selectorsCompact);
+                forceDefaults(selectorsCompact, masterDataCompact);
                 updateAllChartsCompact();
                 
-                // This preserves athlete selection state
                 setupAthleteProfileTab();
 
-                // Update timestamp UI
                 const timeString = now.toLocaleTimeString();
-                lastUpdatedEl.html(`
-                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
-                    Last Updated: ${timeString}
-                `);
+                lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-green-500"></span> Last Updated: ${timeString}`);
 
-                // --- CRITICAL FIX: RECURSIVE TIMEOUT INSTEAD OF INTERVAL ---
                 setTimeout(loadInitialData, 90000); 
+
+                // Setup tabs events only once
+                if (!tabFull.on("click")) {
+                    tabFull.on("click", () => { setActiveTab(tabFull); if (masterDataFull.length > 0) updateAllChartsFull(); });
+                    tabCompact.on("click", () => { setActiveTab(tabCompact); if (masterDataCompact.length > 0) updateAllChartsCompact(); });
+                    tabAthlete.on("click", () => { setActiveTab(tabAthlete); });
+                }
 
                 window.addEventListener('resize', () => {
                     if (!reportFull.classed('hidden')) updateAllChartsFull();
@@ -425,12 +386,7 @@
             } catch (error) {
                 console.error('Error loading initial CSV files:', error);
                 const timeString = new Date().toLocaleTimeString();
-                lastUpdatedEl.html(`
-                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                    Error at ${timeString}
-                `);
-                
-                // Retry in 90s even if error
+                lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-red-500"></span> Error at ${timeString}`);
                 setTimeout(loadInitialData, 90000);
             }
         }
@@ -461,18 +417,43 @@
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
             for (const key in selectorGroup) {
-                selectorGroup[key].selectAll("option").data(['All', ...uniqueValues[key]]).join("option").attr("value", d => d).text(d => d);
+                // Keep 'All' as an option, but we will override the selection in forceDefaults
+                const options = key === 'year' ? uniqueValues[key] : ['All', ...uniqueValues[key]];
+                selectorGroup[key].selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
+                
+                // Add listener
+                if (key === 'year' && selectorGroup === selectorsFull) selectorGroup[key].on("change", updateAllChartsFull);
+                else if (key === 'year' && selectorGroup === selectorsCompact) selectorGroup[key].on("change", updateAllChartsCompact);
+                else if (selectorGroup === selectorsFull) selectorGroup[key].on("change", updateAllChartsFull);
+                else selectorGroup[key].on("change", updateAllChartsCompact);
             }
-            if (selectorGroup === selectorsFull) {
-                Object.values(selectorGroup).forEach(sel => sel.on("change", updateAllChartsFull));
-            } else {
-                Object.values(selectorGroup).forEach(sel => sel.on("change", updateAllChartsCompact));
+        }
+        
+        // --- NEW HELPER: Force Defaults to avoid "Empty Chart" on load ---
+        function forceDefaults(selectorGroup, data) {
+            // 1. Force Year to latest
+            const latestYear = d3.max(data, d => d.Year);
+            if (latestYear) selectorGroup.year.property("value", latestYear);
+            
+            // 2. Force Competition to first available in that year
+            const compsInYear = [...new Set(data.filter(d => d.Year === latestYear).map(d => d.Competition))].sort();
+            if (compsInYear.length > 0) {
+                 selectorGroup.competition.property("value", compsInYear[0]);
             }
+            
+            // 3. Force Gender to Men (or first available)
+            const genders = [...new Set(data.map(d => d.Gender))];
+            if (genders.includes("Men")) selectorGroup.gender.property("value", "Men");
+            else if (genders.length > 0) selectorGroup.gender.property("value", genders[0]);
+            
+            // 4. Force Phase to Final (or first available)
+            const phases = [...new Set(data.map(d => d.Phase))];
+            if (phases.includes("Final")) selectorGroup.phase.property("value", "Final");
+            else if (phases.length > 0) selectorGroup.phase.property("value", phases[0]);
         }
 
         // --- ATHLETE PROFILE TAB ---
         function setupAthleteProfileTab() {
-            // Capture current top-level filter state
             const currentFilters = {
                 year: selectorsAthlete.year.property("value"),
                 competition: selectorsAthlete.competition.property("value"),
@@ -492,7 +473,6 @@
                     .attr("value", d => d)
                     .text(d => d);
                 
-                // Restore filter state if it exists in the new data
                 if (currentFilters[key] && (currentFilters[key] === 'All' || uniqueValues[key].includes(key === 'year' ? +currentFilters[key] : currentFilters[key]))) {
                      selectorsAthlete[key].property("value", currentFilters[key]);
                 }
@@ -505,14 +485,12 @@
         }
 
         function updateAthleteSelectors() {
-            // 1. CAPTURE STATE: Save the athletes currently selected by the user
             const currentSelections = {};
             d3.selectAll(".athlete-select").each(function() {
                 const id = d3.select(this).attr("id");
                 currentSelections[id] = d3.select(this).property("value");
             });
 
-            // Standard filtering logic
             const selectedFilters = {
                 year: selectorsAthlete.year.property("value"),
                 competition: selectorsAthlete.competition.property("value"),
@@ -535,9 +513,8 @@
             const uniqueAthleteNames = ['', ...[...new Set(athleteRampData.map(d => formatAthleteName(d.AthleteName)))].sort()];
 
             const selects = d3.selectAll(".athlete-select");
-            selects.html(""); // Still clear to ensure the list is fresh
+            selects.html(""); 
 
-            // Rebuild the options
             selects.each(function() {
                 d3.select(this).selectAll("option")
                     .data(uniqueAthleteNames)
@@ -546,12 +523,9 @@
                     .text(d => d || "Select Athlete...");
             });
             
-            // 2. RESTORE STATE: Set the values back to what they were
             selects.each(function() {
                 const id = d3.select(this).attr("id");
                 const previousValue = currentSelections[id];
-                
-                // Only restore if the previously selected athlete is still in the new filtered list
                 if (previousValue && uniqueAthleteNames.includes(previousValue)) {
                     d3.select(this).property("value", previousValue);
                 }
@@ -602,7 +576,7 @@
                 const { Phase: phase, BIB: bib, RampPosition: rampPos } = rampEntry;
                 const fullRaceDataForAthlete = masterDataCompact.filter(d => d.Phase === phase && d.BIB === bib);
                 
-                // --- FIXED LOGIC: Detect ANY Upstream Gate with data, not just hardcoded 2 or 8 ---
+                // DYNAMIC UPSTREAM DETECTION
                 const upstreamData = fullRaceDataForAthlete.find(d => 
                     d.Gate !== 'Ramp' && 
                     d.Gate !== 'Start' && 
@@ -619,7 +593,6 @@
                     tactic = 'Was in 1st Place';
                 }
 
-                // Append Gate name to Direction if specific action found
                 if(direction !== 'N/A') direction = direction + gateName;
 
                 return { phase, bib, rampPos, direction, tactic };
