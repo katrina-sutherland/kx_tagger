@@ -18,7 +18,7 @@
         .tooltip {
             position: absolute; text-align: left; padding: 8px; font: 12px sans-serif;
             background: #1e293b; color: white; border: 1px solid #334155; border-radius: 8px;
-            pointer-events: none; opacity: 0; transition: opacity 0.2s;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 50;
         }
         .chart-card { transition: border-color 0.3s ease-in-out; }
     </style>
@@ -232,7 +232,7 @@
             tabs.forEach(tab => {
                 const isActive = tab.node() === activeTab.node();
                 tab.classed("text-indigo-400 border-indigo-500", isActive)
-                    .classed("text-slate-400 border-transparent", !isActive);
+                   .classed("text-slate-400 border-transparent", !isActive);
             });
 
             reports.forEach((report, index) => {
@@ -268,16 +268,15 @@
         }
 
         function parseCsvData(csvString) {
-            // NOTE: We now explicitly parse the row index (Order) carefully if it's missing or named differently
-            // but your CSV uses 'Order' for position.
             return d3.csvParse(csvString, (d, i) => ({
                 Year: +d.Year,
                 Competition: d.Competition,
                 Gender: d.Gender,
                 Phase: d.Phase,
-                // Normalize "Course" to "Roll" immediately
+                // Ensure nice gate names
                 Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : d.Gate),
                 BIB: d.BIB,
+                // Order is "Rank" (Y-axis)
                 Position: +d.Order,
                 RampPosition: +d['Ramp Position'],
                 FinalPosition: +d['Final Position'],
@@ -288,14 +287,13 @@
         }
 
         // --- GLOBAL COMPETITION SCANNER ---
-        // This function scans ALL data for a specific competition/year to build the "truth" of the course.
+        // Updated logic: Detects structure based on actual run data order
         function scanCompetitionStructure(year, competition, allData) {
             
-            // 1. Filter data to ONLY this competition (ignore gender/phase for structure detection)
+            // 1. Filter data to ONLY this competition/year
             const compData = allData.filter(d => d.Year === year && d.Competition === competition);
             
             if (compData.length === 0) {
-                // Fallback default if no data found
                 return { 
                     orderedGates: ['1','2','3','4','5','6','Roll','7','8'], 
                     upstreamGates: ['2', '8'] 
@@ -303,109 +301,61 @@
             }
 
             // 2. Detect Upstream Gates
-            // Scan every single row. If ANY row has "Up" in Action or UpstreamTactic for a gate, that gate is Upstream.
+            // If ANY athlete in the competition has "Up" action or tactic at a gate, it's Upstream
             const detectedUpstreams = new Set();
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
 
-                const isUpstreamAction = (d.Action && d.Action.includes('Up'));
-                const isUpstreamTactic = (d.UpstreamTactic && d.UpstreamTactic.trim() !== '');
+                const isUpstreamAction = (d.Action && (d.Action.includes('Up') || d.Action.includes('up')));
+                const isUpstreamTactic = (d.UpstreamTactic && d.UpstreamTactic.trim().length > 0);
                 
                 if (isUpstreamAction || isUpstreamTactic) {
                     detectedUpstreams.add(gate);
                 }
             });
 
-            // 3. Detect Course Order
-            // We can calculate the average 'Position' (Order) for each Gate label across the competition.
-            // This assumes the CSV 'Order' column roughly corresponds to chronological race order.
-            // If 'Order' isn't chronological, we might need another proxy, but usually CSVs are sorted.
-            // Alternatively, we can just look at the unique gates and attempt to sort them numerically, 
-            // but we need to know where 'Roll' fits.
+            // 3. Detect Course Order (X-Axis)
+            // We find the "Run" with the most gates to use as the template for the course order.
+            // This relies on the CSV rows being ordered by time/sequence for each athlete.
             
-            // Let's create a "Gate Index" map. We'll find the first time each gate appears in a "Run" 
-            // and average its index.
-            const gateOrderSums = {};
-            const gateOrderCounts = {};
-
-            // Group by unique Race (Phase + Gender + maybe Heat number if we had it, but Phase+Gender+Bib is a unique run)
-            // We just need to iterate rows. Since your CSV is "long format" (one row per gate event), 
-            // we can trust the 'Order' field if it represents the sequence.
-            // IF 'Order' is actually "Position in Race" (1st place, 2nd place), that's not time. 
-            // We need to assume the data *import* order or Gate numeric value implies order.
+            const runs = {}; // Key: Unique Run ID, Value: Array of Gates
             
-            // BETTER APPROACH FOR ORDER:
-            // 1. Get all unique numeric gates. Sort them.
-            // 2. Find "Roll". Check if "Roll" usually happens before or after specific gates.
-            //    We can check adjacent rows in the CSV. If we often see "Gate 5" then "Roll", Roll is after 5.
-            
-            const numericGates = new Set();
-            let hasRoll = false;
-
-            // Create a simple adjacency map: Gate A -> Gate B (how many times A is followed by B in the CSV)
-            // This requires the CSV to be sorted by race. Assuming the CSV comes sorted by Year/Comp/Phase/Heat/Bib/Order.
-            
-            const uniqueGates = new Set(compData.map(d => d.Gate).filter(g => g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish'));
-            uniqueGates.forEach(g => {
-                if (g === 'Roll') hasRoll = true;
-                else if (!isNaN(parseInt(g))) numericGates.add(g);
+            compData.forEach(d => {
+                // Create a unique ID for a specific run
+                const runId = `${d.Phase}-${d.Gender}-${d.BIB}`; 
+                
+                if (!runs[runId]) runs[runId] = [];
+                
+                // Only collect actual obstacles, ignore Start/Finish/Ramp for sequence detection
+                if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp') {
+                    runs[runId].push(d.Gate);
+                }
             });
 
-            const sortedNumericGates = Array.from(numericGates).sort((a, b) => parseInt(a) - parseInt(b));
-            
-            // Determine Roll Position:
-            // We'll infer it by finding the numeric gate that most frequently precedes 'Roll' in the raw data.
-            // We iterate through the raw rows.
-            let precedingGateCounts = {};
-            
-            for (let i = 1; i < compData.length; i++) {
-                const curr = compData[i];
-                const prev = compData[i-1];
-                
-                // Check if they belong to the same athlete run
-                if (curr.BIB === prev.BIB && curr.Phase === prev.Phase && curr.Gender === prev.Gender) {
-                    if (curr.Gate === 'Roll') {
-                        const pGate = prev.Gate;
-                        if (pGate && pGate !== 'Start' && pGate !== 'Ramp') {
-                            precedingGateCounts[pGate] = (precedingGateCounts[pGate] || 0) + 1;
-                        }
-                    }
+            // Find the longest sequence found in the data (most complete run)
+            let longestSequence = [];
+            Object.values(runs).forEach(seq => {
+                // If this run has more gates, or same amount but we prefer it (could add logic), pick it
+                if (seq.length > longestSequence.length) {
+                    longestSequence = seq;
                 }
-            }
+            });
 
-            let rollAfterGate = null;
-            let maxCount = -1;
-            for (const [gate, count] of Object.entries(precedingGateCounts)) {
-                if (count > maxCount) {
-                    maxCount = count;
-                    rollAfterGate = gate;
-                }
-            }
+            // Remove duplicates from the sequence just in case, while preserving order
+            const finalOrder = [...new Set(longestSequence)];
 
-            // Construct Final Order
-            let finalOrder = [];
-            // If we never found a 'Roll' (maybe it's not in data), just return numerics
-            if (!hasRoll) {
-                finalOrder = sortedNumericGates;
-            } else {
-                // If we found a predecessor, insert Roll after it. 
-                // If no predecessor found (Roll is first), insert at 0.
-                if (!rollAfterGate) {
-                    finalOrder = ['Roll', ...sortedNumericGates];
-                } else {
-                    finalOrder = [];
-                    let inserted = false;
-                    for (const g of sortedNumericGates) {
-                        finalOrder.push(g);
-                        if (g === rollAfterGate) {
-                            finalOrder.push('Roll');
-                            inserted = true;
-                        }
-                    }
-                    // Fallback: if predecessor was somehow not in sorted list (rare), put Roll at end or based on config logic
-                    if (!inserted) finalOrder.push('Roll'); 
-                }
+            // Fallback: if data is weird and we found no sequence, use numeric sort
+            if (finalOrder.length === 0) {
+                const uniqueGates = [...new Set(compData.map(d => d.Gate))].filter(g => g && g !== 'Start' && g !== 'Finish' && g !== 'Ramp');
+                uniqueGates.sort((a,b) => {
+                     if (a === 'Roll') return 0; // Hard to guess position
+                     return parseInt(a) - parseInt(b);
+                });
+                return {
+                    orderedGates: uniqueGates,
+                    upstreamGates: Array.from(detectedUpstreams)
+                };
             }
 
             return {
@@ -936,6 +886,7 @@
             };
             
             // 1. SCAN COMPETITION STRUCTURE GLOBALLY
+            // This determines order and upstreams based on the selected competition
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
 
             // 2. Filter for specific Race (Phase + Gender)
@@ -1100,7 +1051,7 @@
             const rampColorScale = d3.scaleOrdinal().domain(rampWinnerPieData.map(d => d.label)).range(['#a855f7', '#ec4899', '#f97316', '#84cc16']);
             drawPieChartAndLegend("#pie-chart-ramp-compact", "#pie-legend-ramp-compact", rampWinnerPieData, rampColorScale);
         }
-        
+
         // --- INITIALIZE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
             loadInitialData();
