@@ -1392,3 +1392,15 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,M,H4,Finish,G,3,Finish,2,2,,
 2024,OLY,M,H4,Finish,B,2,Finish,3,3,,
 2024,OLY,M,H4,Finish,Y,4,Finish,4,4,,
+2024,OLY,M,H5,Ramp,R,1,Assigned,,,,NEVEU Boris
+2024,OLY,M,H5,Ramp,G,2,Assigned,,,,JEMAI Salim
+2024,OLY,M,H5,Ramp,B,3,Assigned,,,,DOUGOUD Martin
+2024,OLY,M,H5,Ramp,Y,4,Assigned,,,,MARINIC Matija
+2024,OLY,M,H5,Gate 1,R,1,Down-Left,1,,,
+2024,OLY,M,H5,Gate 1,B,3,Down-Left,2,,,
+2024,OLY,M,H5,Gate 1,G,2,Down-Left,3,,,
+2024,OLY,M,H5,Gate 1,Y,4,Down-Left,4,,,
+2024,OLY,M,H5,Gate 2,R,1,Left-Up,1,,Left-Up,
+2024,OLY,M,H5,Gate 2,B,3,Right-Up,2,,SPLIT,
+2024,OLY,M,H5,Gate 2,G,2,Right-Up,3,,FOLLOW,
+2024,OLY,M,H5,Gate 2,Y,4,Left-Up,4,,SPLIT,
