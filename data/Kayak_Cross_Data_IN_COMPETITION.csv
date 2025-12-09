@@ -1133,10 +1133,6 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,M,R8,Gate 2,Y,3,Left-Up,3,3,SPLIT,
 2024,OLY,M,R8,Gate 2,B,4,Left-Up,4,4,FOLLOW,
 2024,OLY,M,R8,Gate 3,R,2,Down-Right,1,1,,
-2024,OLY,M,R8,Gate 3,B,4,Down-Right,2,4,,
-2024,OLY,M,R8,Gate 3,Y,3,Down-Right,3,3,,
-2024,OLY,M,R8,Gate 3,G,1,Down-Right,4,2,,
-2024,OLY,M,R8,Gate 3,R,2,Down-Right,1,1,,
 2024,OLY,M,R8,Gate 3,G,1,Down-Right,2,2,,
 2024,OLY,M,R8,Gate 3,Y,3,Down-Right,3,3,,
 2024,OLY,M,R8,Gate 3,B,4,Down-Right,4,4,,
@@ -1256,9 +1252,6 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,M,Rep2,Finish,R,2,Finish,1,1,,
 2024,OLY,M,Rep2,Finish,B,3,Finish,2,2,,
 2024,OLY,M,Rep2,Finish,G,1,Finish,3,3,,
-2024,OLY,M,Rep3,Ramp,R,2,Assigned,,1,,JEGOU Liam
-2024,OLY,M,Rep3,Ramp,B,1,Assigned,,3,,EICHFELD Casey
-2024,OLY,M,Rep3,Ramp,G,3,Assigned,,2,,BURGESS Adam
 2024,OLY,M,Rep3,Ramp,R,2,Assigned,,1,,JEGOU Liam
 2024,OLY,M,Rep3,Ramp,G,4,Assigned,,2,,BURGESS Adam
 2024,OLY,M,Rep3,Ramp,B,1,Assigned,,3,,EICHFELD Casey
