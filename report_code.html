@@ -232,7 +232,7 @@
             tabs.forEach(tab => {
                 const isActive = tab.node() === activeTab.node();
                 tab.classed("text-indigo-400 border-indigo-500", isActive)
-                   .classed("text-slate-400 border-transparent", !isActive);
+                    .classed("text-slate-400 border-transparent", !isActive);
             });
 
             reports.forEach((report, index) => {
@@ -446,8 +446,15 @@
             }
         }
 
-        // --- ATHLETE PROFILE TAB ---
+        // --- ATHLETE PROFILE TAB (FIXED: STATE PERSISTENCE) ---
         function setupAthleteProfileTab() {
+            // Capture current top-level filter state
+            const currentFilters = {
+                year: selectorsAthlete.year.property("value"),
+                competition: selectorsAthlete.competition.property("value"),
+                gender: selectorsAthlete.gender.property("value")
+            };
+
             const uniqueValues = {
                 year: [...new Set(masterDataCompact.map(d => d.Year))].sort((a, b) => b - a),
                 competition: [...new Set(masterDataCompact.map(d => d.Competition))].sort(),
@@ -460,16 +467,28 @@
                     .join("option")
                     .attr("value", d => d)
                     .text(d => d);
+                
+                // Restore filter state if it exists in the new data
+                if (currentFilters[key] && (currentFilters[key] === 'All' || uniqueValues[key].includes(key === 'year' ? +currentFilters[key] : currentFilters[key]))) {
+                     selectorsAthlete[key].property("value", currentFilters[key]);
+                }
             }
             
             Object.values(selectorsAthlete).forEach(sel => sel.on("change", updateAthleteSelectors));
-            
             d3.selectAll(".athlete-select").on("change", updateAthleteProfiles);
 
             updateAthleteSelectors();
         }
 
         function updateAthleteSelectors() {
+            // 1. CAPTURE STATE: Save the athletes currently selected by the user
+            const currentSelections = {};
+            d3.selectAll(".athlete-select").each(function() {
+                const id = d3.select(this).attr("id");
+                currentSelections[id] = d3.select(this).property("value");
+            });
+
+            // Standard filtering logic
             const selectedFilters = {
                 year: selectorsAthlete.year.property("value"),
                 competition: selectorsAthlete.competition.property("value"),
@@ -492,14 +511,26 @@
             const uniqueAthleteNames = ['', ...[...new Set(athleteRampData.map(d => formatAthleteName(d.AthleteName)))].sort()];
 
             const selects = d3.selectAll(".athlete-select");
-            selects.html(""); 
+            selects.html(""); // Still clear to ensure the list is fresh
 
+            // Rebuild the options
             selects.each(function() {
                 d3.select(this).selectAll("option")
                     .data(uniqueAthleteNames)
                     .join("option")
                     .attr("value", d => d)
                     .text(d => d || "Select Athlete...");
+            });
+            
+            // 2. RESTORE STATE: Set the values back to what they were
+            selects.each(function() {
+                const id = d3.select(this).attr("id");
+                const previousValue = currentSelections[id];
+                
+                // Only restore if the previously selected athlete is still in the new filtered list
+                if (previousValue && uniqueAthleteNames.includes(previousValue)) {
+                    d3.select(this).property("value", previousValue);
+                }
             });
             
             updateAthleteProfiles();
@@ -904,13 +935,12 @@
             };
             
             // 1. SCAN COMPETITION STRUCTURE GLOBALLY
-            // This determines order and upstreams based on the selected competition
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
 
-            // 2. Filter for specific Race (Phase + Gender)
+            // 2. Filter for specific Race
             const currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
-            // 3. Calculate Tactics using the SCANNED upstream gates
+            // 3. Calculate Tactics
             calculateTacticLogic(currentRaceData, structure.upstreamGates);
 
             const bibToNameMap = new Map();
@@ -926,7 +956,6 @@
             });
 
             // --- DYNAMIC AXIS LOGIC ---
-            // Use the scanned structure for the layout
             const courseDisplayOrder = structure.orderedGates;
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
 
@@ -1024,7 +1053,6 @@
             
             // Filter the full layout for the compact view's specific gates
             const compactGatesToShow = new Set(['1', '2', '3', '8', 'Roll']);
-            // Add any other upstream gates detected in config to the compact view so they don't disappear
             structure.upstreamGates.forEach(g => compactGatesToShow.add(g));
 
             const courseDisplayOrder = fullCourseDisplayOrder.filter(gate => compactGatesToShow.has(gate));
