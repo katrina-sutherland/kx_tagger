@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,50 +8,19 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .x-axis path, .y-axis path {
-            display: none;
-        }
-        .x-axis .tick line, .y-axis .tick line {
-            stroke: #334155; /* slate-700 */
-            stroke-dasharray: 2,2;
-        }
-        .x-axis .tick text {
-            fill: #94a3b8; /* slate-400 */
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .y-axis .tick text {
-             fill: #94a3b8; /* slate-400 */
-             font-size: 14px;
-             font-weight: 700; /* bold */
-        }
-        .domain {
-            display: none;
-        }
-        .dark-select {
-            background-color: #1e293b; /* slate-800 */
-            border-color: #475569; /* slate-600 */
-            color: #e2e8f0; /* slate-200 */
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .x-axis path, .y-axis path { display: none; }
+        .x-axis .tick line, .y-axis .tick line { stroke: #334155; stroke-dasharray: 2,2; }
+        .x-axis .tick text { fill: #94a3b8; font-size: 12px; font-weight: 600; }
+        .y-axis .tick text { fill: #94a3b8; font-size: 14px; font-weight: 700; }
+        .domain { display: none; }
+        .dark-select, .dark-input { background-color: #1e293b; border-color: #475569; color: #e2e8f0; }
         .tooltip {
-            position: absolute;
-            text-align: left;
-            padding: 8px;
-            font: 12px sans-serif;
-            background: #1e293b; /* slate-800 */
-            color: white;
-            border: 1px solid #334155; /* slate-700 */
-            border-radius: 8px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.2s;
+            position: absolute; text-align: left; padding: 8px; font: 12px sans-serif;
+            background: #1e293b; color: white; border: 1px solid #334155; border-radius: 8px;
+            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 50;
         }
-        .chart-card {
-            transition: border-color 0.3s ease-in-out;
-        }
+        .chart-card { transition: border-color 0.3s ease-in-out; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-200 antialiased">
@@ -61,7 +30,6 @@
             <h1 class="text-3xl font-bold text-slate-100">Kayak Cross Analysis</h1>
         </header>
 
-        <!-- Tab Navigation -->
         <div class="max-w-7xl mx-auto mb-8 border-b border-slate-700">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button id="tab-full" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
@@ -70,10 +38,12 @@
                 <button id="tab-compact" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
                     In-Competition Report
                 </button>
+                <button id="tab-athlete" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                    Athlete Profile
+                </button>
             </nav>
         </div>
 
-        <!-- Full Report Content -->
         <div id="report-full">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-full" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
@@ -123,14 +93,13 @@
                     </div>
                      <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st Upstream When Overall Finish 2nd</h3>
-                         <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
-                         <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                              <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                              <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- In-Competition Report Content -->
         <div id="report-compact" class="hidden">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-compact" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
@@ -163,17 +132,54 @@
                     </div>
                 </div>
                 <div class="lg:col-span-1 grid grid-rows-2 gap-8">
-                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
-                        <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib Color</h3>
-                        <div id="pie-chart-bib-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
-                        <div id="pie-legend-bib-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
-                    </div>
+                          <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                              <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib Color</h3>
+                              <div id="pie-chart-bib-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
+                              <div id="pie-legend-bib-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                          </div>
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
                         <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp Position</h3>
                         <div id="pie-chart-ramp-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
                         <div id="pie-legend-ramp-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <div id="report-athlete" class="hidden">
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div id="athlete-search-controls" class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label for="year-select-athlete" class="block text-sm font-medium text-slate-300 mb-2">Year</label>
+                                    <select id="year-select-athlete" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                </div>
+                                <div>
+                                    <label for="competition-select-athlete" class="block text-sm font-medium text-slate-300 mb-2">Competition</label>
+                                    <select id="competition-select-athlete" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                </div>
+                                <div>
+                                    <label for="gender-select-athlete" class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
+                                    <select id="gender-select-athlete" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700 pt-6">
+                                <div>
+                                    <label for="athlete-select-1" class="block text-sm font-medium text-slate-300 mb-2">Athlete 1</label>
+                                    <select id="athlete-select-1" class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                </div>
+                                <div>
+                                    <label for="athlete-select-2" class="block text-sm font-medium text-slate-300 mb-2">Athlete 2</label>
+                                    <select id="athlete-select-2" class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                </div>
+                                <div>
+                                    <label for="athlete-select-3" class="block text-sm font-medium text-slate-300 mb-2">Athlete 3</label>
+                                    <select id="athlete-select-3" class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                </div>
+                            </div>
+                </div>
+                <div id="athlete-profile-area" class="mt-8 space-y-8">
+                    </div>
             </div>
         </div>
     </div>
@@ -185,13 +191,15 @@
         const bibColors = { 'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308' };
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
-
+        
         // --- DOM SELECTORS ---
         const tooltip = d3.select(".tooltip");
         const tabFull = d3.select("#tab-full");
         const tabCompact = d3.select("#tab-compact");
+        const tabAthlete = d3.select("#tab-athlete");
         const reportFull = d3.select("#report-full");
         const reportCompact = d3.select("#report-compact");
+        const reportAthlete = d3.select("#report-athlete");
         
         const selectorsFull = {
             year: d3.select("#year-select-full"),
@@ -208,24 +216,44 @@
             phase: d3.select("#phase-select-compact")
         };
         const filterControlsCompact = d3.select("#filter-controls-compact");
+        
+        const selectorsAthlete = {
+            year: d3.select("#year-select-athlete"),
+            competition: d3.select("#competition-select-athlete"),
+            gender: d3.select("#gender-select-athlete")
+        };
 
 
         // --- TAB HANDLING ---
+        function setActiveTab(activeTab) {
+            const tabs = [tabFull, tabCompact, tabAthlete];
+            const reports = [reportFull, reportCompact, reportAthlete];
+
+            tabs.forEach(tab => {
+                const isActive = tab.node() === activeTab.node();
+                tab.classed("text-indigo-400 border-indigo-500", isActive)
+                    .classed("text-slate-400 border-transparent", !isActive);
+            });
+
+            reports.forEach((report, index) => {
+                report.classed("hidden", tabs[index].node() !== activeTab.node());
+            });
+        }
+
         tabFull.on("click", () => {
-            tabFull.classed("text-indigo-400 border-indigo-500", true).classed("text-slate-400 border-transparent", false);
-            tabCompact.classed("text-indigo-400 border-indigo-500", false).classed("text-slate-400 border-transparent", true);
-            reportFull.classed("hidden", false);
-            reportCompact.classed("hidden", true);
+            setActiveTab(tabFull);
             if (masterDataFull.length > 0) updateAllChartsFull();
         });
 
         tabCompact.on("click", () => {
-            tabCompact.classed("text-indigo-400 border-indigo-500", true).classed("text-slate-400 border-transparent", false);
-            tabFull.classed("text-indigo-400 border-indigo-500", false).classed("text-slate-400 border-transparent", true);
-            reportCompact.classed("hidden", false);
-            reportFull.classed("hidden", true);
+            setActiveTab(tabCompact);
             if (masterDataCompact.length > 0) updateAllChartsCompact();
         });
+        
+        tabAthlete.on("click", () => {
+            setActiveTab(tabAthlete);
+        });
+
 
         // --- DATA PARSING & FORMATTING ---
         function formatAthleteName(name) {
@@ -240,33 +268,117 @@
         }
 
         function parseCsvData(csvString) {
-            return d3.csvParse(csvString, d => ({
+            return d3.csvParse(csvString, (d, i) => ({
                 Year: +d.Year,
                 Competition: d.Competition,
                 Gender: d.Gender,
                 Phase: d.Phase,
+                // Ensure nice gate names
                 Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : d.Gate),
                 BIB: d.BIB,
+                // Order is "Rank" (Y-axis)
                 Position: +d.Order,
                 RampPosition: +d['Ramp Position'],
                 FinalPosition: +d['Final Position'],
                 UpstreamTactic: d['Upstream Tactic'],
-                AthleteName: d['Athlete Name']
+                AthleteName: d['Athlete Name'],
+                Action: d.Action
             }));
         }
+
+        // --- GLOBAL COMPETITION SCANNER ---
+        // Updated logic: Detects structure based on actual run data order
+        function scanCompetitionStructure(year, competition, allData) {
+            
+            // 1. Filter data to ONLY this competition/year
+            const compData = allData.filter(d => d.Year === year && d.Competition === competition);
+            
+            if (compData.length === 0) {
+                return { 
+                    orderedGates: ['1','2','3','4','5','6','Roll','7','8'], 
+                    upstreamGates: ['2', '8'] 
+                };
+            }
+
+            // 2. Detect Upstream Gates
+            // If ANY athlete in the competition has "Up" action or tactic at a gate, it's Upstream
+            const detectedUpstreams = new Set();
+            compData.forEach(d => {
+                const gate = d.Gate;
+                if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+
+                const isUpstreamAction = (d.Action && (d.Action.includes('Up') || d.Action.includes('up')));
+                const isUpstreamTactic = (d.UpstreamTactic && d.UpstreamTactic.trim().length > 0);
+                
+                if (isUpstreamAction || isUpstreamTactic) {
+                    detectedUpstreams.add(gate);
+                }
+            });
+
+            // 3. Detect Course Order (X-Axis)
+            // We find the "Run" with the most gates to use as the template for the course order.
+            // This relies on the CSV rows being ordered by time/sequence for each athlete.
+            
+            const runs = {}; // Key: Unique Run ID, Value: Array of Gates
+            
+            compData.forEach(d => {
+                // Create a unique ID for a specific run
+                const runId = `${d.Phase}-${d.Gender}-${d.BIB}`; 
+                
+                if (!runs[runId]) runs[runId] = [];
+                
+                // Only collect actual obstacles, ignore Start/Finish/Ramp for sequence detection
+                if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp') {
+                    runs[runId].push(d.Gate);
+                }
+            });
+
+            // Find the longest sequence found in the data (most complete run)
+            let longestSequence = [];
+            Object.values(runs).forEach(seq => {
+                // If this run has more gates, or same amount but we prefer it (could add logic), pick it
+                if (seq.length > longestSequence.length) {
+                    longestSequence = seq;
+                }
+            });
+
+            // Remove duplicates from the sequence just in case, while preserving order
+            const finalOrder = [...new Set(longestSequence)];
+
+            // Fallback: if data is weird and we found no sequence, use numeric sort
+            if (finalOrder.length === 0) {
+                const uniqueGates = [...new Set(compData.map(d => d.Gate))].filter(g => g && g !== 'Start' && g !== 'Finish' && g !== 'Ramp');
+                uniqueGates.sort((a,b) => {
+                      if (a === 'Roll') return 0; // Hard to guess position
+                      return parseInt(a) - parseInt(b);
+                });
+                return {
+                    orderedGates: uniqueGates,
+                    upstreamGates: Array.from(detectedUpstreams)
+                };
+            }
+
+            return {
+                orderedGates: finalOrder,
+                upstreamGates: Array.from(detectedUpstreams)
+            };
+        }
+
 
         // --- INITIALIZATION ---
         async function loadInitialData() {
             showInitialMessage("#chart-full", "Loading data...");
             showInitialMessage("#chart-compact", "Loading data...");
 
+            const cacheBuster = new Date().getTime();
+
             try {
                 const [responseFull, responseCompact] = await Promise.all([
-                    fetch('data/Kayak_Cross_Data.csv'),
-                    fetch('data/Kayak_Cross_Data_IN_COMPETITION.csv') 
+                    fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`),
+                    fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`) 
                 ]);
 
-                if (!responseFull.ok) throw new Error(`Failed to load: Kayak_Cross_Data.csv`);
+                if (!responseFull.ok) throw new Error(`Failed to load: kx_race_analysis_git.csv`);
                 if (!responseCompact.ok) throw new Error(`Failed to load: Kayak_Cross_Data_IN_COMPETITION.csv`);
 
                 const csvStringFull = await responseFull.text();
@@ -282,13 +394,14 @@
                 filterControlsCompact.classed("hidden", false);
                 populateFilters(masterDataCompact, selectorsCompact);
                 updateAllChartsCompact();
+                
+                setupAthleteProfileTab();
 
-                 // Set up auto-refresh
                 setInterval(loadInitialData, 90000); 
 
                 window.addEventListener('resize', () => {
-                    updateAllChartsFull();
-                    updateAllChartsCompact();
+                    if (!reportFull.classed('hidden')) updateAllChartsFull();
+                    if (!reportCompact.classed('hidden')) updateAllChartsCompact();
                 });
 
             } catch (error) {
@@ -324,7 +437,7 @@
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
             for (const key in selectorGroup) {
-                selectorGroup[key].selectAll("option").data(uniqueValues[key]).join("option").attr("value", d => d).text(d => d);
+                selectorGroup[key].selectAll("option").data(['All', ...uniqueValues[key]]).join("option").attr("value", d => d).text(d => d);
             }
             if (selectorGroup === selectorsFull) {
                 Object.values(selectorGroup).forEach(sel => sel.on("change", updateAllChartsFull));
@@ -332,6 +445,178 @@
                 Object.values(selectorGroup).forEach(sel => sel.on("change", updateAllChartsCompact));
             }
         }
+
+        // --- ATHLETE PROFILE TAB (FIXED: STATE PERSISTENCE) ---
+        function setupAthleteProfileTab() {
+            // Capture current top-level filter state
+            const currentFilters = {
+                year: selectorsAthlete.year.property("value"),
+                competition: selectorsAthlete.competition.property("value"),
+                gender: selectorsAthlete.gender.property("value")
+            };
+
+            const uniqueValues = {
+                year: [...new Set(masterDataCompact.map(d => d.Year))].sort((a, b) => b - a),
+                competition: [...new Set(masterDataCompact.map(d => d.Competition))].sort(),
+                gender: [...new Set(masterDataCompact.map(d => d.Gender))].sort(),
+            };
+
+            for (const key in selectorsAthlete) {
+                selectorsAthlete[key].selectAll("option")
+                    .data(['All', ...uniqueValues[key]])
+                    .join("option")
+                    .attr("value", d => d)
+                    .text(d => d);
+                
+                // Restore filter state if it exists in the new data
+                if (currentFilters[key] && (currentFilters[key] === 'All' || uniqueValues[key].includes(key === 'year' ? +currentFilters[key] : currentFilters[key]))) {
+                     selectorsAthlete[key].property("value", currentFilters[key]);
+                }
+            }
+            
+            Object.values(selectorsAthlete).forEach(sel => sel.on("change", updateAthleteSelectors));
+            d3.selectAll(".athlete-select").on("change", updateAthleteProfiles);
+
+            updateAthleteSelectors();
+        }
+
+        function updateAthleteSelectors() {
+            // 1. CAPTURE STATE: Save the athletes currently selected by the user
+            const currentSelections = {};
+            d3.selectAll(".athlete-select").each(function() {
+                const id = d3.select(this).attr("id");
+                currentSelections[id] = d3.select(this).property("value");
+            });
+
+            // Standard filtering logic
+            const selectedFilters = {
+                year: selectorsAthlete.year.property("value"),
+                competition: selectorsAthlete.competition.property("value"),
+                gender: selectorsAthlete.gender.property("value")
+            };
+
+            let filteredData = masterDataCompact;
+
+            if (selectedFilters.year !== 'All') {
+                filteredData = filteredData.filter(d => d.Year === +selectedFilters.year);
+            }
+            if (selectedFilters.competition !== 'All') {
+                filteredData = filteredData.filter(d => d.Competition === selectedFilters.competition);
+            }
+            if (selectedFilters.gender !== 'All') {
+                filteredData = filteredData.filter(d => d.Gender === selectedFilters.gender);
+            }
+
+            const athleteRampData = filteredData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            const uniqueAthleteNames = ['', ...[...new Set(athleteRampData.map(d => formatAthleteName(d.AthleteName)))].sort()];
+
+            const selects = d3.selectAll(".athlete-select");
+            selects.html(""); // Still clear to ensure the list is fresh
+
+            // Rebuild the options
+            selects.each(function() {
+                d3.select(this).selectAll("option")
+                    .data(uniqueAthleteNames)
+                    .join("option")
+                    .attr("value", d => d)
+                    .text(d => d || "Select Athlete...");
+            });
+            
+            // 2. RESTORE STATE: Set the values back to what they were
+            selects.each(function() {
+                const id = d3.select(this).attr("id");
+                const previousValue = currentSelections[id];
+                
+                // Only restore if the previously selected athlete is still in the new filtered list
+                if (previousValue && uniqueAthleteNames.includes(previousValue)) {
+                    d3.select(this).property("value", previousValue);
+                }
+            });
+            
+            updateAthleteProfiles();
+        }
+        
+        function updateAthleteProfiles() {
+            const mainContainer = d3.select("#athlete-profile-area");
+            mainContainer.html(""); 
+
+            const selectedAthletes = [
+                d3.select("#athlete-select-1").property("value"),
+                d3.select("#athlete-select-2").property("value"),
+                d3.select("#athlete-select-3").property("value")
+            ];
+            
+            const athletesToDisplay = selectedAthletes.filter(name => name && name.trim() !== '');
+
+            athletesToDisplay.forEach(athleteName => {
+                appendAthleteProfile(athleteName, mainContainer);
+            });
+        }
+        
+        function appendAthleteProfile(selectedFormattedName, container) {
+            if (!selectedFormattedName) return;
+
+            const originalAthleteEntry = masterDataCompact.find(d => formatAthleteName(d.AthleteName) === selectedFormattedName);
+            if (!originalAthleteEntry) return;
+            
+            const originalName = originalAthleteEntry.AthleteName;
+            
+            const athleteRampEntries = masterDataCompact.filter(d => d.AthleteName === originalName && d.Gate === 'Ramp');
+            
+            const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
+            athleteRampEntries.sort((a, b) => {
+                const regex = /^([A-Za-z]+)(\d*)$/;
+                const matchA = a.Phase.match(regex) || [a.Phase, a.Phase, ''];
+                const matchB = b.Phase.match(regex) || [b, b, ''];
+                const orderA = phaseSortOrder[matchA[1]] || 99;
+                const orderB = phaseSortOrder[matchB[1]] || 99;
+                if (orderA !== orderB) return orderA - orderB;
+                return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
+            });
+
+            const profileData = athleteRampEntries.map(rampEntry => {
+                const { Phase: phase, BIB: bib, RampPosition: rampPos } = rampEntry;
+                const fullRaceDataForAthlete = masterDataCompact.filter(d => d.Phase === phase && d.BIB === bib);
+                const upstreamData = fullRaceDataForAthlete.find(d => (d.Gate === '2' || d.Gate === '8') && d.UpstreamTactic && d.UpstreamTactic.trim() !== '');
+                
+                let tactic = upstreamData?.UpstreamTactic || 'N/A';
+                let direction = upstreamData?.Action || 'N/A';
+
+                if (tactic === 'Left-Up' || tactic === 'Right-Up') {
+                    tactic = 'Was in 1st Place';
+                }
+
+                return { phase, bib, rampPos, direction, tactic };
+            });
+
+            if (profileData.length === 0) {
+                 return;
+            }
+
+            const card = container.append("div").attr("class", "bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-x-auto");
+            card.append("h3").attr("class", "text-lg font-bold text-slate-100 p-4 border-b border-slate-700").text(selectedFormattedName);
+            
+            const table = card.append("table").attr("class", "w-full text-left text-sm");
+            const thead = table.append("thead").attr("class", "bg-slate-700/50");
+            thead.append("tr")
+                .selectAll("th")
+                .data(['Phase', 'Bib', 'Ramp', 'Direction', 'Tactic'])
+                .join("th")
+                .attr("class", "p-3 font-semibold text-slate-300")
+                .text(d => d);
+
+            const tbody = table.append("tbody");
+            profileData.forEach(d => {
+                const row = tbody.append("tr").attr("class", "border-t border-slate-700");
+                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.phase);
+                row.append("td").attr("class", "p-3")
+                    .html(`<div class="w-4 h-4 rounded-sm inline-block" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
+                row.append("td").attr("class", "p-3").text(d.rampPos);
+                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.direction);
+                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.tactic);
+            });
+        }
+
 
         // --- GENERIC PIE CHART ---
         function drawPieChartAndLegend(chartSelector, legendSelector, data, colorScale) {
@@ -356,14 +641,49 @@
                     tooltip.html(`<strong>${d.data.label}</strong><br>${d.data.value} times (${percent}%)`).style("left", `${event.pageX + 10}px`).style("top", `${event.pageY - 28}px`);
                 }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
             const labelArc = d3.arc().innerRadius(66).outerRadius(66);
-            g.selectAll('text.label').data(pie(dataForPie)).join('text').attr('class', 'label text-xs font-bold pointer-events-none').attr('transform', d => `translate(${labelArc.centroid(d)})`).attr('text-anchor', 'middle').attr('fill', '#FFFFFF').text(d => ((d.data.value / totalValue) * 100 > 5 ? `${((d.data.value / totalValue) * 100).toFixed(0)}%` : ''));
+            g.selectAll('text.label').data(pie(dataForPie)).join('text').attr('class', 'label text-sm font-bold pointer-events-none').attr('transform', d => `translate(${labelArc.centroid(d)})`).attr('text-anchor', 'middle').attr('fill', '#000000').text(d => ((d.data.value / totalValue) * 100 > 5 ? `${((d.data.value / totalValue) * 100).toFixed(0)}%` : ''));
             const legendItems = legendContainer.selectAll('div').data(data).join('div').attr('class', 'flex items-center space-x-2');
             legendItems.append('div').attr('class', 'w-3 h-3 rounded-sm').style('background-color', d => colorScale(d.label));
             legendItems.append('span').attr('class', 'text-xs text-slate-300').text(d => `${d.label} (${(totalValue > 0 ? (d.value / totalValue) * 100 : 0).toFixed(2)}%)`);
         }
 
+        // --- CORRECTED TACTIC LOGIC ---
+        function calculateTacticLogic(raceData, upstreamGates) {
+            upstreamGates.forEach(gate => {
+                const gateEvents = raceData
+                    .filter(d => d.Gate === gate)
+                    .sort((a, b) => a.Position - b.Position);
+
+                if (gateEvents.length === 0) return;
+
+                const leader = gateEvents[0];
+                leader.displayTactic = leader.UpstreamTactic;
+
+                for (let i = 1; i < gateEvents.length; i++) {
+                    const currentAthlete = gateEvents[i];
+                    const athleteAhead = gateEvents[i - 1];
+
+                    if (currentAthlete.Action && athleteAhead.Action) {
+                        if (currentAthlete.Action === athleteAhead.Action) {
+                            currentAthlete.displayTactic = 'FOLLOW';
+                        } else {
+                            currentAthlete.displayTactic = `SPLIT - ${currentAthlete.Action}`;
+                        }
+                    } else {
+                         currentAthlete.displayTactic = currentAthlete.UpstreamTactic;
+                    }
+                }
+            });
+            raceData.forEach(d => {
+                if (!upstreamGates.includes(d.Gate)) {
+                    d.displayTactic = d.UpstreamTactic;
+                }
+            });
+        }
+
+
         // --- FULL REPORT CHARTING ---
-        function drawLineChartFull(raceData, rampPositions) {
+        function drawLineChartFull(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
             const svg = d3.select("#chart-full");
             svg.selectAll("*").remove();
             const defs = svg.append('defs');
@@ -379,12 +699,19 @@
             const { width, height } = d3.select("#chart-container-full").node().getBoundingClientRect();
             const margin = { top: 50, right: 20, bottom: 20, left: 90 };
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-            const courseDisplayOrderFull = ['1', 'Roll', '2', '3', '4', '5', '6', '7', '8', 'Finish'];
-            const lineSortOrderFull = ['Start', ...courseDisplayOrderFull];
-            const xScale = d3.scalePoint().domain(lineSortOrderFull).range([0, width - margin.left - margin.right]).padding(0.5);
+
+            const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
-            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues(courseDisplayOrderFull).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => ({'1':'#228B22','3':'#228B22','4':'#228B22','5':'#228B22','6':'#228B22','7':'#228B22','2':'#DC143C','8':'#DC143C','Roll':'#eab308'}[d] || '#94a3b8'));
+            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
+            
+            // DYNAMIC COLORING
+            xAxis.selectAll(".tick text").style("fill", d => {
+                 if (d === 'Finish' || d === 'Start') return '#94a3b8'; // Slate-400
+                 if (d === 'Roll') return '#eab308'; // Yellow
+                 if (upstreamGates.includes(d)) return '#DC143C'; // Red (Upstream)
+                 return '#22c55e'; // Green (Downstream) - Default
+            });
+
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const finishTextNode = finishTick.select('text').node();
@@ -398,17 +725,57 @@
             svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
-                chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
-                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibFullNames[bib]}: ${pos}`));
+                chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 10) - 4).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
+                sortedRamps.forEach(([bib, pos], i) => {
+                    const fullName = bibToNameMap.get(bib);
+                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+                      const textNode = chart.append("text")
+                           .attr("x", -10)
+                           .attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12))
+                           .attr("text-anchor", "end")
+                           .style("fill", bibColors[bib])
+                           .style("font-size", "10px");
+                    
+                      textNode.append("tspan")
+                           .style("font-weight", "bold")
+                           .text(`${lastName}: `);
+                    
+                      textNode.append("tspan")
+                           .style("font-weight", "normal")
+                           .text(pos);
+                });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
+
+            const labelYPositions = { };
+            // Initialize labelYPositions based on upstream gates
+            upstreamGates.forEach(g => labelYPositions[g] = []);
+
             groupedData.forEach((values, key) => {
-                chart.append("path").datum(values.sort((a, b) => lineSortOrderFull.indexOf(a.Gate) - lineSortOrderFull.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
-                chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
+                
+                const pointsData = values.filter(d => d.Gate !== 'Start');
+                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                
                 values.forEach(d => {
-                    if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
-                        const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                    if (upstreamGates.includes(d.Gate) && d.displayTactic) {
+                        if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = []; // Safety check
+
+                        const yBase = yScale(d.Position);
+                        let yPos = yBase - 12; 
+
+                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
+                        if (collision) {
+                            yPos = yBase + 20; 
+                        }
+                        labelYPositions[d.Gate].push(yPos);
+
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos)
+                            .attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        
                         if (d.displayTactic.includes(' - ')) {
                             const parts = d.displayTactic.split(' - ');
                             textEl.append("tspan").text(parts[0] + ' - ');
@@ -421,13 +788,22 @@
             });
             const legendContainer = d3.select("#legend-full");
             legendContainer.selectAll("*").remove();
-            const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
+            
+            // UPDATED SORTING LOGIC HERE
+            const legendItems = legendContainer.selectAll("div")
+                .data(Array.from(groupedData.keys()).sort((a, b) => {
+                    const order = ['R', 'G', 'B', 'Y'];
+                    return order.indexOf(a) - order.indexOf(b);
+                }))
+                .join("div")
+                .attr("class", "flex items-center");
+                
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
-            legendItems.append("span").text(d => bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
+            legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
         
         // --- COMPACT REPORT CHARTING ---
-        function drawLineChartCompact(raceData, rampPositions, bibToNameMap) {
+        function drawLineChartCompact(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
             const svg = d3.select("#chart-compact");
             svg.selectAll("*").remove();
             
@@ -446,12 +822,20 @@
             const { width, height } = d3.select("#chart-container-compact").node().getBoundingClientRect();
             const margin = { top: 50, right: 20, bottom: 20, left: 90 };
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-            const courseDisplayOrderCompact = ['Ramp', '1', '2', '3', '8', 'Finish'];
-            const lineSortOrderCompact = ['Start', ...courseDisplayOrderCompact];
-            const xScale = d3.scalePoint().domain(lineSortOrderCompact).range([0, width - margin.left - margin.right]).padding(0.5);
+            
+            const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5); 
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
-            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues(courseDisplayOrderCompact).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => ({'Ramp': '#eab308', '1': '#22c55e', '3': '#22c55e', '2': '#DC143C', '8': '#DC143C'}[d] || '#94a3b8'));
+            
+            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
+            
+             // DYNAMIC COLORING
+            xAxis.selectAll(".tick text").style("fill", d => {
+                 if (d === 'Finish' || d === 'Start') return '#94a3b8'; // Slate-400
+                 if (d === 'Roll') return '#eab308'; // Yellow
+                 if (upstreamGates.includes(d)) return '#DC143C'; // Red (Upstream)
+                 return '#22c55e'; // Green (Downstream) - Default
+            });
+            
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const bbox = finishTick.select('text').node().getBBox();
@@ -463,16 +847,57 @@
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
                 chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
-                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibToNameMap.get(bib) || bibFullNames[bib]}: ${pos}`));
+                sortedRamps.forEach(([bib, pos], i) => {
+                    const fullName = bibToNameMap.get(bib);
+                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+                    
+                    const textNode = chart.append("text")
+                        .attr("x", -10)
+                        .attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12))
+                        .attr("text-anchor", "end")
+                        .style("fill", bibColors[bib])
+                        .style("font-size", "10px");
+                    
+                    textNode.append("tspan")
+                        .style("font-weight", "bold")
+                        .text(`${lastName}: `);
+                    
+                    textNode.append("tspan")
+                        .style("font-weight", "normal")
+                        .text(pos);
+                });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
+
+            const labelYPositions = { };
+             // Initialize labelYPositions based on upstream gates
+             upstreamGates.forEach(g => labelYPositions[g] = []);
+
             groupedData.forEach((values, key) => {
-                chart.append("path").datum(values.sort((a, b) => lineSortOrderCompact.indexOf(a.Gate) - lineSortOrderCompact.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
-                chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
+                
+                const pointsData = values.filter(d => d.Gate !== 'Start');
+                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                
                 values.forEach(d => {
-                    if ((d.Gate === '2' || d.Gate === '8') && d.displayTactic) {
-                         const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                    if (upstreamGates.includes(d.Gate) && d.displayTactic) {
+                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
+
+                        const yBase = yScale(d.Position);
+                        let yPos = yBase - 12; 
+
+                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
+                        if (collision) {
+                            yPos = yBase + 20; 
+                        }
+                        labelYPositions[d.Gate].push(yPos);
+                        
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos)
+                            .attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        
                         if (d.displayTactic.includes(' - ')) {
                             const parts = d.displayTactic.split(' - ');
                             textEl.append("tspan").text(parts[0] + ' - ');
@@ -485,7 +910,16 @@
             });
             const legendContainer = d3.select("#legend-compact");
             legendContainer.selectAll("*").remove();
-            const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
+            
+            // UPDATED SORTING LOGIC HERE
+            const legendItems = legendContainer.selectAll("div")
+                .data(Array.from(groupedData.keys()).sort((a, b) => {
+                    const order = ['R', 'G', 'B', 'Y'];
+                    return order.indexOf(a) - order.indexOf(b);
+                }))
+                .join("div")
+                .attr("class", "flex items-center");
+                
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
             legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
@@ -499,45 +933,53 @@
                 gender: selectorsFull.gender.property("value"),
                 phase: selectorsFull.phase.property("value")
             };
-            const currentRaceAllData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
-            const bibRampPositions = new Map();
-            currentRaceAllData.forEach(d => {
-                if(d.RampPosition && d.BIB) bibRampPositions.set(d.BIB, d.RampPosition);
+            // 1. SCAN COMPETITION STRUCTURE GLOBALLY
+            const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
+
+            // 2. Filter for specific Race
+            const currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            
+            // 3. Calculate Tactics
+            calculateTacticLogic(currentRaceData, structure.upstreamGates);
+
+            const bibToNameMap = new Map();
+            const rampPositions = new Map();
+
+            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            rampEntriesForCurrentRace.forEach(d => {
+                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
-            const firstSplitters = {};
-            const sortedBibsByRamp = [...bibRampPositions.entries()].sort((a,b) => a[1] - b[1]).map(entry => entry[0]);
-            sortedBibsByRamp.forEach(bib => {
-                const athleteEvents = currentRaceAllData.filter(d => d.BIB === bib);
-                athleteEvents.forEach(event => {
-                    if (event.UpstreamTactic) {
-                        event.displayTactic = event.UpstreamTactic;
-                        if (event.UpstreamTactic === 'SPLIT') {
-                            if (!firstSplitters[event.Gate]) {
-                                firstSplitters[event.Gate] = event.BIB;
-                                event.displayTactic = 'SPLIT - Left';
-                            } else {
-                                event.displayTactic = 'SPLIT - Right';
-                            }
-                        }
-                    }
-                });
+            
+            currentRaceData.forEach(d => {
+                if(d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
 
-            const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map(), rampPositions = new Map();
-            currentRaceAllData.forEach(d => {
-                if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
-                if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition);
-            });
+            // --- DYNAMIC AXIS LOGIC ---
+            const courseDisplayOrder = structure.orderedGates;
+            const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
+
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataFull = [];
+
             bibsInRace.forEach(bib => {
+                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
+
                 lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Gate !== 'Ramp' && d.Position);
-                lineChartReadyDataFull.push(...athleteRaceData);
-                if (finalPositions.has(bib)) lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
+
+                const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
+                lineChartReadyDataFull.push(...gateData);
+
+                if (finalPosition) {
+                    lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
+                }
             });
-            drawLineChartFull(lineChartReadyDataFull, rampPositions);
+
+            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
+            
+            // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
@@ -584,49 +1026,59 @@
                 gender: selectorsCompact.gender.property("value"),
                 phase: selectorsCompact.phase.property("value")
             };
-            const currentRaceAllData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+
+            // 1. SCAN COMPETITION STRUCTURE GLOBALLY
+            const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataCompact);
+
+            // 2. Filter for specific Race
+            const currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             
+            // 3. Calculate Tactics
+            calculateTacticLogic(currentRaceData, structure.upstreamGates);
+
             const bibToNameMap = new Map();
             const rampPositions = new Map();
-            currentRaceAllData.forEach(d => {
+            
+            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            rampEntriesForCurrentRace.forEach(d => {
+                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
+            });
+
+            currentRaceData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
-                const nameEntry = masterDataCompact.find(nameD => nameD.BIB === d.BIB && nameD.AthleteName);
-                if (nameEntry) bibToNameMap.set(d.BIB, formatAthleteName(nameEntry.AthleteName));
             });
 
-            const firstSplitters = {};
-            const sortedBibsByRamp = [...rampPositions.entries()].sort((a,b) => a[1] - b[1]).map(entry => entry[0]);
-             sortedBibsByRamp.forEach(bib => {
-                const athleteEvents = currentRaceAllData.filter(d => d.BIB === bib);
-                athleteEvents.forEach(event => {
-                    if (event.UpstreamTactic) {
-                        event.displayTactic = event.UpstreamTactic;
-                        if (event.UpstreamTactic === 'SPLIT') {
-                            if (!firstSplitters[event.Gate]) {
-                                firstSplitters[event.Gate] = event.BIB;
-                                event.displayTactic = 'SPLIT - Left';
-                            } else {
-                                event.displayTactic = 'SPLIT - Right';
-                            }
-                        }
-                    }
-                });
-            });
+            // --- DYNAMIC AXIS LOGIC ---
+            const fullCourseDisplayOrder = structure.orderedGates;
+            
+            // Filter the full layout for the compact view's specific gates
+            const compactGatesToShow = new Set(['1', '2', '3', '8', 'Roll']);
+            structure.upstreamGates.forEach(g => compactGatesToShow.add(g));
 
-            const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
-            const finalPositions = new Map();
-            currentRaceAllData.forEach(d => {
-                if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
-            });
+            const courseDisplayOrder = fullCourseDisplayOrder.filter(gate => compactGatesToShow.has(gate));
+            const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
+            
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataCompact = [];
+
             bibsInRace.forEach(bib => {
+                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
+
                 lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-                if (rampPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Ramp', Position: rampPositions.get(bib) });
-                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Position);
-                lineChartReadyDataCompact.push(...athleteRaceData);
-                if (finalPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
+
+                const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
+                lineChartReadyDataCompact.push(...gateData);
+
+                if (finalPosition) {
+                    lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
+                }
             });
-            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap);
+
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
+            
+            // --- PIE CHART LOGIC (UNCHANGED) ---
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
@@ -645,7 +1097,7 @@
             const rampColorScale = d3.scaleOrdinal().domain(rampWinnerPieData.map(d => d.label)).range(['#a855f7', '#ec4899', '#f97316', '#84cc16']);
             drawPieChartAndLegend("#pie-chart-ramp-compact", "#pie-legend-ramp-compact", rampWinnerPieData, rampColorScale);
         }
-        
+
         // --- INITIALIZE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
             loadInitialData();
