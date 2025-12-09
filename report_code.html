@@ -349,8 +349,8 @@
             if (finalOrder.length === 0) {
                 const uniqueGates = [...new Set(compData.map(d => d.Gate))].filter(g => g && g !== 'Start' && g !== 'Finish' && g !== 'Ramp');
                 uniqueGates.sort((a,b) => {
-                     if (a === 'Roll') return 0; // Hard to guess position
-                     return parseInt(a) - parseInt(b);
+                      if (a === 'Roll') return 0; // Hard to guess position
+                      return parseInt(a) - parseInt(b);
                 });
                 return {
                     orderedGates: uniqueGates,
@@ -757,7 +757,16 @@
             });
             const legendContainer = d3.select("#legend-full");
             legendContainer.selectAll("*").remove();
-            const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
+            
+            // UPDATED SORTING LOGIC HERE
+            const legendItems = legendContainer.selectAll("div")
+                .data(Array.from(groupedData.keys()).sort((a, b) => {
+                    const order = ['R', 'G', 'B', 'Y'];
+                    return order.indexOf(a) - order.indexOf(b);
+                }))
+                .join("div")
+                .attr("class", "flex items-center");
+                
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
             legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
@@ -870,7 +879,16 @@
             });
             const legendContainer = d3.select("#legend-compact");
             legendContainer.selectAll("*").remove();
-            const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
+            
+            // UPDATED SORTING LOGIC HERE
+            const legendItems = legendContainer.selectAll("div")
+                .data(Array.from(groupedData.keys()).sort((a, b) => {
+                    const order = ['R', 'G', 'B', 'Y'];
+                    return order.indexOf(a) - order.indexOf(b);
+                }))
+                .join("div")
+                .attr("class", "flex items-center");
+                
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
             legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
