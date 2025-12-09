@@ -1440,7 +1440,27 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,M,H6,Finish,Y,4,Finish,2,2,,
 2024,OLY,M,H6,Finish,R,2,Finish,3,3,,
 2024,OLY,M,H6,Finish,B,3,Finish,4,4,,
-2024,OLY,M,H7,Ramp,R,2,Assigned,,,,HEGGE Noah
-2024,OLY,M,H7,Ramp,G,1,Assigned,,,,QUAN Xin
-2024,OLY,M,H7,Ramp,B,3,Assigned,,,,HENDRICK Noel
-2024,OLY,M,H7,Ramp,Y,4,Assigned,,,,CARTER Tristan
+2024,OLY,M,H7,Ramp,R,2,Assigned,,1,,HEGGE Noah
+2024,OLY,M,H7,Ramp,G,1,Assigned,,3,,QUAN Xin
+2024,OLY,M,H7,Ramp,B,3,Assigned,,4,,HENDRICK Noel
+2024,OLY,M,H7,Ramp,Y,4,Assigned,,2,,CARTER Tristan
+2024,OLY,M,H7,Gate 1,R,2,Down-Left,1,1,,
+2024,OLY,M,H7,Gate 1,B,3,Down-Left,2,4,,
+2024,OLY,M,H7,Gate 1,G,1,Down-Left,3,3,,
+2024,OLY,M,H7,Gate 1,Y,4,Down-Left,4,2,,
+2024,OLY,M,H7,Gate 2,R,2,Right-Up,1,1,Right-Up,
+2024,OLY,M,H7,Gate 2,Y,4,Right-Up,2,2,FOLLOW,
+2024,OLY,M,H7,Gate 2,G,1,Left-Up,3,3,SPLIT,
+2024,OLY,M,H7,Gate 2,B,3,Left-Up,4,4,FOLLOW,
+2024,OLY,M,H7,Gate 3,R,2,Down-Right,1,1,,
+2024,OLY,M,H7,Gate 3,Y,4,Down-Right,2,2,,
+2024,OLY,M,H7,Gate 3,G,1,Down-Right,3,3,,
+2024,OLY,M,H7,Gate 3,B,3,Down-Right,4,4,,
+2024,OLY,M,H7,Gate 8,R,2,Left-Up,1,1,Left-Up,
+2024,OLY,M,H7,Gate 8,Y,4,Right-Up,2,2,SPLIT,
+2024,OLY,M,H7,Gate 8,G,1,Left-Up,3,3,SPLIT,
+2024,OLY,M,H7,Gate 8,B,3,Right-Up,4,4,SPLIT,
+2024,OLY,M,H7,Finish,R,2,Finish,1,1,,
+2024,OLY,M,H7,Finish,Y,4,Finish,2,2,,
+2024,OLY,M,H7,Finish,G,1,Finish,3,3,,
+2024,OLY,M,H7,Finish,B,3,Finish,4,4,,
