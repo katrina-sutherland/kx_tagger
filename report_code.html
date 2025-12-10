@@ -373,8 +373,6 @@
                 const timeString = now.toLocaleTimeString();
                 lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-green-500"></span> Last Updated: ${timeString}`);
 
-                setTimeout(loadInitialData, 90000); 
-
                 // Setup tabs events only once
                 if (!tabFull.on("click")) {
                     tabFull.on("click", () => { setActiveTab(tabFull); if (masterDataFull.length > 0) updateAllChartsFull(); });
@@ -391,7 +389,6 @@
                 console.error('Error loading initial CSV files:', error);
                 const timeString = new Date().toLocaleTimeString();
                 lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-red-500"></span> ${error.name}: ${error.message} (${timeString})`);
-                setTimeout(loadInitialData, 90000);
             }
         }
 
