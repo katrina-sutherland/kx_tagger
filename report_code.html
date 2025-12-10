@@ -55,6 +55,7 @@
             </nav>
         </div>
 
+        <!-- FULL REPORT CONTAINER -->
         <div id="report-full">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-full" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
@@ -111,6 +112,7 @@
             </div>
         </div>
 
+        <!-- COMPACT / IN-COMPETITION REPORT CONTAINER -->
         <div id="report-compact" class="hidden">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-compact" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
@@ -157,6 +159,7 @@
             </div>
         </div>
 
+        <!-- ATHLETE PROFILE CONTAINER -->
         <div id="report-athlete" class="hidden">
             <div class="max-w-4xl mx-auto space-y-8">
                 <div id="athlete-search-controls" class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
@@ -215,7 +218,7 @@
             tabs.forEach(tab => {
                 const isActive = tab.node() === activeTab.node();
                 tab.classed("text-indigo-400 border-indigo-500", isActive)
-                    .classed("text-slate-400 border-transparent", !isActive);
+                   .classed("text-slate-400 border-transparent", !isActive);
             });
 
             reports.forEach((report, index) => {
@@ -237,19 +240,41 @@
 
         function parseCsvData(csvString) {
             return d3.csvParse(csvString, (d, i) => {
+                // ROBUST PARSING: Check for multiple possible column headers to handle inconsistencies between files
+                const year = +d.Year || 0;
+                const competition = d.Competition || '';
+                const gender = d.Gender || '';
+                const phase = d.Phase || '';
+                
+                // Gate parsing logic
+                let gate = d.Gate || '';
+                if (gate.startsWith('Gate ')) gate = gate.replace('Gate ', '');
+                else if (gate === 'Course') gate = 'Roll';
+                
+                const bib = d.BIB || d.Bib || ''; // Check both case variants
+                const position = +(d.Order || d.Position || 0); // Check Order or Position
+                const rampPosition = +(d['Ramp Position'] || d['RampPosition'] || 0);
+                const finalPosition = +(d['Final Position'] || d['FinalPosition'] || 0);
+                const upstreamTactic = d['Upstream Tactic'] || d['UpstreamTactic'] || '';
+                
+                // Check multiple variations for Athlete Name
+                const athleteName = d['Athlete Name'] || d['Athlete'] || d['Name'] || '';
+                
+                const action = d.Action || '';
+
                 return {
-                    Year: +d.Year || 0,
-                    Competition: d.Competition || '',
-                    Gender: d.Gender || '',
-                    Phase: d.Phase || '',
-                    Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : (d.Gate || '')),
-                    BIB: d.BIB || '',
-                    Position: +d.Order || 0,
-                    RampPosition: +d['Ramp Position'] || 0,
-                    FinalPosition: +d['Final Position'] || 0,
-                    UpstreamTactic: d['Upstream Tactic'] || '',
-                    AthleteName: d['Athlete Name'] || '',
-                    Action: d.Action || ''
+                    Year: year,
+                    Competition: competition,
+                    Gender: gender,
+                    Phase: phase,
+                    Gate: gate,
+                    BIB: bib,
+                    Position: position,
+                    RampPosition: rampPosition,
+                    FinalPosition: finalPosition,
+                    UpstreamTactic: upstreamTactic,
+                    AthleteName: athleteName,
+                    Action: action
                 };
             });
         }
@@ -344,31 +369,50 @@
             const cacheBuster = now.getTime();
 
             try {
+                // EXPLICIT FETCHING
+                const urlFull = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
+                const urlCompact = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
+
                 const [responseFull, responseCompact] = await Promise.all([
-                    fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`),
-                    fetch(`https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`) 
+                    fetch(urlFull),
+                    fetch(urlCompact) 
                 ]);
 
-                if (!responseFull.ok) throw new Error(`Failed to load CSV`);
-                if (!responseCompact.ok) throw new Error(`Failed to load CSV`);
+                if (!responseFull.ok) throw new Error(`Failed to load Full Report CSV`);
+                if (!responseCompact.ok) throw new Error(`Failed to load In-Competition CSV`);
 
                 const csvStringFull = await responseFull.text();
                 const csvStringCompact = await responseCompact.text();
 
+                // Assign to specific variables
                 masterDataFull = parseCsvData(csvStringFull);
                 masterDataCompact = parseCsvData(csvStringCompact);
 
-                filterControlsFull.classed("hidden", false);
-                populateFilters(masterDataFull, selectorsFull);
-                forceDefaults(selectorsFull, masterDataFull);
-                updateAllChartsFull();
+                console.log(`Loaded ${masterDataFull.length} rows for Full Report`);
+                console.log(`Loaded ${masterDataCompact.length} rows for In-Competition Report`);
+
+                // Setup Full Report
+                if (masterDataFull.length > 0) {
+                    filterControlsFull.classed("hidden", false);
+                    populateFilters(masterDataFull, selectorsFull);
+                    forceDefaults(selectorsFull, masterDataFull);
+                    updateAllChartsFull();
+                } else {
+                    console.warn("Full Report data is empty.");
+                }
                 
-                filterControlsCompact.classed("hidden", false);
-                populateFilters(masterDataCompact, selectorsCompact);
-                forceDefaults(selectorsCompact, masterDataCompact);
-                updateAllChartsCompact();
-                
-                setupAthleteProfileTab();
+                // Setup Compact Report
+                if (masterDataCompact.length > 0) {
+                    filterControlsCompact.classed("hidden", false);
+                    populateFilters(masterDataCompact, selectorsCompact);
+                    forceDefaults(selectorsCompact, masterDataCompact);
+                    updateAllChartsCompact();
+                    
+                    // Setup Athlete Profile (Using Compact/In-Comp Data)
+                    setupAthleteProfileTab(); 
+                } else {
+                    console.warn("In-Competition Report data is empty.");
+                }
 
                 const timeString = now.toLocaleTimeString();
                 lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-green-500"></span> Last Updated: ${timeString}`);
@@ -446,6 +490,7 @@
 
         // --- ATHLETE PROFILE ---
         function setupAthleteProfileTab() {
+            // NOTE: This explicitly uses masterDataCompact (In-Competition Data)
             const currentFilters = {
                 year: selectorsAthlete.year.property("value"),
                 competition: selectorsAthlete.competition.property("value"),
@@ -466,7 +511,7 @@
                     .text(d => d);
                 
                 if (currentFilters[key] && (currentFilters[key] === 'All' || uniqueValues[key].includes(key === 'year' ? +currentFilters[key] : currentFilters[key]))) {
-                     selectorsAthlete[key].property("value", currentFilters[key]);
+                      selectorsAthlete[key].property("value", currentFilters[key]);
                 }
             }
             
@@ -549,7 +594,7 @@
             const comp = selectorsAthlete.competition.property("value");
             const gender = selectorsAthlete.gender.property("value");
 
-            // 2. Create Context Data based on selections
+            // 2. Create Context Data based on COMPACT DATA (In Competition)
             let contextData = masterDataCompact;
             if (year !== 'All') contextData = contextData.filter(d => d.Year === +year);
             if (comp !== 'All') contextData = contextData.filter(d => d.Competition === comp);
@@ -580,7 +625,7 @@
             const profileData = athleteRampEntries.map(rampEntry => {
                 const { Phase: phase, BIB: bib, RampPosition: rampPos } = rampEntry;
                 
-                // 5. Get full race data from CONTEXT DATA, ensuring we don't pull data from other competitions
+                // 5. Get full race data from CONTEXT DATA
                 const fullRaceDataForAthlete = contextData.filter(d => d.Phase === phase && d.BIB === bib);
                 
                 const upstreamData = fullRaceDataForAthlete.find(d => 
