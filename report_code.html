@@ -21,7 +21,6 @@
             pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 50;
         }
         .chart-card { transition: border-color 0.3s ease-in-out; }
-        /* Pulse animation for live update indicator */
         @keyframes pulse-green {
             0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
             70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
@@ -37,8 +36,8 @@
             <div class="w-full text-center absolute left-0 right-0 pointer-events-none">
                 <h1 class="text-3xl font-bold text-slate-100 pointer-events-auto inline-block">Kayak Cross Analysis</h1>
             </div>
-            <div id="last-updated" class="md:ml-auto text-xs text-slate-500 font-mono z-10 mt-4 md:mt-0 relative flex items-center gap-2">
-                </div>
+            <div id="last-updated" class="md:ml-auto text-xs text-slate-500 font-mono z-10 mt-4 md:mt-0 relative flex items-center gap-2 max-w-md text-right overflow-hidden whitespace-nowrap text-ellipsis">
+            </div>
         </header>
 
         <div class="max-w-7xl mx-auto mb-8 border-b border-slate-700">
@@ -236,20 +235,23 @@
         }
 
         function parseCsvData(csvString) {
-            return d3.csvParse(csvString, (d, i) => ({
-                Year: +d.Year,
-                Competition: d.Competition,
-                Gender: d.Gender,
-                Phase: d.Phase,
-                Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : d.Gate),
-                BIB: d.BIB,
-                Position: +d.Order,
-                RampPosition: +d['Ramp Position'],
-                FinalPosition: +d['Final Position'],
-                UpstreamTactic: d['Upstream Tactic'],
-                AthleteName: d['Athlete Name'],
-                Action: d.Action
-            }));
+            return d3.csvParse(csvString, (d, i) => {
+                // SAFETY: Use default values to prevent undefined crashes if headers change or cells are empty
+                return {
+                    Year: +d.Year || 0,
+                    Competition: d.Competition || '',
+                    Gender: d.Gender || '',
+                    Phase: d.Phase || '',
+                    Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : (d.Gate || '')),
+                    BIB: d.BIB || '',
+                    Position: +d.Order || 0,
+                    RampPosition: +d['Ramp Position'] || 0,
+                    FinalPosition: +d['Final Position'] || 0,
+                    UpstreamTactic: d['Upstream Tactic'] || '',
+                    AthleteName: d['Athlete Name'] || '',
+                    Action: d.Action || ''
+                };
+            });
         }
 
         // --- GLOBAL COMPETITION SCANNER ---
@@ -264,8 +266,14 @@
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
-                const isUpstreamAction = (d.Action && (d.Action.includes('Up') || d.Action.includes('up')));
-                const isUpstreamTactic = (d.UpstreamTactic && d.UpstreamTactic.trim().length > 0);
+                
+                // SAFETY: Check existence before calling methods
+                const action = d.Action || "";
+                const tactic = d.UpstreamTactic || "";
+                
+                const isUpstreamAction = (action.includes('Up') || action.includes('up'));
+                const isUpstreamTactic = (tactic.trim().length > 0);
+                
                 if (isUpstreamAction || isUpstreamTactic) {
                     detectedUpstreams.add(gate);
                 }
@@ -386,7 +394,8 @@
             } catch (error) {
                 console.error('Error loading initial CSV files:', error);
                 const timeString = new Date().toLocaleTimeString();
-                lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-red-500"></span> Error at ${timeString}`);
+                // SAFETY: Show the actual error name to help debug
+                lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-red-500"></span> ${error.name}: ${error.message} (${timeString})`);
                 setTimeout(loadInitialData, 90000);
             }
         }
@@ -429,7 +438,6 @@
             }
         }
         
-        // --- NEW HELPER: Force Defaults to avoid "Empty Chart" on load ---
         function forceDefaults(selectorGroup, data) {
             // 1. Force Year to latest
             const latestYear = d3.max(data, d => d.Year);
