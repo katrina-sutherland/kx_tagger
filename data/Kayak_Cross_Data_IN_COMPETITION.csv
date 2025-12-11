@@ -1,7 +1,7 @@
 Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position,Upstream Tactic,Athlete Name
-2025,WCh,W,R1,Ramp,R,4,Assigned,,1,,Marx Alena
-2025,WCh,W,R1,Ramp,G,3,Assigned,,2,,Sabattini Chiara
-2025,WCh,W,R1,Ramp,B,2,Assigned,,3,,Altman Marcella
+2025,WCh,W,R1,Ramp,R,4,Assigned,,1,,MARX Alena
+2025,WCh,W,R1,Ramp,G,3,Assigned,,2,,SABATTINI Chiara
+2025,WCh,W,R1,Ramp,B,2,Assigned,,3,,ALTMAN Marcella
 2025,WCh,W,R1,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R1,Gate 1,G,3,Down-Through,2,2,,
 2025,WCh,W,R1,Gate 1,B,2,Down-Through,3,3,,
@@ -17,9 +17,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R1,Finish,G,3,Finish,1,2,,
 2025,WCh,W,R1,Finish,R,4,Finish,2,1,,
 2025,WCh,W,R1,Finish,B,2,Finish,3,3,,
-2025,WCh,W,R2,Ramp,R,4,Assigned,,1,,Novak Ajda
-2025,WCh,W,R2,Ramp,G,3,Assigned,,2,,Lazkano Miren
-2025,WCh,W,R2,Ramp,B,2,Assigned,,3,,Sokolova Mariia
+2025,WCh,W,R2,Ramp,R,4,Assigned,,1,,NOVAK Ajda
+2025,WCh,W,R2,Ramp,G,3,Assigned,,2,,LAZKANO Miren
+2025,WCh,W,R2,Ramp,B,2,Assigned,,3,,SOKOLOVA Mariia
 2025,WCh,W,R2,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R2,Gate 1,G,3,Down-Through,2,2,,
 2025,WCh,W,R2,Gate 1,B,2,Down-Through,3,3,,
@@ -35,10 +35,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R2,Finish,R,4,Finish,1,1,,
 2025,WCh,W,R2,Finish,G,3,Finish,2,2,,
 2025,WCh,W,R2,Finish,B,2,Finish,3,3,,
-2025,WCh,W,R3,Ramp,R,4,Assigned,,1,,Satila Ana
-2025,WCh,W,R3,Ramp,G,3,Assigned,,2,,Kneblova Tereza
-2025,WCh,W,R3,Ramp,B,2,Assigned,,4,,Rex Rosie
-2025,WCh,W,R3,Ramp,Y,1,Assigned,,3,,Plata Laura
+2025,WCh,W,R3,Ramp,R,4,Assigned,,1,,SATILA Ana
+2025,WCh,W,R3,Ramp,G,3,Assigned,,2,,KNEBLOVA Tereza
+2025,WCh,W,R3,Ramp,B,2,Assigned,,4,,REX Rosie
+2025,WCh,W,R3,Ramp,Y,1,Assigned,,3,,PLATA Laura
 2025,WCh,W,R3,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R3,Gate 1,G,3,Down-Through,2,2,,
 2025,WCh,W,R3,Gate 1,B,2,Down-Through,3,4,,
@@ -59,9 +59,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R3,Finish,G,3,Finish,2,2,,
 2025,WCh,W,R3,Finish,Y,1,Finish,3,3,,
 2025,WCh,W,R3,Finish,B,2,Finish,4,4,,
-2025,WCh,W,R4,Ramp,R,4,Assigned,,3,,Herzog Andrea
-2025,WCh,W,R4,Ramp,G,3,Assigned,,1,,Woods Kimberley
-2025,WCh,W,R4,Ramp,B,2,Assigned,,4,,Chang Chu-Han
+2025,WCh,W,R4,Ramp,R,4,Assigned,,3,,HERZOG Andrea
+2025,WCh,W,R4,Ramp,G,3,Assigned,,1,,WOODS Kimberley
+2025,WCh,W,R4,Ramp,B,2,Assigned,,4,,CHANG Chu-Han
 2025,WCh,W,R4,Ramp,Y,1,Assigned,,2,,Li Shiting
 2025,WCh,W,R4,Gate 1,G,3,Down-Through,1,1,,
 2025,WCh,W,R4,Gate 1,Y,1,Down-Through,2,2,,
@@ -83,10 +83,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R4,Finish,Y,1,Finish,2,2,,
 2025,WCh,W,R4,Finish,R,4,Finish,3,3,,
 2025,WCh,W,R4,Finish,B,2,Finish,4,4,,
-2025,WCh,W,R5,Ramp,R,4,Assigned,,1,,Fox Noemie
-2025,WCh,W,R5,Ramp,G,3,Assigned,,2,,Stanovska Sona
-2025,WCh,W,R5,Ramp,Y,2,Assigned,,3,,Us Viktoriia
-2025,WCh,W,R5,Ramp,B,1,Assigned,,4,,Mills Waris
+2025,WCh,W,R5,Ramp,R,4,Assigned,,1,,FOX Noemie
+2025,WCh,W,R5,Ramp,G,3,Assigned,,2,,STANOVSKA Sona
+2025,WCh,W,R5,Ramp,Y,2,Assigned,,3,,US Viktoriia
+2025,WCh,W,R5,Ramp,B,1,Assigned,,4,,MILLS Waris
 2025,WCh,W,R5,Gate 1,G,3,Down-Through,1,2,,
 2025,WCh,W,R5,Gate 1,R,4,Down-Through,2,1,,
 2025,WCh,W,R5,Gate 1,B,1,Down-Through,3,4,,
@@ -107,9 +107,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R5,Finish,B,1,Finish,2,4,,
 2025,WCh,W,R5,Finish,R,4,Finish,3,1,,
 2025,WCh,W,R5,Finish,Y,2,Finish,4,3,,
-2025,WCh,W,R6,Ramp,R,4,Assigned,,1,,Hug Angele
-2025,WCh,W,R6,Ramp,G,3,Assigned,,2,,Chourraut Maialen
-2025,WCh,W,R6,Ramp,Y,2,Assigned,,4,,Brzezinska Dominika
+2025,WCh,W,R6,Ramp,R,4,Assigned,,1,,HUG Angele
+2025,WCh,W,R6,Ramp,G,3,Assigned,,2,,CHOURRAUT Maialen
+2025,WCh,W,R6,Ramp,Y,2,Assigned,,4,,BRZEZINSKA Dominika
 2025,WCh,W,R6,Ramp,B,1,Assigned,,3,,PITCHER FARRELL Cleo
 2025,WCh,W,R6,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R6,Gate 1,G,3,Down-Through,2,2,,
@@ -131,10 +131,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R6,Finish,G,3,Finish,2,2,,
 2025,WCh,W,R6,Finish,B,1,Finish,3,3,,
 2025,WCh,W,R6,Finish,Y,2,Finish,4,4,,
-2025,WCh,W,R7,Ramp,R,4,Assigned,,1,,Vuitton Emma
-2025,WCh,W,R7,Ramp,G,3,Assigned,,4,,Pankova Zuzana
-2025,WCh,W,R7,Ramp,Y,2,Assigned,,2,,Leaver Lois
-2025,WCh,W,R7,Ramp,B,1,Assigned,,3,,Xie Xueting
+2025,WCh,W,R7,Ramp,R,4,Assigned,,1,,VUITTON Emma
+2025,WCh,W,R7,Ramp,G,3,Assigned,,4,,PANKOVA Zuzana
+2025,WCh,W,R7,Ramp,Y,2,Assigned,,2,,LEAVER Lois
+2025,WCh,W,R7,Ramp,B,1,Assigned,,3,,XIE Xueting
 2025,WCh,W,R7,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R7,Gate 1,G,3,Down-Through,2,4,,
 2025,WCh,W,R7,Gate 1,B,1,Down-Through,3,3,,
@@ -155,10 +155,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R7,Finish,G,3,Finish,2,4,,
 2025,WCh,W,R7,Finish,B,1,Finish,3,3,,
 2025,WCh,W,R7,Finish,Y,2,Finish,4,2,,
-2025,WCh,W,R8,Ramp,R,4,Assigned,,1,,Setchell Nikita
-2025,WCh,W,R8,Ramp,G,3,Assigned,,2,,Prigent Camille
+2025,WCh,W,R8,Ramp,R,4,Assigned,,1,,SETCHELL Nikita
+2025,WCh,W,R8,Ramp,G,3,Assigned,,2,,PRIGENT Camille
 2025,WCh,W,R8,Ramp,Y,2,Assigned,,4,,DAVIDSON Codie
-2025,WCh,W,R8,Ramp,B,1,Assigned,,3,,Teunissen Lena
+2025,WCh,W,R8,Ramp,B,1,Assigned,,3,,TEUNISSEN Lena
 2025,WCh,W,R8,Gate 1,G,3,Down-Through,1,2,,
 2025,WCh,W,R8,Gate 1,B,1,Down-Through,2,3,,
 2025,WCh,W,R8,Gate 1,R,4,Down-Through,3,1,,
@@ -179,10 +179,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R8,Finish,B,1,Finish,2,3,,
 2025,WCh,W,R8,Finish,R,4,Finish,3,1,,
 2025,WCh,W,R8,Finish,Y,2,Finish,4,4,,
-2025,WCh,W,R9,Ramp,R,4,Assigned,,2,,Doria Monica
-2025,WCh,W,R9,Ramp,G,3,Assigned,,1,,Hilgertova Amalie
-2025,WCh,W,R9,Ramp,Y,2,Assigned,,3,,Estacia Neta Omira
-2025,WCh,W,R9,Ramp,B,1,Assigned,,4,,Williams Courtney
+2025,WCh,W,R9,Ramp,R,4,Assigned,,2,,DORIA Monica
+2025,WCh,W,R9,Ramp,G,3,Assigned,,1,,HILGERTOVA Amalie
+2025,WCh,W,R9,Ramp,Y,2,Assigned,,3,,ESTACIA NETA Omira
+2025,WCh,W,R9,Ramp,B,1,Assigned,,4,,WILLIAMS Courtney
 2025,WCh,W,R9,Gate 1,R,4,Down-Through,1,2,,
 2025,WCh,W,R9,Gate 1,G,3,Down-Through,2,1,,
 2025,WCh,W,R9,Gate 1,B,1,Down-Through,3,4,,
@@ -203,10 +203,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R9,Finish,G,3,Finish,2,1,,
 2025,WCh,W,R9,Finish,Y,2,Finish,3,3,,
 2025,WCh,W,R9,Finish,R,4,Finish,4,2,,
-2025,WCh,W,R10,Ramp,R,4,Assigned,,1,,Zwolinska Klaudia
-2025,WCh,W,R10,Ramp,G,3,Assigned,,4,,Gora Aleksandra
-2025,WCh,W,R10,Ramp,Y,2,Assigned,,3,,Krylova Kseniia
-2025,WCh,W,R10,Ramp,B,1,Assigned,,2,,Reinoso Sofia
+2025,WCh,W,R10,Ramp,R,4,Assigned,,1,,ZWOLINSKA Klaudia
+2025,WCh,W,R10,Ramp,G,3,Assigned,,4,,GORA Aleksandra
+2025,WCh,W,R10,Ramp,Y,2,Assigned,,3,,KRYLOVA Ksneiia
+2025,WCh,W,R10,Ramp,B,1,Assigned,,2,,REINOSO Sofia
 2025,WCh,W,R10,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R10,Gate 1,G,3,Down-Through,2,4,,
 2025,WCh,W,R10,Gate 1,B,1,Down-Through,3,2,,
@@ -227,10 +227,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R10,Finish,G,3,Finish,2,4,,
 2025,WCh,W,R10,Finish,B,1,Finish,3,2,,
 2025,WCh,W,R10,Finish,Y,2,Finish,4,3,,
-2025,WCh,W,R11,Ramp,R,4,Assigned,,1,,Leibfarth Evy
-2025,WCh,W,R11,Ramp,G,3,Assigned,,4,,Bayn Nele
-2025,WCh,W,R11,Ramp,Y,2,Assigned,,2,,Sorribes Laia
-2025,WCh,W,R11,Ramp,B,1,Assigned,,3,,Funk Ricarda
+2025,WCh,W,R11,Ramp,R,4,Assigned,,1,,LEIBFARTH Evy
+2025,WCh,W,R11,Ramp,G,3,Assigned,,4,,BAYN Nele
+2025,WCh,W,R11,Ramp,Y,2,Assigned,,2,,SORRIBES Laia
+2025,WCh,W,R11,Ramp,B,1,Assigned,,3,,FUNK Ricarda
 2025,WCh,W,R11,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R11,Gate 1,G,3,Down-Through,2,4,,
 2025,WCh,W,R11,Gate 1,Y,2,Down-Through,3,2,,
@@ -502,9 +502,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,M,R11,Finish,B,2,Finish,2,3,,
 2025,WCh,M,R11,Finish,G,3,Finish,3,4,,
 2025,WCh,M,R11,Finish,Y,1,Finish,4,2,,
-2025,WCh,W,Rep1,Ramp,R,4,Assigned,,1,,Herzog Andrea
-2025,WCh,W,Rep1,Ramp,G,3,Assigned,,3,,Teunissen Lena
-2025,WCh,W,Rep1,Ramp,Y,2,Assigned,,3,,Plata Laura
+2025,WCh,W,Rep1,Ramp,R,4,Assigned,,1,,HERZOG Andrea
+2025,WCh,W,Rep1,Ramp,G,3,Assigned,,3,,TEUNISSEN Lena
+2025,WCh,W,Rep1,Ramp,Y,2,Assigned,,3,,PLATA Laura
 2025,WCh,W,Rep1,Ramp,B,1,Assigned,,2,,Williams Cou
 2025,WCh,W,Rep1,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,Rep1,Gate 1,G,3,Down-Through,2,3,,
@@ -526,10 +526,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,Rep1,Finish,G,3,Finish,2,3,,
 2025,WCh,W,Rep1,Finish,Y,2,Finish,3,3,,
 2025,WCh,W,Rep1,Finish,B,1,Finish,4,2,,
-2025,WCh,W,Rep2,Ramp,R,4,Assigned,,1,,Fox Noemie
-2025,WCh,W,Rep2,Ramp,G,3,Assigned,,3,,Leaver Lois
-2025,WCh,W,Rep2,Ramp,Y,2,Assigned,,4,,Mills Waris
-2025,WCh,W,Rep2,Ramp,B,1,Assigned,,2,,Reinoso Sofia
+2025,WCh,W,Rep2,Ramp,R,4,Assigned,,1,,FOX Noemie
+2025,WCh,W,Rep2,Ramp,G,3,Assigned,,3,,LEAVER Lois
+2025,WCh,W,Rep2,Ramp,Y,2,Assigned,,4,,MILLS Waris
+2025,WCh,W,Rep2,Ramp,B,1,Assigned,,2,,REINOSO Sofia
 2025,WCh,W,Rep2,Gate 1,G,3,Down-Through,1,3,,
 2025,WCh,W,Rep2,Gate 1,R,4,Down-Through,2,1,,
 2025,WCh,W,Rep2,Gate 1,B,1,Down-Through,3,2,,
@@ -552,8 +552,8 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,Rep2,Finish,Y,2,Finish,4,4,,
 2025,WCh,W,Rep3,Ramp,R,4,Assigned,,1,,DORIA VILARRBULA Monica
 2025,WCh,W,Rep3,Ramp,G,3,Assigned,,2,,Brezeska Dominika
-2025,WCh,W,Rep3,Ramp,Y,2,Assigned,,3,,Pitcher Farrell Cleo
-2025,WCh,W,Rep3,Ramp,B,1,Assigned,,3,,Funk Ricarda
+2025,WCh,W,Rep3,Ramp,Y,2,Assigned,,3,,PITCHER FARREL CLeo
+2025,WCh,W,Rep3,Ramp,B,1,Assigned,,3,,FUNK Ricarda
 2025,WCh,W,Rep3,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,Rep3,Gate 1,G,3,Down-Through,2,2,,
 2025,WCh,W,Rep3,Gate 1,B,1,Down-Through,3,3,,
@@ -574,9 +574,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,Rep3,Finish,B,1,Finish,2,3,,
 2025,WCh,W,Rep3,Finish,G,3,Finish,3,2,,
 2025,WCh,W,Rep3,Finish,Y,2,Finish,4,3,,
-2025,WCh,W,Rep4,Ramp,R,4,Assigned,,1,,Sorribes Laia
-2025,WCh,W,Rep4,Ramp,G,3,Assigned,,2,,Chang Chu-Han
-2025,WCh,W,Rep4,Ramp,B,2,Assigned,,3,,Altman Marcella
+2025,WCh,W,Rep4,Ramp,R,4,Assigned,,1,,SORRIBES Laia
+2025,WCh,W,Rep4,Ramp,G,3,Assigned,,2,,CHANG Chu-Han
+2025,WCh,W,Rep4,Ramp,B,2,Assigned,,3,,ALTMAN Marcella
 2025,WCh,W,Rep4,Gate 1,G,3,Down-Through,1,2,,
 2025,WCh,W,Rep4,Gate 1,R,4,Down-Through,2,1,,
 2025,WCh,W,Rep4,Gate 1,B,2,Down-Through,3,3,,
@@ -593,9 +593,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,Rep4,Finish,G,3,Finish,2,2,,
 2025,WCh,W,Rep4,Finish,B,2,Finish,3,3,,
 2025,WCh,W,Rep5,Ramp,R,4,Assigned,,1,,krylova Knseiia
-2025,WCh,W,Rep5,Ramp,G,3,Assigned,,3,,Rex Rosie
-2025,WCh,W,Rep5,Ramp,B,2,Assigned,,4,,Sokolova Mariia
-2025,WCh,W,Rep5,Ramp,Y,1,Assigned,,2,,Davidson Coide
+2025,WCh,W,Rep5,Ramp,G,3,Assigned,,3,,REX Rosie
+2025,WCh,W,Rep5,Ramp,B,2,Assigned,,4,,SOKOLOVA Mariia
+2025,WCh,W,Rep5,Ramp,Y,1,Assigned,,2,,DAVIDSON Codie
 2025,WCh,W,Rep5,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,Rep5,Gate 1,G,3,Down-Through,2,3,,
 2025,WCh,W,Rep5,Gate 1,B,2,Down-Through,3,4,,
@@ -1780,7 +1780,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,H5,Finish,B,2,Finish,2,2,,
 2025,WCh,W,H5,Finish,G,3,Finish,3,3,,
 2025,WCh,W,H5,Finish,Y,1,Finish,4,4,,
-2025,WCh,W,H6,Ramp,R,4,Assigned,,2,,LIEBFARTH Evy
+2025,WCh,W,H6,Ramp,R,4,Assigned,,2,,LEIBFARTH Evy
 2025,WCh,W,H6,Ramp,G,3,Assigned,,1,,ESTACIA Neta Omira
 2025,WCh,W,H6,Ramp,Y,2,Assigned,,3,,REX Rosie
 2025,WCh,W,H6,Ramp,B,1,Assigned,,4,,LI Shiting
@@ -1901,7 +1901,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,QF2,Finish,R,1,Finish,3,3,,
 2025,WCh,W,QF2,Finish,G,4,Finish,4,4,,
 2025,WCh,W,QF3,Ramp,R,4,Assigned,,1,,HUG Angele
-2025,WCh,W,QF3,Ramp,G,3,Assigned,,2,,LIEBFARTH Evy
+2025,WCh,W,QF3,Ramp,G,3,Assigned,,2,,LEIBFARTH Evy
 2025,WCh,W,QF3,Ramp,B,1,Assigned,,4,,LI Shiting
 2025,WCh,W,QF3,Ramp,Y,2,Assigned,,3,,TEUNISSEN Lena
 2025,WCh,W,QF3,Gate 1,R,4,Down-Through,1,1,,
@@ -1972,9 +1972,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,SF1,Finish,Y,2,Finish,2,2,,
 2025,WCh,W,SF1,Finish,B,1,Finish,3,3,,
 2025,WCh,W,SF1,Finish,G,3,Finish,4,4,,
-2025,WCh,W,SF2,Ramp,R,4,Assigned,,1,,HUG Angle
+2025,WCh,W,SF2,Ramp,R,4,Assigned,,1,,HUG Angele
 2025,WCh,W,SF2,Ramp,G,3,Assigned,,4,,HERZOG Andrea
-2025,WCh,W,SF2,Ramp,B,1,Assigned,,3,,LIEBFARTH Evy
+2025,WCh,W,SF2,Ramp,B,1,Assigned,,3,,LEIBFARTH Evy
 2025,WCh,W,SF2,Ramp,Y,2,Assigned,,2,,PRIGENT Camille
 2025,WCh,W,SF2,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,SF2,Gate 1,G,3,Down-Through,2,4,,
@@ -2022,7 +2022,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,Final,Finish,G,3,Finish,4,4,,
 2025,WCh,W,Small Final,Ramp,R,4,Assigned,,1,,SETCHELL Nikita
 2025,WCh,W,Small Final,Ramp,G,3,Assigned,,4,,HERZOG Andrea
-2025,WCh,W,Small Final,Ramp,B,1,Assigned,,3,,LIEBFARTH Evy
+2025,WCh,W,Small Final,Ramp,B,1,Assigned,,3,,LEIBFARTH Evy
 2025,WCh,W,Small Final,Ramp,Y,2,Assigned,,2,,FUNK Ricarda
 2025,WCh,W,Small Final,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,Small Final,Gate 1,G,3,Down-Through,2,4,,
