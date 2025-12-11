@@ -161,7 +161,7 @@
 
         <!-- ATHLETE PROFILE CONTAINER -->
         <div id="report-athlete" class="hidden">
-            <div class="max-w-4xl mx-auto space-y-8">
+            <div class="max-w-7xl mx-auto space-y-8"> <!-- Expanded max-width for columns -->
                 <div id="athlete-search-controls" class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
@@ -192,8 +192,9 @@
                                 </div>
                             </div>
                 </div>
-                <div id="athlete-profile-area" class="mt-8 space-y-8">
-                    </div>
+                <!-- REMOVED space-y-8, updated in JS -->
+                <div id="athlete-profile-area" class="mt-8">
+                </div>
             </div>
         </div>
     </div>
@@ -583,6 +584,14 @@
             
             const athletesToDisplay = selectedAthletes.filter(name => name && name.trim() !== '');
 
+            // NEW LOGIC: Dynamic Grid Classes
+            const count = athletesToDisplay.length;
+            let gridClass = "grid-cols-1";
+            if (count === 2) gridClass = "grid-cols-1 md:grid-cols-2";
+            if (count >= 3) gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+
+            mainContainer.attr("class", `mt-8 grid gap-6 items-start ${gridClass}`);
+
             athletesToDisplay.forEach(athleteName => {
                 appendAthleteProfile(athleteName, mainContainer);
             });
@@ -638,20 +647,17 @@
                 
                 let tactic = upstreamData?.UpstreamTactic || 'N/A';
                 let direction = upstreamData?.Action || 'N/A';
-                let gateName = upstreamData?.Gate ? ` (Gate ${upstreamData.Gate})` : '';
-
+                
                 if (tactic === 'Left-Up' || tactic === 'Right-Up') {
-                    tactic = 'Was in 1st Place';
+                    tactic = 'in 1st Place';
                 }
-
-                if(direction !== 'N/A') direction = direction + gateName;
 
                 return { phase, bib, rampPos, direction, tactic };
             });
 
             if (profileData.length === 0) return;
 
-            const card = container.append("div").attr("class", "bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-x-auto");
+            const card = container.append("div").attr("class", "bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-x-auto w-full");
             card.append("h3").attr("class", "text-lg font-bold text-slate-100 p-4 border-b border-slate-700").text(selectedFormattedName);
             
             const table = card.append("table").attr("class", "w-full text-left text-sm");
