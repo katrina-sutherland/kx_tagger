@@ -105,8 +105,8 @@
                     </div>
                      <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st Upstream When Overall Finish 2nd</h3>
-                              <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
-                              <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                             <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                             <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                 </div>
             </div>
@@ -218,7 +218,7 @@
             tabs.forEach(tab => {
                 const isActive = tab.node() === activeTab.node();
                 tab.classed("text-indigo-400 border-indigo-500", isActive)
-                   .classed("text-slate-400 border-transparent", !isActive);
+                    .classed("text-slate-400 border-transparent", !isActive);
             });
 
             reports.forEach((report, index) => {
@@ -617,7 +617,7 @@
                 const matchA = a.Phase.match(regex) || [a.Phase, a.Phase, ''];
                 const matchB = b.Phase.match(regex) || [b, b, ''];
                 const orderA = phaseSortOrder[matchA[1]] || 99;
-                const orderB = phaseSortOrder[matchB[1]] || 99;
+                const orderB = phaseSortOrder[matchB[1] || matchB[0]] || 99;
                 if (orderA !== orderB) return orderA - orderB;
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
@@ -656,14 +656,33 @@
             
             const table = card.append("table").attr("class", "w-full text-left text-sm");
             const thead = table.append("thead").attr("class", "bg-slate-700/50");
-            thead.append("tr").selectAll("th").data(['Phase', 'Bib', 'Ramp', 'Direction', 'Tactic']).join("th").attr("class", "p-3 font-semibold text-slate-300").text(d => d);
+            
+            // Defined column headers with alignment
+            const columns = [
+                { text: 'Phase', cls: 'text-left' },
+                { text: 'Bib', cls: 'text-center' }, // Centered Header
+                { text: 'Ramp', cls: 'text-center' }, // Centered Header
+                { text: 'Direction', cls: 'text-left' },
+                { text: 'Tactic', cls: 'text-left' }
+            ];
+
+            thead.append("tr").selectAll("th")
+                .data(columns)
+                .join("th")
+                .attr("class", d => `p-3 font-semibold text-slate-300 ${d.cls}`)
+                .text(d => d.text);
 
             const tbody = table.append("tbody");
             profileData.forEach(d => {
                 const row = tbody.append("tr").attr("class", "border-t border-slate-700");
                 row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.phase);
-                row.append("td").attr("class", "p-3").html(`<div class="w-4 h-4 rounded-sm inline-block" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
-                row.append("td").attr("class", "p-3").text(d.rampPos);
+                
+                // Centered Bib Cell
+                row.append("td").attr("class", "p-3 text-center").html(`<div class="w-4 h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
+                
+                // Centered Ramp Cell
+                row.append("td").attr("class", "p-3 text-center").text(d.rampPos);
+                
                 row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.direction);
                 row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.tactic);
             });
