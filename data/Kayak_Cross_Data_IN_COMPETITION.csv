@@ -109,7 +109,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R5,Finish,Y,2,Finish,4,3,,
 2025,WCh,W,R6,Ramp,R,4,Assigned,,1,,HUG Angele
 2025,WCh,W,R6,Ramp,G,3,Assigned,,2,,CHOURRAUT Maialen
-2025,WCh,W,R6,Ramp,Y,2,Assigned,,4,,BRZEZINSKA Dominika
+2025,WCh,W,R6,Ramp,Y,2,Assigned,,4,,BRZESKA Dominika
 2025,WCh,W,R6,Ramp,B,1,Assigned,,3,,PITCHER FARRELL Cleo
 2025,WCh,W,R6,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R6,Gate 1,G,3,Down-Through,2,2,,
@@ -205,7 +205,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,R9,Finish,R,4,Finish,4,2,,
 2025,WCh,W,R10,Ramp,R,4,Assigned,,1,,ZWOLINSKA Klaudia
 2025,WCh,W,R10,Ramp,G,3,Assigned,,4,,GORA Aleksandra
-2025,WCh,W,R10,Ramp,Y,2,Assigned,,3,,KRYLOVA Ksneiia
+2025,WCh,W,R10,Ramp,Y,2,Assigned,,3,,KRYLOVA Kseniia
 2025,WCh,W,R10,Ramp,B,1,Assigned,,2,,REINOSO Sofia
 2025,WCh,W,R10,Gate 1,R,4,Down-Through,1,1,,
 2025,WCh,W,R10,Gate 1,G,3,Down-Through,2,4,,
@@ -550,7 +550,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WCh,W,Rep2,Finish,R,4,Finish,2,1,,
 2025,WCh,W,Rep2,Finish,B,1,Finish,3,2,,
 2025,WCh,W,Rep2,Finish,Y,2,Finish,4,4,,
-2025,WCh,W,Rep3,Ramp,R,4,Assigned,,1,,DORIA VILARRBULA Monica
+2025,WCh,W,Rep3,Ramp,R,4,Assigned,,1,,DORIA Monica
 2025,WCh,W,Rep3,Ramp,G,3,Assigned,,2,,Brezeska Dominika
 2025,WCh,W,Rep3,Ramp,Y,2,Assigned,,3,,PITCHER FARREL CLeo
 2025,WCh,W,Rep3,Ramp,B,1,Assigned,,3,,FUNK Ricarda
