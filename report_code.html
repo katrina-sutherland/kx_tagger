@@ -588,16 +588,17 @@
             const count = athletesToDisplay.length;
             let gridClass = "grid-cols-1";
             if (count === 2) gridClass = "grid-cols-1 md:grid-cols-2";
-            if (count >= 3) gridClass = "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
+            if (count >= 3) gridClass = "grid-cols-1 md:grid-cols-3"; // More aggressive 3-col breakpoint
 
-            mainContainer.attr("class", `mt-8 grid gap-6 items-start ${gridClass}`);
+            // Reduced gap to help fit columns
+            mainContainer.attr("class", `mt-8 grid gap-4 items-start ${gridClass}`);
 
             athletesToDisplay.forEach(athleteName => {
-                appendAthleteProfile(athleteName, mainContainer);
+                appendAthleteProfile(athleteName, mainContainer, count); // Passing count
             });
         }
         
-        function appendAthleteProfile(selectedFormattedName, container) {
+        function appendAthleteProfile(selectedFormattedName, container, totalCount) { // Accepting totalCount
             // 1. Get current filters to ensure we only look at the selected competition
             const year = selectorsAthlete.year.property("value");
             const comp = selectorsAthlete.competition.property("value");
@@ -655,12 +656,19 @@
                 return { phase, bib, rampPos, direction, tactic };
             });
 
+            // Styling Logic based on density
+            const isCompact = totalCount >= 3;
+            // Use smaller text and padding if we are showing 3 columns on a potentially medium screen
+            const tableClass = isCompact ? "w-full text-left text-[10px] lg:text-xs" : "w-full text-left text-sm";
+            const cellClass = isCompact ? "p-1.5" : "p-3";
+            const headerSize = isCompact ? "text-xs" : "text-sm"; // Header text size
+
             if (profileData.length === 0) return;
 
             const card = container.append("div").attr("class", "bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-x-auto w-full");
-            card.append("h3").attr("class", "text-lg font-bold text-slate-100 p-4 border-b border-slate-700").text(selectedFormattedName);
+            card.append("h3").attr("class", `font-bold text-slate-100 border-b border-slate-700 ${isCompact ? 'text-sm p-2' : 'text-lg p-4'}`).text(selectedFormattedName);
             
-            const table = card.append("table").attr("class", "w-full text-left text-sm");
+            const table = card.append("table").attr("class", tableClass);
             const thead = table.append("thead").attr("class", "bg-slate-700/50");
             
             // Defined column headers with alignment
@@ -675,22 +683,22 @@
             thead.append("tr").selectAll("th")
                 .data(columns)
                 .join("th")
-                .attr("class", d => `p-3 font-semibold text-slate-300 ${d.cls}`)
+                .attr("class", d => `${cellClass} font-semibold text-slate-300 ${d.cls} ${headerSize}`)
                 .text(d => d.text);
 
             const tbody = table.append("tbody");
             profileData.forEach(d => {
                 const row = tbody.append("tr").attr("class", "border-t border-slate-700");
-                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.phase);
+                row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.phase);
                 
                 // Centered Bib Cell
-                row.append("td").attr("class", "p-3 text-center").html(`<div class="w-4 h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
+                row.append("td").attr("class", `${cellClass} text-center`).html(`<div class="w-3 h-3 md:w-4 md:h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
                 
                 // Centered Ramp Cell
-                row.append("td").attr("class", "p-3 text-center").text(d.rampPos);
+                row.append("td").attr("class", `${cellClass} text-center`).text(d.rampPos);
                 
-                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.direction);
-                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.tactic);
+                row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.direction);
+                row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.tactic);
             });
         }
 
