@@ -919,9 +919,7 @@
             
             const rankHeader = rankBox.append("div").attr("class", "mb-3 border-b border-slate-700 pb-2");
             rankHeader.append("h4").attr("class", "text-base font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result"); 
-            if (rankingChanged) {
-                rankHeader.append("span").attr("class", "ml-2 text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/50").text("UPDATED");
-            }
+            // Removed UPDATED badge logic here
 
             const rankList = rankBox.append("div").attr("class", "space-y-2");
 
