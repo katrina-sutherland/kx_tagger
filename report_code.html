@@ -869,7 +869,7 @@
             
             // Left Column: Athlete Fault Status
             const statusBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
-            statusBox.append("h4").attr("class", "text-sm font-bold text-slate-300 mb-3 uppercase tracking-wider").text("Fault Status");
+            statusBox.append("h4").attr("class", "text-base font-bold text-slate-300 mb-3 pb-2 border-b border-slate-700 uppercase tracking-wider").text("Fault Status");
             
             const statusList = statusBox.append("div").attr("class", "space-y-2");
 
@@ -917,8 +917,8 @@
             // 6. Render Section 2: Calculated Result
             const rankBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
             
-            const rankHeader = rankBox.append("div").attr("class", "mb-3");
-            rankHeader.append("h4").attr("class", "text-sm font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result"); // Renamed
+            const rankHeader = rankBox.append("div").attr("class", "mb-3 border-b border-slate-700 pb-2");
+            rankHeader.append("h4").attr("class", "text-base font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result"); 
             if (rankingChanged) {
                 rankHeader.append("span").attr("class", "ml-2 text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/50").text("UPDATED");
             }
