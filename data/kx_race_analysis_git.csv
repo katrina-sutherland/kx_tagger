@@ -28,7 +28,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R1,Gate 7,B,3,Down-Through,3,3,,,
 2024,OLY,W,R1,Gate 8,R,1,Left-Up,1,1,Left-Up,,
 2024,OLY,W,R1,Gate 8,G,2,Left-Up,2,2,FOLLOW,,
-2024,OLY,W,R1,Gate 8,B,3,Left-Up,3,3,FOLLOW,,FLT 8
+2024,OLY,W,R1,Gate 8,B,3,Left-Up,3,3,FOLLOW,,FLT
 2024,OLY,W,R1,Finish,R,1,Finish,1,1,,,
 2024,OLY,W,R1,Finish,G,2,Finish,2,2,,,
 2024,OLY,W,R1,Finish,B,3,Finish,3,3,,,
@@ -81,7 +81,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R3,Gate 3,B,3,Down-Right,2,2,,,
 2024,OLY,W,R3,Gate 3,G,2,Down-Right,3,3,,,
 2024,OLY,W,R3,Gate 4,R,1,Down-Left,1,1,,,
-2024,OLY,W,R3,Gate 4,B,3,Down-Left,2,2,,,FLT 4
+2024,OLY,W,R3,Gate 4,B,3,Down-Left,2,2,,,FLT
 2024,OLY,W,R3,Gate 4,G,2,Down-Left,3,3,,,
 2024,OLY,W,R3,Gate 5,R,1,Down-Left,1,1,,,
 2024,OLY,W,R3,Gate 5,B,3,Down-Left,2,2,,,
@@ -157,7 +157,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R5,Gate 6,B,3,Down-Right,3,4,,,
 2024,OLY,W,R5,Gate 7,G,1,Down-Through,1,2,,,
 2024,OLY,W,R5,Gate 7,B,3,Down-Through,2,4,,,
-2024,OLY,W,R5,Gate 7,R,2,Down-Through,3,1,,,FLT 8
+2024,OLY,W,R5,Gate 7,R,2,Down-Through,3,1,,,FLT
 2024,OLY,W,R5,Gate 8,G,1,Right-Up,1,2,Right-Up,,
 2024,OLY,W,R5,Gate 8,B,3,Left-Up,2,4,SPLIT,,
 2024,OLY,W,R5,Gate 8,R,2,Left-Up,3,1,FOLLOW,,
@@ -174,7 +174,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R6,Course,G,2,Roll,2,2,,,
 2024,OLY,W,R6,Course,B,4,Roll,3,4,,,
 2024,OLY,W,R6,Gate 2,R,1,Left-Up,1,1,Left-Up,,
-2024,OLY,W,R6,Gate 2,G,2,Right-Up,2,2,SPLIT,,FLT 2
+2024,OLY,W,R6,Gate 2,G,2,Right-Up,2,2,SPLIT,,FLT
 2024,OLY,W,R6,Gate 2,B,4,Left-Up,3,4,SPLIT,,
 2024,OLY,W,R6,Gate 3,R,1,Down-Right,1,1,,,
 2024,OLY,W,R6,Gate 3,G,2,Down-Right,2,2,,,
@@ -253,7 +253,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R8,Gate 4,R,1,Down-Left,1,2,,,
 2024,OLY,W,R8,Gate 4,B,3,Down-Left,2,1,,,
 2024,OLY,W,R8,Gate 4,G,2,Down-Left,3,4,,,
-2024,OLY,W,R8,Gate 4,Y,4,Down-Left,4,3,,,FLT 4
+2024,OLY,W,R8,Gate 4,Y,4,Down-Left,4,3,,,FLT
 2024,OLY,W,R8,Gate 5,R,1,Down-Left,1,2,,,
 2024,OLY,W,R8,Gate 5,B,3,Down-Left,2,1,,,
 2024,OLY,W,R8,Gate 5,G,2,Down-Left,3,4,,,
@@ -281,7 +281,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R9,Gate 1,G,2,Down-Left,1,1,,,
 2024,OLY,W,R9,Gate 1,R,1,Down-Left,2,2,,,
 2024,OLY,W,R9,Gate 1,B,4,Down-Left,3,3,,,
-2024,OLY,W,R9,Gate 1,Y,3,Down-Left,4,4,,,FLT 1
+2024,OLY,W,R9,Gate 1,Y,3,Down-Left,4,4,,,FLT
 2024,OLY,W,R9,Course,G,2,Roll,1,1,,,
 2024,OLY,W,R9,Course,R,1,Roll,2,2,,,
 2024,OLY,W,R9,Course,B,4,Roll,3,3,,,
@@ -348,8 +348,8 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R10,Gate 5,G,1,Down-Left,4,4,,,
 2024,OLY,W,R10,Gate 6,R,2,Down-Right,1,1,,,
 2024,OLY,W,R10,Gate 6,B,3,Down-Right,2,2,,,
-2024,OLY,W,R10,Gate 6,Y,4,Down-Right,3,3,,,FLT 6
-2024,OLY,W,R10,Gate 6,G,1,Down-Right,4,4,,,FLT 6
+2024,OLY,W,R10,Gate 6,Y,4,Down-Right,3,3,,,FLT
+2024,OLY,W,R10,Gate 6,G,1,Down-Right,4,4,,,FLT
 2024,OLY,W,R10,Gate 7,R,2,Down-Through,1,1,,,
 2024,OLY,W,R10,Gate 7,B,3,Down-Through,2,2,,,
 2024,OLY,W,R10,Gate 7,Y,4,Down-Through,3,3,,,
@@ -373,13 +373,13 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2024,OLY,W,R11,Course,R,2,Roll,1,1,,,
 2024,OLY,W,R11,Course,Y,1,Roll,2,4,,,
 2024,OLY,W,R11,Course,B,4,Roll,3,2,,,
-2024,OLY,W,R11,Course,G,3,Roll,4,3,,,FLT R
+2024,OLY,W,R11,Course,G,3,Roll,4,3,,,FLT
 2024,OLY,W,R11,Gate 2,R,2,Right-Up,1,1,Right-Up,,
 2024,OLY,W,R11,Gate 2,Y,1,Right-Up,2,4,FOLLOW,,
 2024,OLY,W,R11,Gate 2,B,4,Right-Up,3,2,FOLLOW,,
-2024,OLY,W,R11,Gate 2,G,3,Right-Up,4,3,FOLLOW,,FLT 2
+2024,OLY,W,R11,Gate 2,G,3,Right-Up,4,3,FOLLOW,,FLT
 2024,OLY,W,R11,Gate 3,R,2,Down-Right,1,1,,,
-2024,OLY,W,R11,Gate 3,G,3,Down-Right,2,3,,,FLT 3
+2024,OLY,W,R11,Gate 3,G,3,Down-Right,2,3,,,FLT
 2024,OLY,W,R11,Gate 3,Y,1,Down-Right,3,4,,,
 2024,OLY,W,R11,Gate 3,B,4,Down-Right,4,2,,,
 2024,OLY,W,R11,Gate 4,R,2,Down-Left,1,1,,,
