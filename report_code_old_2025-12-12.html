@@ -32,12 +32,12 @@
 <body class="bg-slate-900 text-slate-200 antialiased">
     <div class="tooltip"></div>
     <div class="container mx-auto p-4 md:p-8">
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8 relative">
-            <div class="w-full text-center absolute left-0 right-0 pointer-events-none">
+        <header class="flex flex-col lg:flex-row justify-between items-center mb-8 relative">
+            <div class="w-full text-center lg:absolute lg:left-0 lg:right-0 pointer-events-none mb-2 lg:mb-0">
                 <h1 class="text-3xl font-bold text-slate-100 pointer-events-auto inline-block">Kayak Cross Analysis</h1>
             </div>
             <!-- Expanded width for error messages -->
-            <div id="last-updated" class="md:ml-auto text-xs text-slate-500 font-mono z-10 mt-4 md:mt-0 relative flex items-center gap-2 max-w-md text-right overflow-hidden whitespace-nowrap text-ellipsis">
+            <div id="last-updated" class="lg:ml-auto text-[10px] md:text-xs text-slate-500 font-mono z-10 relative flex items-center gap-2 max-w-md text-right overflow-hidden whitespace-nowrap text-ellipsis">
             </div>
         </header>
 
@@ -161,7 +161,7 @@
 
         <!-- ATHLETE PROFILE CONTAINER -->
         <div id="report-athlete" class="hidden">
-            <div class="max-w-4xl mx-auto space-y-8">
+            <div class="max-w-7xl mx-auto space-y-8"> <!-- Expanded max-width for columns -->
                 <div id="athlete-search-controls" class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
@@ -192,8 +192,9 @@
                                 </div>
                             </div>
                 </div>
-                <div id="athlete-profile-area" class="mt-8 space-y-8">
-                    </div>
+                <!-- REMOVED space-y-8, updated in JS -->
+                <div id="athlete-profile-area" class="mt-8">
+                </div>
             </div>
         </div>
     </div>
@@ -365,7 +366,7 @@
             };
 
             const now = new Date();
-            lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-green-500 live-indicator"></span> Refreshing...`);
+            lastUpdatedEl.html(`<span class="w-1.5 h-1.5 rounded-full bg-green-500 live-indicator"></span> Refreshing...`);
             const cacheBuster = now.getTime();
 
             try {
@@ -415,7 +416,7 @@
                 }
 
                 const timeString = now.toLocaleTimeString();
-                lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-green-500"></span> Last Updated: ${timeString}`);
+                lastUpdatedEl.html(`<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Last Updated: ${timeString}`);
 
                 // Setup tabs events only once
                 if (!tabFull.on("click")) {
@@ -432,7 +433,7 @@
             } catch (error) {
                 console.error('Error loading initial CSV files:', error);
                 const timeString = new Date().toLocaleTimeString();
-                lastUpdatedEl.html(`<span class="w-2 h-2 rounded-full bg-red-500"></span> ${error.name}: ${error.message} (${timeString})`);
+                lastUpdatedEl.html(`<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> ${error.name}: ${error.message} (${timeString})`);
             }
         }
 
@@ -583,12 +584,21 @@
             
             const athletesToDisplay = selectedAthletes.filter(name => name && name.trim() !== '');
 
+            // NEW LOGIC: Dynamic Grid Classes
+            const count = athletesToDisplay.length;
+            let gridClass = "grid-cols-1";
+            if (count === 2) gridClass = "grid-cols-1 md:grid-cols-2";
+            if (count >= 3) gridClass = "grid-cols-1 md:grid-cols-3"; // More aggressive 3-col breakpoint
+
+            // Reduced gap to help fit columns
+            mainContainer.attr("class", `mt-8 grid gap-4 items-start ${gridClass}`);
+
             athletesToDisplay.forEach(athleteName => {
-                appendAthleteProfile(athleteName, mainContainer);
+                appendAthleteProfile(athleteName, mainContainer, count); // Passing count
             });
         }
         
-        function appendAthleteProfile(selectedFormattedName, container) {
+        function appendAthleteProfile(selectedFormattedName, container, totalCount) { // Accepting totalCount
             // 1. Get current filters to ensure we only look at the selected competition
             const year = selectorsAthlete.year.property("value");
             const comp = selectorsAthlete.competition.property("value");
@@ -616,7 +626,7 @@
                 const regex = /^([A-Za-z]+)(\d*)$/;
                 const matchA = a.Phase.match(regex) || [a.Phase, a.Phase, ''];
                 const matchB = b.Phase.match(regex) || [b, b, ''];
-                const orderA = phaseSortOrder[matchA[1]] || 99;
+                const orderA = phaseSortOrder[matchA[1] || matchA[0]] || 99;
                 const orderB = phaseSortOrder[matchB[1] || matchB[0]] || 99;
                 if (orderA !== orderB) return orderA - orderB;
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
@@ -638,23 +648,27 @@
                 
                 let tactic = upstreamData?.UpstreamTactic || 'N/A';
                 let direction = upstreamData?.Action || 'N/A';
-                let gateName = upstreamData?.Gate ? ` (Gate ${upstreamData.Gate})` : '';
-
+                
                 if (tactic === 'Left-Up' || tactic === 'Right-Up') {
-                    tactic = 'Was in 1st Place';
+                    tactic = 'in 1st Place';
                 }
-
-                if(direction !== 'N/A') direction = direction + gateName;
 
                 return { phase, bib, rampPos, direction, tactic };
             });
 
+            // Styling Logic based on density
+            const isCompact = totalCount >= 3;
+            // Use smaller text and padding if we are showing 3 columns on a potentially medium screen
+            const tableClass = isCompact ? "w-full text-left text-[10px] lg:text-xs" : "w-full text-left text-sm";
+            const cellClass = isCompact ? "p-1.5" : "p-3";
+            const headerSize = isCompact ? "text-[10px] md:text-xs" : "text-xs md:text-sm"; // Header text size
+
             if (profileData.length === 0) return;
 
-            const card = container.append("div").attr("class", "bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-x-auto");
-            card.append("h3").attr("class", "text-lg font-bold text-slate-100 p-4 border-b border-slate-700").text(selectedFormattedName);
+            const card = container.append("div").attr("class", "bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-x-auto w-full");
+            card.append("h3").attr("class", `font-bold text-slate-100 border-b border-slate-700 ${isCompact ? 'text-sm p-2' : 'text-lg p-4'}`).text(selectedFormattedName);
             
-            const table = card.append("table").attr("class", "w-full text-left text-sm");
+            const table = card.append("table").attr("class", tableClass);
             const thead = table.append("thead").attr("class", "bg-slate-700/50");
             
             // Defined column headers with alignment
@@ -669,22 +683,22 @@
             thead.append("tr").selectAll("th")
                 .data(columns)
                 .join("th")
-                .attr("class", d => `p-3 font-semibold text-slate-300 ${d.cls}`)
+                .attr("class", d => `${cellClass} font-semibold text-slate-300 ${d.cls} ${headerSize}`)
                 .text(d => d.text);
 
             const tbody = table.append("tbody");
             profileData.forEach(d => {
                 const row = tbody.append("tr").attr("class", "border-t border-slate-700");
-                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.phase);
+                row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.phase);
                 
                 // Centered Bib Cell
-                row.append("td").attr("class", "p-3 text-center").html(`<div class="w-4 h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
+                row.append("td").attr("class", `${cellClass} text-center`).html(`<div class="w-2 h-2 md:w-4 md:h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
                 
                 // Centered Ramp Cell
-                row.append("td").attr("class", "p-3 text-center").text(d.rampPos);
+                row.append("td").attr("class", `${cellClass} text-center`).text(d.rampPos);
                 
-                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.direction);
-                row.append("td").attr("class", "p-3 whitespace-nowrap").text(d.tactic);
+                row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.direction);
+                row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.tactic);
             });
         }
 
