@@ -79,16 +79,21 @@
                     </div>
                 </div>
             </div>
-            <div id="charts-area-full" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
-                <div class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
-                    <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
-                    <div id="legend-full" class="flex justify-center space-x-4 mb-4"></div>
-                    <div id="chart-container-full" class="w-full h-[600px]">
-                        <svg id="chart-full" class="w-full h-full"></svg>
+            <!-- Added items-start to prevent column stretching -->
+            <div id="charts-area-full" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                <!-- Wrapper for Chart and Fault Analysis to keep them in the same column -->
+                <div class="lg:col-span-3 flex flex-col gap-8">
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
+                        <div id="legend-full" class="flex justify-center space-x-4 mb-4"></div>
+                        <div id="chart-container-full" class="w-full h-[600px]">
+                            <svg id="chart-full" class="w-full h-full"></svg>
+                        </div>
                     </div>
-                    <!-- NEW FAULT ANALYSIS CONTAINER FULL -->
-                    <div id="fault-analysis-full" class="mt-6 border-t border-slate-700 pt-4 hidden"></div>
+                    <!-- NEW SEPARATE CONTAINER FOR FAULT ANALYSIS -->
+                    <div id="fault-analysis-full" class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
                 </div>
+
                 <div class="lg:col-span-2 grid grid-cols-2 gap-4">
                     <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by Bib Color</h3>
@@ -138,16 +143,21 @@
                     </div>
                 </div>
             </div>
-            <div id="charts-area-compact" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
-                    <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
-                    <div id="legend-compact" class="flex justify-center space-x-4 mb-4"></div>
-                    <div id="chart-container-compact" class="w-full h-[600px]">
-                        <svg id="chart-compact" class="w-full h-full"></svg>
+            <!-- Added items-start to prevent column stretching -->
+            <div id="charts-area-compact" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Wrapper for Chart and Fault Analysis to keep them in the same column -->
+                <div class="lg:col-span-2 flex flex-col gap-8">
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
+                        <div id="legend-compact" class="flex justify-center space-x-4 mb-4"></div>
+                        <div id="chart-container-compact" class="w-full h-[600px]">
+                            <svg id="chart-compact" class="w-full h-full"></svg>
+                        </div>
                     </div>
-                    <!-- NEW FAULT ANALYSIS CONTAINER COMPACT -->
-                    <div id="fault-analysis-compact" class="mt-6 border-t border-slate-700 pt-4 hidden"></div>
+                    <!-- NEW SEPARATE CONTAINER FOR FAULT ANALYSIS -->
+                    <div id="fault-analysis-compact" class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
                 </div>
+
                 <div class="lg:col-span-1 grid grid-rows-2 gap-8">
                           <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
                               <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib Color</h3>
@@ -265,7 +275,9 @@
                 // Check multiple variations for Athlete Name
                 const athleteName = d['Athlete Name'] || d['Athlete'] || d['Name'] || '';
                 
-                const action = d.Action || '';
+                // UPDATED: Capture Action AND Fault specific columns
+                const action = d.Action || d.action || d.Notes || d.notes || '';
+                const faultVal = d.Fault || d.fault || ''; 
 
                 return {
                     Year: year,
@@ -279,7 +291,8 @@
                     FinalPosition: finalPosition,
                     UpstreamTactic: upstreamTactic,
                     AthleteName: athleteName,
-                    Action: action
+                    Action: action,
+                    FaultVal: faultVal // New dedicated property
                 };
             });
         }
@@ -766,11 +779,20 @@
             const container = d3.select(containerSelector);
             container.html("").classed("hidden", true);
 
-            // 1. Identify Faults
-            // We look for rows where Action contains "FLT" or "Fault"
-            const faultData = raceData.filter(d => 
-                d.Action && (d.Action.toUpperCase().includes('FLT') || d.Action.toUpperCase().includes('FAULT'))
-            );
+            // UPDATED: Check BOTH Action, Gate AND Notes columns for "FLT", "FAULT", "DSQ", "DNF"
+            // Also case-insensitive check and checks new FaultVal property
+            const faultData = raceData.filter(d => {
+                const checkString = (str) => {
+                    if (!str) return false;
+                    const s = str.toUpperCase();
+                    return s.includes('FLT') || s.includes('FAULT') || s.includes('DSQ') || s.includes('DNF');
+                };
+                
+                return checkString(d.Action) || checkString(d.Gate) || checkString(d.FaultVal);
+            });
+
+            // Debugging log (visible in console)
+            console.log(`Fault Analysis for Race: Found ${faultData.length} faults. (Bibs: ${[...new Set(faultData.map(d=>d.BIB))].join(',')})`);
 
             // If no faults exist in this race, hide and return
             if (faultData.length === 0) return;
@@ -786,9 +808,40 @@
                 // Higher index = completed more of the course
                 let deepestFaultIndex = -1;
                 const faultStrings = myFaults.map(f => {
-                    const gateIndex = orderedGates.indexOf(f.Gate);
+                    // Normalize Gate name logic:
+                    // Priority: 1. Gate Column, 2. Extraction from FaultVal/Action strings
+                    
+                    let gateName = f.Gate || "";
+                    let rawStrings = [f.Gate, f.FaultVal, f.Action].filter(s => s);
+                    
+                    // Attempt to extract a clean gate number/name from any available string
+                    let cleanGateName = "";
+                    
+                    // 1. Try simple Gate column cleanup
+                    if (f.Gate) {
+                         cleanGateName = f.Gate.replace(/FLT/i, '').replace(/FAULT/i, '').replace(/DSQ/i, '').replace(/DNF/i, '').trim();
+                    }
+                    
+                    // 2. If Gate column was empty or just "FLT", try to parse number from FaultVal/Action
+                    if (!cleanGateName && (f.FaultVal || f.Action)) {
+                        const combined = (f.FaultVal + " " + f.Action).toUpperCase();
+                        // Look for a number after FLT/FAULT, or just a standalone number
+                        const match = combined.match(/(?:FLT|FAULT)\s*(\d+|Roll|Upstream)/i) || combined.match(/(\d+)/);
+                        if (match) cleanGateName = match[1];
+                    }
+
+                    // Try to match against orderedGates
+                    let gateIndex = orderedGates.indexOf(cleanGateName);
+                    
                     if (gateIndex > deepestFaultIndex) deepestFaultIndex = gateIndex;
-                    return `FLT ${f.Gate}`; 
+                    
+                    // Display string: prefer explicit Gate col, else construct string
+                    if (f.Gate && !f.Gate.toUpperCase().includes('FLT') && !f.Gate.toUpperCase().includes('FAULT')) {
+                         return `FLT ${f.Gate}`;
+                    } else if (cleanGateName) {
+                         return `FLT ${cleanGateName}`;
+                    }
+                    return f.FaultVal || f.Action || "Fault"; 
                 });
 
                 // Get original finish position for tie-breaking clean runs
@@ -805,6 +858,12 @@
                 };
             });
 
+            // --- SORT LOGIC FOR FAULT STATUS LIST (FIXED BIB ORDER) ---
+            const bibOrder = ['R', 'G', 'B', 'Y'];
+            const statusListAthletes = [...athleteStats].sort((a, b) => {
+                return bibOrder.indexOf(a.bib) - bibOrder.indexOf(b.bib);
+            });
+
             // 3. Render Section 1: Fault List
             const faultSection = container.append("div").attr("class", "grid grid-cols-1 md:grid-cols-2 gap-6");
             
@@ -814,7 +873,7 @@
             
             const statusList = statusBox.append("div").attr("class", "space-y-2");
 
-            athleteStats.forEach(athlete => {
+            statusListAthletes.forEach(athlete => {
                 const row = statusList.append("div").attr("class", "flex items-center justify-between text-sm border-b border-slate-800 pb-1 last:border-0");
                 
                 const leftSide = row.append("div").attr("class", "flex items-center gap-2");
@@ -859,7 +918,7 @@
             const rankBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
             
             const rankHeader = rankBox.append("div").attr("class", "mb-3");
-            rankHeader.append("h4").attr("class", "text-sm font-bold text-slate-300 uppercase tracking-wider inline-block").text("Calculated Standings");
+            rankHeader.append("h4").attr("class", "text-sm font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result"); // Renamed
             if (rankingChanged) {
                 rankHeader.append("span").attr("class", "ml-2 text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/50").text("UPDATED");
             }
@@ -871,17 +930,27 @@
                 const isWinner = rank === 1;
                 const colorClass = isWinner ? "text-yellow-400" : "text-slate-300";
                 
-                const row = rankList.append("div").attr("class", "flex items-center justify-between text-sm border-b border-slate-800 pb-1 last:border-0");
+                // UPDATED LAYOUT: Use Grid for columns
+                // Columns: Rank (small) | Bib (small) | Name (fluid) | Reason (fixed/auto right aligned)
+                const row = rankList.append("div").attr("class", "grid grid-cols-[1.5rem_1rem_1fr_auto] gap-x-3 items-center text-sm border-b border-slate-800 pb-1 last:border-0");
                 
-                const leftSide = row.append("div").attr("class", "flex items-center gap-3");
-                leftSide.append("span").attr("class", `font-mono w-4 ${colorClass}`).text(rank);
-                leftSide.append("div").attr("class", "w-3 h-3 rounded-sm").style("background-color", bibColors[athlete.bib]);
-                leftSide.append("span").attr("class", "text-slate-200").text(athlete.name);
+                // Rank Column
+                row.append("span").attr("class", `font-mono ${colorClass} text-right`).text(rank);
+                
+                // Bib Column
+                row.append("div").attr("class", "w-3 h-3 rounded-sm").style("background-color", bibColors[athlete.bib]);
+                
+                // Name Column
+                row.append("span").attr("class", "text-slate-200 truncate").text(athlete.name);
 
-                // Optional: Show why
-                const reason = athlete.faultCount === 0 ? "Clean" : (athlete.faultCount === 1 ? `1 Fault (Gate ${orderedGates[athlete.deepestFaultIndex]})` : `${athlete.faultCount} Faults`);
+                // Optional: Show why (New Column)
+                let reason = "Clean";
+                if (athlete.faultCount > 0) {
+                    const gateName = orderedGates[athlete.deepestFaultIndex] || "Start";
+                    reason = athlete.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athlete.faultCount} Faults`;
+                }
                 
-                row.append("span").attr("class", "text-xs text-slate-500 italic").text(reason);
+                row.append("span").attr("class", "text-xs text-slate-500 italic text-right whitespace-nowrap").text(reason);
             });
         }
 
