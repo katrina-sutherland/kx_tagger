@@ -777,7 +777,13 @@
         // --- FAULT ANALYSIS & RANKING LOGIC ---
         function updateFaultAnalysis(containerSelector, raceData, orderedGates, bibToNameMap) {
             const container = d3.select(containerSelector);
-            container.html("").classed("hidden", true);
+            container.html(""); // Clear content
+
+            // If no race data (empty filter result), hide and return
+            if (!raceData || raceData.length === 0) {
+                container.classed("hidden", true);
+                return;
+            }
 
             // UPDATED: Check BOTH Action, Gate AND Notes columns for "FLT", "FAULT", "DSQ", "DNF"
             // Also case-insensitive check and checks new FaultVal property
@@ -794,10 +800,16 @@
             // Debugging log (visible in console)
             console.log(`Fault Analysis for Race: Found ${faultData.length} faults. (Bibs: ${[...new Set(faultData.map(d=>d.BIB))].join(',')})`);
 
-            // If no faults exist in this race, hide and return
-            if (faultData.length === 0) return;
-
+            // Show container
             container.classed("hidden", false);
+
+            // If no faults exist, show specific message and return
+            if (faultData.length === 0) {
+                 container.append("p")
+                    .attr("class", "text-slate-400 text-sm italic text-center")
+                    .text("Note: NO Faults for this Race. Result remains unchanged.");
+                 return;
+            }
 
             // 2. Aggregate Data per Athlete
             const bibsInRace = [...new Set(raceData.map(d => d.BIB))];
