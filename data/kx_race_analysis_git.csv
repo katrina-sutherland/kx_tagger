@@ -2897,7 +2897,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,M,QF1,Gate 1,G,3,Down,4,,,,
 2025,WC1,M,QF1,Gate 2,B,2,Right-Up,1,,Right-Up,,
 2025,WC1,M,QF1,Gate 2,R,4,Left-Up,2,,SPLIT,,
-2025,WC1,M,QF1,Gate 2,G,3,Left-Up,3,,FOLLOW,,
+2025,WC1,M,QF1,Gate 2,G,3,Left-Up,3,,FOLLOW,,FLT
 2025,WC1,M,QF1,Gate 2,Y,1,Right-Up,4,,SPLIT,,
 2025,WC1,M,QF1,Gate 3,B,2,Down-Left,1,,,,
 2025,WC1,M,QF1,Gate 3,R,4,Down-Left,2,,,,
@@ -3013,7 +3013,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,M,QF4,Gate 3,G,2,Down-Left,4,,,,
 2025,WC1,M,QF4,Gate 4,R,3,Down-Right,1,,,,
 2025,WC1,M,QF4,Gate 4,B,4,Down-Right,2,,,,
-2025,WC1,M,QF4,Gate 4,Y,1,Down-Right,3,,,,
+2025,WC1,M,QF4,Gate 4,Y,1,Down-Right,3,,,,FLT
 2025,WC1,M,QF4,Gate 4,G,2,Down-Right,4,,,,
 2025,WC1,M,QF4,Gate 5,R,3,Down-Left,1,,,,
 2025,WC1,M,QF4,Gate 5,B,4,Down-Left,2,,,,
@@ -3076,10 +3076,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,H1,Gate 1,G,2,Down-Left,3,,,,
 2025,WC1,W,H1,Gate 1,Y,1,Down-Left,4,,,,
 2025,WC1,W,H1,Gate 2,R,3,Left-Up,1,,Left-Up,,
-2025,WC1,W,H1,Gate 2,B,4,Left-Up,2,,FOLLOW,,
+2025,WC1,W,H1,Gate 2,B,4,Left-Up,2,,FOLLOW,,FLT
 2025,WC1,W,H1,Gate 2,G,2,Right-Up,3,,SPLIT,,
 2025,WC1,W,H1,Gate 2,Y,1,Left-Up,4,,SPLIT,,
-2025,WC1,W,H1,Gate 3,R,3,Down-Left,1,,,,
+2025,WC1,W,H1,Gate 3,R,3,Down-Left,1,,,,FLT
 2025,WC1,W,H1,Gate 3,B,4,Down-Left,2,,,,
 2025,WC1,W,H1,Gate 3,G,2,Down-Left,3,,,,
 2025,WC1,W,H1,Gate 3,Y,1,Down-Left,4,,,,
@@ -3118,7 +3118,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,H2,Gate 3,R,3,Down-Left,1,,,,
 2025,WC1,W,H2,Gate 3,Y,1,Down-Left,2,,,,
 2025,WC1,W,H2,Gate 3,B,2,Down-Left,3,,,,
-2025,WC1,W,H2,Gate 3,G,4,Down-Left,4,,,,
+2025,WC1,W,H2,Gate 3,G,4,Down-Left,4,,,,FLT
 2025,WC1,W,H2,Gate 4,R,3,Down-Right,1,,,,
 2025,WC1,W,H2,Gate 4,Y,1,Down-Right,2,,,,
 2025,WC1,W,H2,Gate 4,B,2,Down-Right,3,,,,
@@ -3134,7 +3134,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,H2,Gate 6,R,3,Right-Up,1,,Right-Up,,
 2025,WC1,W,H2,Gate 6,Y,1,Right-Up,2,,FOLLOW,,
 2025,WC1,W,H2,Gate 6,B,2,Right-Up,3,,FOLLOW,,
-2025,WC1,W,H2,Gate 6,G,4,Left-Up,4,,SPLIT,,
+2025,WC1,W,H2,Gate 6,G,4,Left-Up,4,,SPLIT,,FLT
 2025,WC1,W,H2,Finish,R,3,Finish,1,1,,,
 2025,WC1,W,H2,Finish,Y,1,Finish,2,2,,,
 2025,WC1,W,H2,Finish,B,2,Finish,3,3,,,
@@ -3302,7 +3302,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,H7,Gate 4,G,4,Down-Right,1,,,,
 2025,WC1,W,H7,Gate 4,B,2,Down-Right,2,,,,
 2025,WC1,W,H7,Gate 4,Y,1,Down-Right,3,,,,
-2025,WC1,W,H7,Gate 4,R,3,Down-Right,4,,,,
+2025,WC1,W,H7,Gate 4,R,3,Down-Right,4,,,,FLT
 2025,WC1,W,H7,Gate 5,G,4,Down-Left,1,,,,
 2025,WC1,W,H7,Gate 5,B,2,Down-Left,2,,,,
 2025,WC1,W,H7,Gate 5,Y,1,Down-Left,3,,,,
@@ -3373,7 +3373,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,QF1,Gate 3,Y,1,Down-Left,4,,,,
 2025,WC1,W,QF1,Gate 4,G,4,Down-Right,1,,,,
 2025,WC1,W,QF1,Gate 4,R,3,Down-Right,2,,,,
-2025,WC1,W,QF1,Gate 4,B,2,Down-Right,3,,,,
+2025,WC1,W,QF1,Gate 4,B,2,Down-Right,3,,,,FLT
 2025,WC1,W,QF1,Gate 4,Y,1,Down-Right,4,,,,
 2025,WC1,W,QF1,Gate 5,G,4,Down-Left,1,,,,
 2025,WC1,W,QF1,Gate 5,R,3,Down-Left,2,,,,
@@ -3402,7 +3402,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,QF2,Gate 2,Y,1,Right-Up,1,,Right-Up,,
 2025,WC1,W,QF2,Gate 2,R,3,Right-Up,2,,FOLLOW,,
 2025,WC1,W,QF2,Gate 2,G,4,Left-Up,3,,SPLIT,,
-2025,WC1,W,QF2,Gate 2,B,2,Left-Up,4,,FOLLOW,,
+2025,WC1,W,QF2,Gate 2,B,2,Left-Up,4,,FOLLOW,,FLT
 2025,WC1,W,QF2,Gate 3,Y,1,Down-Left,1,,,,
 2025,WC1,W,QF2,Gate 3,R,3,Down-Left,2,,,,
 2025,WC1,W,QF2,Gate 3,G,4,Down-Left,3,,,,
@@ -3442,7 +3442,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,QF3,Gate 3,G,4,Down-Left,1,,,,
 2025,WC1,W,QF3,Gate 3,R,3,Down-Left,2,,,,
 2025,WC1,W,QF3,Gate 3,B,2,Down-Left,3,,,,
-2025,WC1,W,QF3,Gate 3,Y,1,Down-Left,4,,,,
+2025,WC1,W,QF3,Gate 3,Y,1,Down-Left,4,,,,FLT
 2025,WC1,W,QF3,Gate 4,G,4,Down-Right,1,,,,
 2025,WC1,W,QF3,Gate 4,R,3,Down-Right,2,,,,
 2025,WC1,W,QF3,Gate 4,B,2,Down-Right,3,,,,
@@ -3560,7 +3560,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,SF2,Gate 5,B,2,Down-Left,4,,,,
 2025,WC1,W,SF2,Course,R,3,Roll,1,,,,
 2025,WC1,W,SF2,Course,G,4,Roll,2,,,,
-2025,WC1,W,SF2,Course,Y,1,Roll,3,,,,
+2025,WC1,W,SF2,Course,Y,1,Roll,3,,,,FLT
 2025,WC1,W,SF2,Course,B,2,Roll,4,,,,
 2025,WC1,W,SF2,Gate 6,G,4,Left-Up,1,,Left-Up,,
 2025,WC1,W,SF2,Gate 6,R,3,Left-Up,2,,FOLLOW,,
@@ -3604,7 +3604,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC1,W,Final,Gate 6,B,2,Left-Up,4,,FOLLOW,,
 2025,WC1,W,Final,Finish,R,3,Finish,1,1,,,
 2025,WC1,W,Final,Finish,Y,1,Finish,2,2,,,
-2025,WC1,W,Final,Finish,G,4,Finish,3,3,,,
+2025,WC1,W,Final,Finish,G,4,Finish,3,3,,,RAL
 2025,WC1,W,Final,Finish,B,2,Finish,4,4,,,
 2025,WC2,M,H1,Ramp,Y,1,Assigned,,,,SAVLI Jakob,
 2025,WC2,M,H1,Ramp,B,2,Assigned,,,,DE COSTER Gabriel,
@@ -3633,9 +3633,9 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H1,Gate 5,R,4,Right-Up,1,,Right-Up,,
 2025,WC2,M,H1,Gate 5,B,2,Right-Up,2,,FOLLOW,,
 2025,WC2,M,H1,Gate 5,Y,1,Right-Up,3,,FOLLOW,,
-2025,WC2,M,H1,Gate 5,G,3,Right-Up,4,,FOLLOW,,
+2025,WC2,M,H1,Gate 5,G,3,Right-Up,4,,FOLLOW,,FLT
 2025,WC2,M,H1,Gate 6,R,4,Down-Right,1,,,,
-2025,WC2,M,H1,Gate 6,B,2,Down-Right,2,,,,
+2025,WC2,M,H1,Gate 6,B,2,Down-Right,2,,,,FLT
 2025,WC2,M,H1,Gate 6,Y,1,Down-Right,3,,,,
 2025,WC2,M,H1,Gate 6,G,3,Down-Right,4,,,,
 2025,WC2,M,H1,Gate 7,R,4,Down-Left,1,,,,
@@ -3711,7 +3711,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H3,Course,R,2,Roll,3,,,,
 2025,WC2,M,H3,Course,Y,1,Roll,4,,,,
 2025,WC2,M,H3,Gate 5,B,4,Right-Up,1,,Right-Up,,
-2025,WC2,M,H3,Gate 5,G,3,Left-Up,2,,SPLIT,,
+2025,WC2,M,H3,Gate 5,G,3,Left-Up,2,,SPLIT,,FLT
 2025,WC2,M,H3,Gate 5,Y,1,Left-Up,3,,FOLLOW,,
 2025,WC2,M,H3,Gate 5,R,2,Left-Up,4,,FOLLOW,,
 2025,WC2,M,H3,Gate 6,B,4,Down-Right,1,,,,
@@ -3761,7 +3761,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H4,Gate 7,B,3,Down-Left,1,,,,
 2025,WC2,M,H4,Gate 7,R,4,Down-Left,2,,,,
 2025,WC2,M,H4,Gate 7,G,2,Down-Left,3,,,,
-2025,WC2,M,H4,Gate 7,Y,1,Down-Left,4,,,,
+2025,WC2,M,H4,Gate 7,Y,1,Down-Left,4,,,,FLT
 2025,WC2,M,H4,Finish,B,3,Finish,1,1,,,
 2025,WC2,M,H4,Finish,R,4,Finish,2,2,,,
 2025,WC2,M,H4,Finish,G,2,Finish,3,3,,,
@@ -3775,7 +3775,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H5,Gate 1,B,2,Down-Right,3,,,,
 2025,WC2,M,H5,Gate 1,Y,1,Down-Right,4,,,,
 2025,WC2,M,H5,Gate 2,R,4,Right-Up,1,,Right-Up,,
-2025,WC2,M,H5,Gate 2,B,2,Right-Up,2,,FOLLOW,,
+2025,WC2,M,H5,Gate 2,B,2,Right-Up,2,,FOLLOW,,FLT
 2025,WC2,M,H5,Gate 2,Y,1,Left-Up,3,,SPLIT,,
 2025,WC2,M,H5,Gate 2,G,3,Left-Up,4,,FOLLOW,,
 2025,WC2,M,H5,Gate 3,R,4,Down-Left,1,,,,
@@ -3833,10 +3833,10 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H6,Gate 5,Y,1,Right-Up,1,,Right-Up,,
 2025,WC2,M,H6,Gate 5,B,3,Right-Up,2,,FOLLOW,,
 2025,WC2,M,H6,Gate 5,R,2,Left-Up,3,,SPLIT,,
-2025,WC2,M,H6,Gate 5,G,4,Left-Up,4,,FOLLOW,,
+2025,WC2,M,H6,Gate 5,G,4,Left-Up,4,,FOLLOW,,FLT
 2025,WC2,M,H6,Gate 6,Y,1,Down-Right,1,,,,
 2025,WC2,M,H6,Gate 6,B,3,Down-Right,2,,,,
-2025,WC2,M,H6,Gate 6,R,2,Down-Right,3,,,,
+2025,WC2,M,H6,Gate 6,R,2,Down-Right,3,,,,FLT
 2025,WC2,M,H6,Gate 6,G,4,Down-Right,4,,,,
 2025,WC2,M,H6,Gate 7,Y,1,Down-Left,1,,,,
 2025,WC2,M,H6,Gate 7,B,3,Down-Left,2,,,,
@@ -3851,7 +3851,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H7,Ramp,G,3,Assigned,,,,BALDONI Alex,
 2025,WC2,M,H7,Ramp,R,4,Assigned,,,,LORRENTE David,
 2025,WC2,M,H7,Gate 1,R,4,Down-Right,1,,,,
-2025,WC2,M,H7,Gate 1,G,3,Down-Right,2,,,,
+2025,WC2,M,H7,Gate 1,G,3,Down-Right,2,,,,FLT
 2025,WC2,M,H7,Gate 1,B,2,Down-Right,3,,,,
 2025,WC2,M,H7,Gate 1,Y,1,Down-Right,4,,,,
 2025,WC2,M,H7,Gate 2,R,4,Right-Up,1,,Right-Up,,
@@ -3873,7 +3873,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H7,Gate 5,R,4,Right-Up,1,,Right-Up,,
 2025,WC2,M,H7,Gate 5,G,3,Left-Up,2,,SPLIT,,
 2025,WC2,M,H7,Gate 5,B,2,Left-Up,3,,FOLLOW,,
-2025,WC2,M,H7,Gate 5,Y,1,Left-Up,4,,FOLLOW,,
+2025,WC2,M,H7,Gate 5,Y,1,Left-Up,4,,FOLLOW,,FLT
 2025,WC2,M,H7,Gate 6,R,4,Down-Right,1,,,,
 2025,WC2,M,H7,Gate 6,G,3,Down-Right,2,,,,
 2025,WC2,M,H7,Gate 6,B,2,Down-Right,3,,,,
@@ -3904,7 +3904,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,M,H8,Gate 3,Y,1,Down-Left,4,,,,
 2025,WC2,M,H8,Gate 4,R,4,Down-Right,1,,,,
 2025,WC2,M,H8,Gate 4,G,3,Down-Right,2,,,,
-2025,WC2,M,H8,Gate 4,B,2,Down-Right,3,,,,
+2025,WC2,M,H8,Gate 4,B,2,Down-Right,3,,,,FLT
 2025,WC2,M,H8,Gate 4,Y,1,Down-Right,4,,,,
 2025,WC2,M,H8,Course,R,4,Roll,1,,,,
 2025,WC2,M,H8,Course,G,3,Roll,2,,,,
