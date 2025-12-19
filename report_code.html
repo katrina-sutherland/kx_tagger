@@ -785,20 +785,20 @@
                 return;
             }
 
-            // UPDATED: Check BOTH Action, Gate AND Notes columns for "FLT", "FAULT", "DSQ", "DNF"
+            // UPDATED: Check BOTH Action, Gate AND Notes columns for "FLT", "FAULT", "DSQ", "DNF", AND "RAL"
             // Also case-insensitive check and checks new FaultVal property
             const faultData = raceData.filter(d => {
                 const checkString = (str) => {
                     if (!str) return false;
                     const s = str.toUpperCase();
-                    return s.includes('FLT') || s.includes('FAULT') || s.includes('DSQ') || s.includes('DNF');
+                    return s.includes('FLT') || s.includes('FAULT') || s.includes('DSQ') || s.includes('DNF') || s.includes('RAL');
                 };
                 
                 return checkString(d.Action) || checkString(d.Gate) || checkString(d.FaultVal);
             });
 
             // Debugging log (visible in console)
-            console.log(`Fault Analysis for Race: Found ${faultData.length} faults. (Bibs: ${[...new Set(faultData.map(d=>d.BIB))].join(',')})`);
+            console.log(`Fault Analysis for Race: Found ${faultData.length} faults/RALs. (Bibs: ${[...new Set(faultData.map(d=>d.BIB))].join(',')})`);
 
             // Show container
             container.classed("hidden", false);
@@ -816,29 +816,33 @@
             const athleteStats = bibsInRace.map(bib => {
                 const myFaults = faultData.filter(d => d.BIB === bib);
                 
+                // Track RAL status specifically
+                let isRAL = false;
+
                 // Find the "Index" of the fault in the ordered gates to determine distance
                 // Higher index = completed more of the course
                 let deepestFaultIndex = -1;
                 const faultStrings = myFaults.map(f => {
+                    // Check for RAL in any of the fields
+                    const combinedRaw = (f.Gate + " " + f.FaultVal + " " + f.Action).toUpperCase();
+                    
+                    if (combinedRaw.includes("RAL")) {
+                        isRAL = true;
+                    }
+
                     // Normalize Gate name logic:
-                    // Priority: 1. Gate Column, 2. Extraction from FaultVal/Action strings
-                    
                     let gateName = f.Gate || "";
-                    let rawStrings = [f.Gate, f.FaultVal, f.Action].filter(s => s);
-                    
-                    // Attempt to extract a clean gate number/name from any available string
                     let cleanGateName = "";
                     
                     // 1. Try simple Gate column cleanup
                     if (f.Gate) {
-                         cleanGateName = f.Gate.replace(/FLT/i, '').replace(/FAULT/i, '').replace(/DSQ/i, '').replace(/DNF/i, '').trim();
+                         cleanGateName = f.Gate.replace(/FLT/i, '').replace(/FAULT/i, '').replace(/DSQ/i, '').replace(/DNF/i, '').replace(/RAL/i, '').trim();
                     }
                     
                     // 2. If Gate column was empty or just "FLT", try to parse number from FaultVal/Action
                     if (!cleanGateName && (f.FaultVal || f.Action)) {
                         const combined = (f.FaultVal + " " + f.Action).toUpperCase();
-                        // Look for a number after FLT/FAULT, or just a standalone number
-                        const match = combined.match(/(?:FLT|FAULT)\s*(\d+|Roll|Upstream)/i) || combined.match(/(\d+)/);
+                        const match = combined.match(/(?:FLT|FAULT|RAL)\s*(\d+|Roll|Upstream)/i) || combined.match(/(\d+)/);
                         if (match) cleanGateName = match[1];
                     }
 
@@ -847,7 +851,12 @@
                     
                     if (gateIndex > deepestFaultIndex) deepestFaultIndex = gateIndex;
                     
-                    // Display string: prefer explicit Gate col, else construct string
+                    // Display string construction:
+                    // If this is an RAL entry, just return "RAL" (don't show gate for display)
+                    if (combinedRaw.includes("RAL")) {
+                        return "RAL"; 
+                    }
+                    
                     if (f.Gate && !f.Gate.toUpperCase().includes('FLT') && !f.Gate.toUpperCase().includes('FAULT')) {
                          return `FLT ${f.Gate}`;
                     } else if (cleanGateName) {
@@ -866,7 +875,8 @@
                     faults: faultStrings,
                     faultCount: faultStrings.length,
                     deepestFaultIndex: deepestFaultIndex,
-                    originalRank: originalRank
+                    originalRank: originalRank,
+                    isRAL: isRAL
                 };
             });
 
@@ -893,19 +903,32 @@
                 leftSide.append("span").attr("class", "text-slate-200 font-medium").text(athlete.name);
 
                 const faultText = athlete.faultCount > 0 ? athlete.faults.join(", ") : "-";
+                // Color RAL differently (e.g. orange/purple) or just standard Red? Let's use Red for all faults.
                 const faultClass = athlete.faultCount > 0 ? "text-red-400 font-bold" : "text-slate-500";
                 
                 row.append("span").attr("class", `${faultClass}`).text(faultText);
             });
 
-            // 4. Calculate New Ranking (The Logic)
+            // 4. Calculate New Ranking (UPDATED LOGIC WITH RAL)
             const sortedAthletes = [...athleteStats].sort((a, b) => {
+                // Priority 0: RAL Status (Lowest Priority / Worst Rank)
+                // If one has RAL and the other doesn't, the non-RAL is better (ranked higher/lower index)
+                if (a.isRAL !== b.isRAL) {
+                    return a.isRAL ? 1 : -1; // a is RAL -> a > b (a is worse)
+                }
+
+                // If both are RAL, tie-break by distance (Higher index = better = lower rank index)
+                if (a.isRAL && b.isRAL) {
+                    if (a.deepestFaultIndex !== b.deepestFaultIndex) {
+                        return b.deepestFaultIndex - a.deepestFaultIndex; // Descending order of distance
+                    }
+                    return a.originalRank - b.originalRank;
+                }
+
                 // Priority 1: Fault Count (Lower is better)
                 if (a.faultCount !== b.faultCount) {
-                     // Group logic: 0 faults vs 1 fault vs 2+ faults
                      const groupA = a.faultCount === 0 ? 0 : (a.faultCount === 1 ? 1 : 2);
                      const groupB = b.faultCount === 0 ? 0 : (b.faultCount === 1 ? 1 : 2);
-                     
                      if (groupA !== groupB) return groupA - groupB;
                 }
 
@@ -955,7 +978,9 @@
 
                 // Optional: Show why (New Column)
                 let reason = "Clean";
-                if (athlete.faultCount > 0) {
+                if (athlete.isRAL) {
+                     reason = "RAL"; // Just RAL, no gate info
+                } else if (athlete.faultCount > 0) {
                     const gateName = orderedGates[athlete.deepestFaultIndex] || "Start";
                     reason = athlete.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athlete.faultCount} Faults`;
                 }
