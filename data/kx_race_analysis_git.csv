@@ -4354,16 +4354,16 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC2,W,H4,Gate 5,Y,4,Right-Up,3,,FOLLOW,,
 2025,WC2,W,H4,Gate 5,R,2,Right-Up,4,,FOLLOW,,
 2025,WC2,W,H4,Gate 6,G,3,Down-Left,1,,,,
-2025,WC2,W,H4,Gate 6,B,1,Down-Left,2,,,,
+2025,WC2,W,H4,Gate 6,B,1,Down-Left,2,,,,RAL
 2025,WC2,W,H4,Gate 6,R,2,Down-Left,3,,,,
 2025,WC2,W,H4,Gate 6,Y,4,Down-Left,4,,,,
-2025,WC2,W,H4,Gate 7,B,1,Down-Left,1,,,,RAL
+2025,WC2,W,H4,Gate 7,B,1,Down-Left,1,,,,
 2025,WC2,W,H4,Gate 7,G,3,Down-Left,2,,,,
-2025,WC2,W,H4,Gate 7,R,2,Down-Left,3,,,,
+2025,WC2,W,H4,Gate 7,R,2,Down-Left,3,,,,RAL
 2025,WC2,W,H4,Gate 7,Y,4,Down-Left,4,,,,
 2025,WC2,W,H4,Finish,B,1,Finish,1,1,,,
 2025,WC2,W,H4,Finish,G,3,Finish,2,2,,,
-2025,WC2,W,H4,Finish,R,2,Finish,3,3,,,RAL
+2025,WC2,W,H4,Finish,R,2,Finish,3,3,,,
 2025,WC2,W,H4,Finish,Y,4,Finish,4,4,,,
 2025,WC2,W,H5,Ramp,B,4,Assigned,,,,SABATTINI Chiara,
 2025,WC2,W,H5,Ramp,G,3,Assigned,,,,Stanovska Sona,
