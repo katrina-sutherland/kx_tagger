@@ -79,14 +79,21 @@
                     </div>
                 </div>
             </div>
-            <div id="charts-area-full" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
-                <div class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
-                    <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
-                    <div id="legend-full" class="flex justify-center space-x-4 mb-4"></div>
-                    <div id="chart-container-full" class="w-full h-[600px]">
-                        <svg id="chart-full" class="w-full h-full"></svg>
+            <!-- Added items-start to prevent column stretching -->
+            <div id="charts-area-full" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+                <!-- Wrapper for Chart and Fault Analysis to keep them in the same column -->
+                <div class="lg:col-span-3 flex flex-col gap-8">
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
+                        <div id="legend-full" class="flex justify-center space-x-4 mb-4"></div>
+                        <div id="chart-container-full" class="w-full h-[600px]">
+                            <svg id="chart-full" class="w-full h-full"></svg>
+                        </div>
                     </div>
+                    <!-- NEW SEPARATE CONTAINER FOR FAULT ANALYSIS -->
+                    <div id="fault-analysis-full" class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
                 </div>
+
                 <div class="lg:col-span-2 grid grid-cols-2 gap-4">
                     <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by Bib Color</h3>
@@ -136,14 +143,21 @@
                     </div>
                 </div>
             </div>
-            <div id="charts-area-compact" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
-                    <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
-                    <div id="legend-compact" class="flex justify-center space-x-4 mb-4"></div>
-                    <div id="chart-container-compact" class="w-full h-[600px]">
-                        <svg id="chart-compact" class="w-full h-full"></svg>
+            <!-- Added items-start to prevent column stretching -->
+            <div id="charts-area-compact" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                <!-- Wrapper for Chart and Fault Analysis to keep them in the same column -->
+                <div class="lg:col-span-2 flex flex-col gap-8">
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
+                        <div id="legend-compact" class="flex justify-center space-x-4 mb-4"></div>
+                        <div id="chart-container-compact" class="w-full h-[600px]">
+                            <svg id="chart-compact" class="w-full h-full"></svg>
+                        </div>
                     </div>
+                    <!-- NEW SEPARATE CONTAINER FOR FAULT ANALYSIS -->
+                    <div id="fault-analysis-compact" class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
                 </div>
+
                 <div class="lg:col-span-1 grid grid-rows-2 gap-8">
                           <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
                               <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib Color</h3>
@@ -261,7 +275,9 @@
                 // Check multiple variations for Athlete Name
                 const athleteName = d['Athlete Name'] || d['Athlete'] || d['Name'] || '';
                 
-                const action = d.Action || '';
+                // UPDATED: Capture Action AND Fault specific columns
+                const action = d.Action || d.action || d.Notes || d.notes || '';
+                const faultVal = d.Fault || d.fault || ''; 
 
                 return {
                     Year: year,
@@ -275,7 +291,8 @@
                     FinalPosition: finalPosition,
                     UpstreamTactic: upstreamTactic,
                     AthleteName: athleteName,
-                    Action: action
+                    Action: action,
+                    FaultVal: faultVal // New dedicated property
                 };
             });
         }
@@ -757,6 +774,196 @@
             });
         }
 
+        // --- FAULT ANALYSIS & RANKING LOGIC ---
+        function updateFaultAnalysis(containerSelector, raceData, orderedGates, bibToNameMap) {
+            const container = d3.select(containerSelector);
+            container.html(""); // Clear content
+
+            // If no race data (empty filter result), hide and return
+            if (!raceData || raceData.length === 0) {
+                container.classed("hidden", true);
+                return;
+            }
+
+            // UPDATED: Check BOTH Action, Gate AND Notes columns for "FLT", "FAULT", "DSQ", "DNF"
+            // Also case-insensitive check and checks new FaultVal property
+            const faultData = raceData.filter(d => {
+                const checkString = (str) => {
+                    if (!str) return false;
+                    const s = str.toUpperCase();
+                    return s.includes('FLT') || s.includes('FAULT') || s.includes('DSQ') || s.includes('DNF');
+                };
+                
+                return checkString(d.Action) || checkString(d.Gate) || checkString(d.FaultVal);
+            });
+
+            // Debugging log (visible in console)
+            console.log(`Fault Analysis for Race: Found ${faultData.length} faults. (Bibs: ${[...new Set(faultData.map(d=>d.BIB))].join(',')})`);
+
+            // Show container
+            container.classed("hidden", false);
+
+            // If no faults exist, show specific message and return
+            if (faultData.length === 0) {
+                 container.append("p")
+                    .attr("class", "text-slate-400 text-sm italic text-center")
+                    .text("Note: NO Faults for this Race. Result remains unchanged.");
+                 return;
+            }
+
+            // 2. Aggregate Data per Athlete
+            const bibsInRace = [...new Set(raceData.map(d => d.BIB))];
+            const athleteStats = bibsInRace.map(bib => {
+                const myFaults = faultData.filter(d => d.BIB === bib);
+                
+                // Find the "Index" of the fault in the ordered gates to determine distance
+                // Higher index = completed more of the course
+                let deepestFaultIndex = -1;
+                const faultStrings = myFaults.map(f => {
+                    // Normalize Gate name logic:
+                    // Priority: 1. Gate Column, 2. Extraction from FaultVal/Action strings
+                    
+                    let gateName = f.Gate || "";
+                    let rawStrings = [f.Gate, f.FaultVal, f.Action].filter(s => s);
+                    
+                    // Attempt to extract a clean gate number/name from any available string
+                    let cleanGateName = "";
+                    
+                    // 1. Try simple Gate column cleanup
+                    if (f.Gate) {
+                         cleanGateName = f.Gate.replace(/FLT/i, '').replace(/FAULT/i, '').replace(/DSQ/i, '').replace(/DNF/i, '').trim();
+                    }
+                    
+                    // 2. If Gate column was empty or just "FLT", try to parse number from FaultVal/Action
+                    if (!cleanGateName && (f.FaultVal || f.Action)) {
+                        const combined = (f.FaultVal + " " + f.Action).toUpperCase();
+                        // Look for a number after FLT/FAULT, or just a standalone number
+                        const match = combined.match(/(?:FLT|FAULT)\s*(\d+|Roll|Upstream)/i) || combined.match(/(\d+)/);
+                        if (match) cleanGateName = match[1];
+                    }
+
+                    // Try to match against orderedGates
+                    let gateIndex = orderedGates.indexOf(cleanGateName);
+                    
+                    if (gateIndex > deepestFaultIndex) deepestFaultIndex = gateIndex;
+                    
+                    // Display string: prefer explicit Gate col, else construct string
+                    if (f.Gate && !f.Gate.toUpperCase().includes('FLT') && !f.Gate.toUpperCase().includes('FAULT')) {
+                         return `FLT ${f.Gate}`;
+                    } else if (cleanGateName) {
+                         return `FLT ${cleanGateName}`;
+                    }
+                    return f.FaultVal || f.Action || "Fault"; 
+                });
+
+                // Get original finish position for tie-breaking clean runs
+                const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0);
+                const originalRank = finishEntry ? finishEntry.FinalPosition : 99;
+
+                return {
+                    bib: bib,
+                    name: bibToNameMap.get(bib) || bibFullNames[bib] || bib,
+                    faults: faultStrings,
+                    faultCount: faultStrings.length,
+                    deepestFaultIndex: deepestFaultIndex,
+                    originalRank: originalRank
+                };
+            });
+
+            // --- SORT LOGIC FOR FAULT STATUS LIST (FIXED BIB ORDER) ---
+            const bibOrder = ['R', 'G', 'B', 'Y'];
+            const statusListAthletes = [...athleteStats].sort((a, b) => {
+                return bibOrder.indexOf(a.bib) - bibOrder.indexOf(b.bib);
+            });
+
+            // 3. Render Section 1: Fault List
+            const faultSection = container.append("div").attr("class", "grid grid-cols-1 md:grid-cols-2 gap-6");
+            
+            // Left Column: Athlete Fault Status
+            const statusBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
+            statusBox.append("h4").attr("class", "text-base font-bold text-slate-300 mb-3 pb-2 border-b border-slate-700 uppercase tracking-wider").text("Fault Status");
+            
+            const statusList = statusBox.append("div").attr("class", "space-y-2");
+
+            statusListAthletes.forEach(athlete => {
+                const row = statusList.append("div").attr("class", "flex items-center justify-between text-sm border-b border-slate-800 pb-1 last:border-0");
+                
+                const leftSide = row.append("div").attr("class", "flex items-center gap-2");
+                leftSide.append("div").attr("class", "w-3 h-3 rounded-sm").style("background-color", bibColors[athlete.bib]);
+                leftSide.append("span").attr("class", "text-slate-200 font-medium").text(athlete.name);
+
+                const faultText = athlete.faultCount > 0 ? athlete.faults.join(", ") : "-";
+                const faultClass = athlete.faultCount > 0 ? "text-red-400 font-bold" : "text-slate-500";
+                
+                row.append("span").attr("class", `${faultClass}`).text(faultText);
+            });
+
+            // 4. Calculate New Ranking (The Logic)
+            const sortedAthletes = [...athleteStats].sort((a, b) => {
+                // Priority 1: Fault Count (Lower is better)
+                if (a.faultCount !== b.faultCount) {
+                     // Group logic: 0 faults vs 1 fault vs 2+ faults
+                     const groupA = a.faultCount === 0 ? 0 : (a.faultCount === 1 ? 1 : 2);
+                     const groupB = b.faultCount === 0 ? 0 : (b.faultCount === 1 ? 1 : 2);
+                     
+                     if (groupA !== groupB) return groupA - groupB;
+                }
+
+                // Priority 2: If both are Clean (0 faults), use Original Rank
+                if (a.faultCount === 0 && b.faultCount === 0) {
+                    return a.originalRank - b.originalRank;
+                }
+
+                // Priority 3: Distance travelled before fault (Higher Index is better)
+                if (a.deepestFaultIndex !== b.deepestFaultIndex) {
+                    return b.deepestFaultIndex - a.deepestFaultIndex; 
+                }
+
+                // Fallback: Original Rank
+                return a.originalRank - b.originalRank;
+            });
+
+            // 5. Determine if Ranking Changed
+            const rankingChanged = sortedAthletes.some((a, index) => a.originalRank !== (index + 1));
+
+            // 6. Render Section 2: Calculated Result
+            const rankBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
+            
+            const rankHeader = rankBox.append("div").attr("class", "mb-3 border-b border-slate-700 pb-2");
+            rankHeader.append("h4").attr("class", "text-base font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result"); 
+            // Removed UPDATED badge logic here
+
+            const rankList = rankBox.append("div").attr("class", "space-y-2");
+
+            sortedAthletes.forEach((athlete, index) => {
+                const rank = index + 1;
+                const isWinner = rank === 1;
+                const colorClass = isWinner ? "text-yellow-400" : "text-slate-300";
+                
+                // UPDATED LAYOUT: Use Grid for columns
+                // Columns: Rank (small) | Bib (small) | Name (fluid) | Reason (fixed/auto right aligned)
+                const row = rankList.append("div").attr("class", "grid grid-cols-[1.5rem_1rem_1fr_auto] gap-x-3 items-center text-sm border-b border-slate-800 pb-1 last:border-0");
+                
+                // Rank Column
+                row.append("span").attr("class", `font-mono ${colorClass} text-right`).text(rank);
+                
+                // Bib Column
+                row.append("div").attr("class", "w-3 h-3 rounded-sm").style("background-color", bibColors[athlete.bib]);
+                
+                // Name Column
+                row.append("span").attr("class", "text-slate-200 truncate").text(athlete.name);
+
+                // Optional: Show why (New Column)
+                let reason = "Clean";
+                if (athlete.faultCount > 0) {
+                    const gateName = orderedGates[athlete.deepestFaultIndex] || "Start";
+                    reason = athlete.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athlete.faultCount} Faults`;
+                }
+                
+                row.append("span").attr("class", "text-xs text-slate-500 italic text-right whitespace-nowrap").text(reason);
+            });
+        }
+
         function drawLineChartFull(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
             const svg = d3.select("#chart-full");
             svg.selectAll("*").remove();
@@ -971,6 +1178,9 @@
             });
             drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
             
+            // Add Fault Analysis Call
+            updateFaultAnalysis("#fault-analysis-full", currentRaceData, structure.orderedGates, bibToNameMap);
+
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
@@ -1049,6 +1259,9 @@
             });
             drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
             
+            // Add Fault Analysis Call
+            updateFaultAnalysis("#fault-analysis-compact", currentRaceData, structure.orderedGates, bibToNameMap);
+
             const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
