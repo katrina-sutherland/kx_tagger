@@ -5429,7 +5429,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC4,M,H1,Finish,R,4,Finish,3,3,,,
 2025,WC4,M,H1,Finish,G,1,Finish,4,4,,,
 2025,WC4,M,H2,Ramp,B,4,Assigned,,,,LOCNIKAR Jan,
-2025,WC4,M,H2,Ramp,Y,3,Assigned,,,,LONG Kyler James,
+2025,WC4,M,H2,Ramp,Y,3,Assigned,,,,LONG Kyler,
 2025,WC4,M,H2,Ramp,R,2,Assigned,,,,GRIGAR Jakub,
 2025,WC4,M,H2,Ramp,G,1,Assigned,,,,LLORENTE David,
 2025,WC4,M,H2,Gate 1,R,2,Down-Left,1,,,,
@@ -5453,7 +5453,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC4,M,H2,Gate 5,G,1,Down-Left,3,,,,
 2025,WC4,M,H2,Gate 5,Y,3,Down-Left,4,,,,
 2025,WC4,M,H2,Gate 6,B,4,Left-Up,1,,Left-Up,,
-2025,WC4,M,H2,Gate 6,R,2,Left-Up,2,,FOLLOW,,
+2025,WC4,M,H2,Gate 6,R,2,Left-Up,2,,FOLLOW,,FLT
 2025,WC4,M,H2,Gate 6,G,1,Left-Up,3,,FOLLOW,,
 2025,WC4,M,H2,Gate 6,Y,3,Right-Up,4,,SPLIT,,
 2025,WC4,M,H2,Course,B,4,Roll,1,,,,
@@ -5479,7 +5479,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC4,M,H3,Gate 2,R,2,Left-Up,1,,Left-Up,,
 2025,WC4,M,H3,Gate 2,Y,4,Left-Up,2,,FOLLOW,,
 2025,WC4,M,H3,Gate 2,B,1,Right-Up,3,,SPLIT,,
-2025,WC4,M,H3,Gate 2,G,3,Left-Up,4,,SPLIT,,
+2025,WC4,M,H3,Gate 2,G,3,Left-Up,4,,SPLIT,,FLT
 2025,WC4,M,H3,Gate 3,R,2,Down-Left,1,,,,
 2025,WC4,M,H3,Gate 3,B,1,Down-Left,2,,,,
 2025,WC4,M,H3,Gate 3,Y,4,Down-Left,3,,,,
@@ -5557,7 +5557,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2025,WC4,M,H5,Gate 1,Y,3,Down-Left,3,,,,
 2025,WC4,M,H5,Gate 1,B,1,Down-Left,4,,,,
 2025,WC4,M,H5,Gate 2,R,4,Left-Up,1,,Left-Up,,
-2025,WC4,M,H5,Gate 2,Y,3,Left-Up,2,,FOLLOW,,
+2025,WC4,M,H5,Gate 2,Y,3,Left-Up,2,,FOLLOW,,FLT
 2025,WC4,M,H5,Gate 2,G,2,Left-Up,3,,FOLLOW,,
 2025,WC4,M,H5,Gate 2,B,1,Right-Up,4,,SPLIT,,
 2025,WC4,M,H5,Gate 3,R,4,Down-Left,1,,,,
