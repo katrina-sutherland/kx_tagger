@@ -1109,14 +1109,28 @@
                     tr.append("td").attr("class", "p-3").text(athleteResult.rampPosition);
                     
                     // Phase Rank (Result)
+                    const phaseRank = athleteResult.calculatedRank;
                     const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold");
-                    if (athleteResult.calculatedRank === 1) resCell.classed("text-yellow-400", true);
-                    else if (athleteResult.calculatedRank === 2) resCell.classed("text-gray-300", true);
-                    else if (athleteResult.calculatedRank === 3) resCell.classed("text-amber-600", true);
-                    resCell.text(athleteResult.calculatedRank);
+                    if (phaseRank === 1) resCell.classed("text-yellow-400", true);
+                    else if (phaseRank === 2) resCell.classed("text-gray-300", true);
+                    else if (phaseRank === 3) resCell.classed("text-amber-600", true);
+                    else resCell.classed("text-white", true);
+                    resCell.text(phaseRank);
                     
                     // Finish Rank (Overall)
-                    tr.append("td").attr("class", "p-3 font-mono").text(athleteResult.finishRank);
+                    const finishRankStr = String(athleteResult.finishRank);
+                    const finishRankVal = parseInt(finishRankStr, 10);
+                    const finishCell = tr.append("td").attr("class", "p-3 font-mono font-bold"); 
+                    
+                    if (!isNaN(finishRankVal)) {
+                        if (finishRankVal === 1) finishCell.classed("text-yellow-400", true);
+                        else if (finishRankVal === 2) finishCell.classed("text-gray-300", true);
+                        else if (finishRankVal === 3) finishCell.classed("text-amber-600", true);
+                        else finishCell.classed("text-white", true);
+                    } else {
+                        finishCell.classed("text-white", true);
+                    }
+                    finishCell.text(finishRankStr);
 
                     // Notes
                     let note = "-";
