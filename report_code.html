@@ -304,6 +304,8 @@
                 // UPDATED: Capture Action AND Fault specific columns
                 const action = d.Action || d.action || d.Notes || d.notes || '';
                 const faultVal = d.Fault || d.fault || ''; 
+                // Capture overall/finish rank if available
+                const finishRank = d['Finish Rank'] || d['FinishRank'] || d.Rank || d.rank || d['Overall Rank'] || d['OverallRank'] || '';
 
                 return {
                     Year: year,
@@ -318,7 +320,8 @@
                     UpstreamTactic: upstreamTactic,
                     AthleteName: athleteName,
                     Action: action,
-                    FaultVal: faultVal // New dedicated property
+                    FaultVal: faultVal, // New dedicated property
+                    FinishRank: finishRank
                 };
             });
         }
@@ -865,6 +868,10 @@
                 const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0);
                 const originalRank = finishEntry ? finishEntry.FinalPosition : 99;
                 const rampEntry = raceData.find(d => d.BIB === bib && d.Gate === 'Ramp');
+                
+                // Capture finish rank from any entry for this athlete in this race
+                const finishRankEntry = raceData.find(d => d.BIB === bib && d.FinishRank);
+                const overallRank = finishRankEntry ? finishRankEntry.FinishRank : '-';
 
                 return {
                     bib: bib,
@@ -874,7 +881,8 @@
                     faultCount: faultStrings.length,
                     deepestFaultIndex: deepestFaultIndex,
                     originalRank: originalRank,
-                    isRAL: isRAL
+                    isRAL: isRAL,
+                    finishRank: overallRank
                 };
             });
 
@@ -1066,7 +1074,7 @@
             
             const thead = table.append("thead").attr("class", "bg-slate-700/50 uppercase text-xs font-semibold text-slate-400");
             const headerRow = thead.append("tr");
-            ["Competition", "Phase", "Bib", "Ramp", "Result", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
+            ["Competition", "Phase", "Bib", "Ramp", "Phase Rank", "Finish Rank", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
 
             const tbody = table.append("tbody");
 
@@ -1100,12 +1108,15 @@
 
                     tr.append("td").attr("class", "p-3").text(athleteResult.rampPosition);
                     
-                    // Result (Color code 1st/2nd/3rd?)
+                    // Phase Rank (Result)
                     const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold");
                     if (athleteResult.calculatedRank === 1) resCell.classed("text-yellow-400", true);
                     else if (athleteResult.calculatedRank === 2) resCell.classed("text-gray-300", true);
                     else if (athleteResult.calculatedRank === 3) resCell.classed("text-amber-600", true);
                     resCell.text(athleteResult.calculatedRank);
+                    
+                    // Finish Rank (Overall)
+                    tr.append("td").attr("class", "p-3 font-mono").text(athleteResult.finishRank);
 
                     // Notes
                     let note = "-";
