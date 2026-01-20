@@ -1068,6 +1068,38 @@
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
 
+            // --- PRE-CALCULATE FINISH RANKS FOR COMPETITIONS WITH FINALS ---
+            const competitionFinalRankMap = {};
+            // Group races by competition
+            const racesByComp = {};
+            races.forEach(r => {
+                if (!racesByComp[r.competition]) racesByComp[r.competition] = [];
+                racesByComp[r.competition].push(r);
+            });
+
+            Object.keys(racesByComp).forEach(compName => {
+                const compRaces = racesByComp[compName];
+                const finalRace = compRaces.find(r => r.phase === 'Final');
+                
+                if (finalRace) {
+                    // Calculate rank for this final
+                     const fullRaceData = masterDataFull.filter(d => 
+                        d.Year === selectedYear && 
+                        d.Competition === compName && 
+                        d.Phase === 'Final' &&
+                        d.Gender === finalRace.gender
+                    );
+                    const structure = scanCompetitionStructure(selectedYear, compName, masterDataFull);
+                    const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
+                    const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
+                    
+                    if (athleteResult) {
+                         // Use Calculated Phase Rank as Finish Rank for Final
+                         competitionFinalRankMap[compName] = athleteResult.calculatedRank;
+                    }
+                }
+            });
+
             // Render Table
             const table = container.append("div").attr("class", "overflow-x-auto bg-slate-800 rounded-xl border border-slate-700")
                 .append("table").attr("class", "w-full text-left text-sm text-slate-300");
@@ -1110,16 +1142,22 @@
                     
                     // Phase Rank (Result)
                     const phaseRank = athleteResult.calculatedRank;
-                    const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold");
-                    if (phaseRank === 1) resCell.classed("text-yellow-400", true);
-                    else if (phaseRank === 2) resCell.classed("text-gray-300", true);
-                    else if (phaseRank === 3) resCell.classed("text-amber-600", true);
-                    else resCell.classed("text-white", true);
+                    // User requested no highlighting for Phase Rank, only white
+                    const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold text-white"); 
                     resCell.text(phaseRank);
                     
                     // Finish Rank (Overall)
-                    const finishRankStr = String(athleteResult.finishRank);
-                    const finishRankVal = parseInt(finishRankStr, 10);
+                    let finalFinishRank = athleteResult.finishRank;
+                    
+                    // APPLY OVERRIDE: If we found a rank from the Final phase for this competition, use it.
+                    if (competitionFinalRankMap[race.competition] !== undefined) {
+                        finalFinishRank = competitionFinalRankMap[race.competition];
+                    } else if (race.phase === 'Final') {
+                        // Just in case map logic missed it but we are in final now
+                        finalFinishRank = phaseRank;
+                    }
+                    
+                    const finishRankVal = parseInt(finalFinishRank, 10);
                     const finishCell = tr.append("td").attr("class", "p-3 font-mono font-bold"); 
                     
                     if (!isNaN(finishRankVal)) {
@@ -1130,7 +1168,8 @@
                     } else {
                         finishCell.classed("text-white", true);
                     }
-                    finishCell.text(finishRankStr);
+                    // Display value
+                    finishCell.text((!finalFinishRank || finalFinishRank === '-') ? '-' : finalFinishRank);
 
                     // Notes
                     let note = "-";
