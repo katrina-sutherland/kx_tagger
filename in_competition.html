@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>In Competition Analysis - KX</title>
+    <title>Kayak Cross Race Analysis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -11,425 +12,415 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .x-axis path, .y-axis path {
+
+        .x-axis path,
+        .y-axis path {
             display: none;
         }
-        .x-axis .tick line, .y-axis .tick line {
-            stroke: #334155; /* slate-700 */
-            stroke-dasharray: 2,2;
+
+        .x-axis .tick line,
+        .y-axis .tick line {
+            stroke: #334155;
+            /* slate-700 */
+            stroke-dasharray: 2, 2;
         }
+
         .x-axis .tick text {
-            fill: #94a3b8; /* slate-400 */
+            fill: #94a3b8;
+            /* slate-400 */
             font-size: 12px;
             font-weight: 600;
         }
-        /* Custom styling for Y-axis ticks */
+
         .y-axis .tick text {
-             fill: #94a3b8; /* slate-400 */
-             font-size: 14px;
-             font-weight: 700; /* bold */
+            fill: #94a3b8;
+            /* slate-400 */
+            font-size: 14px;
+            font-weight: 700;
+            /* bold */
         }
+
         .domain {
             display: none;
         }
+
         .dark-select {
-            background-color: #1e2b3b; /* slate-800 */
-            border-color: #475569; /* slate-600 */
-            color: #e2e8f0; /* slate-200 */
+            background-color: #1e293b;
+            /* slate-800 */
+            border-color: #475569;
+            /* slate-600 */
+            color: #e2e8f0;
+            /* slate-200 */
         }
+
         .tooltip {
             position: absolute;
             text-align: left;
             padding: 8px;
             font: 12px sans-serif;
-            background: #1e293b; /* slate-800 */
+            background: #1e293b;
+            /* slate-800 */
             color: white;
-            border: 1px solid #334155; /* slate-700 */
+            border: 1px solid #334155;
+            /* slate-700 */
             border-radius: 8px;
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.2s;
         }
+
+        .chart-card {
+            transition: border-color 0.3s ease-in-out;
+        }
     </style>
 </head>
+
 <body class="bg-slate-900 text-slate-200 antialiased">
     <div class="tooltip"></div>
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-slate-100">In Competition Analysis - KX</h1>
-            <p class="text-slate-400 mt-1">Default data loaded. Upload a custom CSV file or select a race to visualize.</p>
+            <h1 class="text-3xl font-bold text-slate-100">Kayak Cross Analysis</h1>
         </header>
 
-        <!-- File Upload & Filters -->
-        <div class="max-w-7xl mx-auto space-y-8">
-             <div class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700">
-                <div>
-                    <label for="csv-upload" class="block text-sm font-medium text-slate-300 mb-1">Upload Custom CSV File</label>
-                    <input type="file" id="csv-upload" accept=".csv" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/10 file:text-indigo-300 hover:file:bg-indigo-500/20"/>
+        <!-- Tab Navigation -->
+        <div class="max-w-7xl mx-auto mb-8 border-b border-slate-700">
+            <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                <button id="tab-full"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
+                    Full Report
+                </button>
+                <button id="tab-compact"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                    In-Competition Report
+                </button>
+            </nav>
+        </div>
+
+        <!-- Full Report Content -->
+        <div id="report-full">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <div id="filter-controls-full"
+                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="year-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Year</label>
+                            <select id="year-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="competition-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
+                            <select id="competition-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="gender-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                            <select id="gender-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="phase-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
+                            <select id="phase-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div id="filter-controls" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                        <label for="year-select" class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                        <select id="year-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+            <div id="charts-area-full" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div
+                    class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
+                    <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis
+                    </h3>
+                    <div id="legend-full" class="flex justify-center space-x-4 mb-4"></div>
+                    <div id="chart-container-full" class="w-full h-[600px]">
+                        <svg id="chart-full" class="w-full h-full"></svg>
                     </div>
-                    <div>
-                        <label for="competition-select" class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
-                        <select id="competition-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                </div>
+                <div class="lg:col-span-2 grid grid-cols-2 gap-4">
+                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by
+                            Bib Color</h3>
+                        <div id="pie-chart-bib-full" class="w-full h-40 flex items-center justify-center"></div>
+                        <div id="pie-legend-bib-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
-                    <div>
-                        <label for="gender-select" class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                        <select id="gender-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd
+                            Place % by Bib Color</h3>
+                        <div id="pie-chart-bib-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                        <div id="pie-legend-bib-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
-                    <div>
-                        <label for="phase-select" class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
-                        <select id="phase-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish Position
+                            % when Leading at 1st Upstream</h3>
+                        <div id="pie-chart-gate2-full" class="w-full h-40 flex items-center justify-center"></div>
+                        <div id="pie-legend-gate2-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                    </div>
+                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st
+                            Upstream When Overall Finish 2nd</h3>
+                        <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center">
+                        </div>
+                        <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                 </div>
             </div>
         </div>
 
-
-        <!-- Main Content Grid -->
-        <div id="charts-area" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 hidden">
-            <!-- Left Column: Line Chart -->
-            <div class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
-                <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
-                <div id="legend" class="flex justify-center space-x-4 mb-4"></div>
-                <div id="chart-container" class="w-full h-[600px]">
-                    <svg id="chart" class="w-full h-full"></svg>
+        <!-- In-Competition Report Content -->
+        <div id="report-compact" class="hidden">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <div id="filter-controls-compact"
+                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                            <label for="year-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Year</label>
+                            <select id="year-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="competition-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
+                            <select id="competition-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="gender-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                            <select id="gender-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="phase-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
+                            <select id="phase-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <!-- Right Column: Pie Charts -->
-            <div class="lg:col-span-2 grid grid-rows-2 gap-8">
-                <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
-                    <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib Color</h3>
-                    <div id="pie-chart-bib" class="w-full max-w-[180px] mx-auto aspect-square"></div>
-                    <div id="pie-legend-bib" class="flex flex-col items-center gap-y-1 mt-2"></div>
+            <div id="charts-area-compact" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div
+                    class="lg:col-span-2 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
+                    <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis
+                    </h3>
+                    <div id="legend-compact" class="flex justify-center space-x-4 mb-4"></div>
+                    <div id="chart-container-compact" class="w-full h-[600px]">
+                        <svg id="chart-compact" class="w-full h-full"></svg>
+                    </div>
                 </div>
-                <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
-                    <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp Position</h3>
-                    <div id="pie-chart-ramp" class="w-full max-w-[180px] mx-auto aspect-square"></div>
-                    <div id="pie-legend-ramp" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                <div class="lg:col-span-1 grid grid-rows-2 gap-8">
+                    <div
+                        class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                        <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win %
+                            by Bib Color</h3>
+                        <div id="pie-chart-bib-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
+                        <div id="pie-legend-bib-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                    </div>
+                    <div
+                        class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                        <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp
+                            Position</h3>
+                        <div id="pie-chart-ramp-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
+                        <div id="pie-legend-ramp-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
         // --- DATA STATE & CONSTANTS ---
-        let masterData = [];
+        let masterDataFull = [];
+        let masterDataCompact = [];
+        const bibColors = { 'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308' };
+        const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
+        const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
 
-        // Define the compact order for the x-axis of the line chart
-        const courseDisplayOrder = ['Ramp', '1', '2', '3', 'Finish'];
-        const lineSortOrder = ['Start', 'Ramp', '1', '2', '3', 'Finish'];
-
-        const bibColors = {
-            'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308'
-        };
-        const bibFullNames = {
-            'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW'
-        };
-
-        const medalColors = {
-            gold: '#D4AF37',
-            silver: '#C0C0C0',
-            bronze: '#A97142'
-        };
-        
         // --- DOM SELECTORS ---
-        const selectors = {
-            year: d3.select("#year-select"),
-            competition: d3.select("#competition-select"),
-            gender: d3.select("#gender-select"),
-            phase: d3.select("#phase-select")
-        };
-        const fileUpload = d3.select("#csv-upload");
-        const filterControls = d3.select("#filter-controls");
-        const chartsArea = d3.select("#charts-area");
         const tooltip = d3.select(".tooltip");
+        const tabFull = d3.select("#tab-full");
+        const tabCompact = d3.select("#tab-compact");
+        const reportFull = d3.select("#report-full");
+        const reportCompact = d3.select("#report-compact");
 
-        // --- FILE HANDLING ---
-        fileUpload.on("change", function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => initializeDashboard(e.target.result);
-            reader.readAsText(file);
+        const selectorsFull = {
+            year: d3.select("#year-select-full"),
+            competition: d3.select("#competition-select-full"),
+            gender: d3.select("#gender-select-full"),
+            phase: d3.select("#phase-select-full")
+        };
+        const filterControlsFull = d3.select("#filter-controls-full");
+
+        const selectorsCompact = {
+            year: d3.select("#year-select-compact"),
+            competition: d3.select("#competition-select-compact"),
+            gender: d3.select("#gender-select-compact"),
+            phase: d3.select("#phase-select-compact")
+        };
+        const filterControlsCompact = d3.select("#filter-controls-compact");
+
+
+        // --- TAB HANDLING ---
+        tabFull.on("click", () => {
+            tabFull.classed("text-indigo-400 border-indigo-500", true).classed("text-slate-400 border-transparent", false);
+            tabCompact.classed("text-indigo-400 border-indigo-500", false).classed("text-slate-400 border-transparent", true);
+            reportFull.classed("hidden", false);
+            reportCompact.classed("hidden", true);
         });
 
-        // --- DATA LOADING & INITIALIZATION ---
-        
-        async function loadDataAndInitialize(path) {
+        tabCompact.on("click", () => {
+            tabCompact.classed("text-indigo-400 border-indigo-500", true).classed("text-slate-400 border-transparent", false);
+            tabFull.classed("text-indigo-400 border-indigo-500", false).classed("text-slate-400 border-transparent", true);
+            reportCompact.classed("hidden", false);
+            reportFull.classed("hidden", true);
+        });
+
+        // --- DATA PARSING ---
+        function parseCsvData(csvString) {
+            return d3.csvParse(csvString, d => ({
+                Year: +d.Year,
+                Competition: d.Competition,
+                Gender: d.Gender,
+                Phase: d.Phase,
+                Gate: d.Gate && d.Gate.startsWith('Gate ') ? d.Gate.replace('Gate ', '') : (d.Gate === 'Course' ? 'Roll' : d.Gate),
+                BIB: d.BIB,
+                Position: +d.Order,
+                RampPosition: +d['Ramp Position'],
+                FinalPosition: +d['Final Position'],
+                UpstreamTactic: d['Upstream Tactic']
+            }));
+        }
+
+        // --- INITIALIZATION ---
+        async function loadInitialData() {
+            showInitialMessage("#chart-full", "Loading data...");
+            showInitialMessage("#chart-compact", "Loading data...");
+
             try {
-                const response = await fetch(path);
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok. Status: ${response.status}`);
-                }
-                const csvString = await response.text();
-                initializeDashboard(csvString);
+                const [responseFull, responseCompact] = await Promise.all([
+                    fetch('data/Kayak_Cross_Data.csv'),
+                    fetch('data/Kayak_Cross_Data_IN_COMPETITION.csv')
+                ]);
+
+                if (!responseFull.ok) throw new Error(`Failed to load: Kayak_Cross_Data.csv`);
+                if (!responseCompact.ok) throw new Error(`Failed to load: Kayak_Cross_Data_IN_COMPETITION.csv`);
+
+                const csvStringFull = await responseFull.text();
+                const csvStringCompact = await responseCompact.text();
+
+                masterDataFull = parseCsvData(csvStringFull);
+                masterDataCompact = parseCsvData(csvStringCompact);
+
+                filterControlsFull.classed("hidden", false);
+                populateFilters(masterDataFull, selectorsFull);
+                updateAllChartsFull();
+
+                filterControlsCompact.classed("hidden", false);
+                populateFilters(masterDataCompact, selectorsCompact);
+                updateAllChartsCompact();
+
+                // Set up auto-refresh
+                setInterval(loadInitialData, 90000);
+
+                window.addEventListener('resize', () => {
+                    updateAllChartsFull();
+                    updateAllChartsCompact();
+                });
+
             } catch (error) {
-                console.error('Error loading or parsing CSV file:', error);
-                showInitialMessage("#chart", "Error: Could not load Kayak_Cross_Data.csv");
+                console.error('Error loading initial CSV files:', error);
+                showInitialMessage("#chart-full", `Error: ${error.message}. Check file name and path.`);
+                showInitialMessage("#chart-compact", `Error: ${error.message}. Check file name and path.`);
             }
         }
 
-        function initializeDashboard(csvString) {
-            masterData = d3.csvParse(csvString, d => {
-                let gate = d.Gate;
-                if (gate === 'Course') gate = 'Roll';
-                else if (gate && gate.startsWith('Gate ')) gate = gate.replace('Gate ', '');
-                return {
-                    Year: +d.Year,
-                    Competition: d.Competition,
-                    Gender: d.Gender,
-                    Phase: d.Phase,
-                    Gate: gate,
-                    BIB: d.BIB,
-                    Position: +d.Order,
-                    RampPosition: +d['Ramp Position'],
-                    FinalPosition: +d['Final Position'],
-                    UpstreamTactic: d['Upstream Tactic']
-                };
-            });
-
-            filterControls.classed("hidden", false);
-            chartsArea.classed("hidden", false);
-            populateFilters();
-            updateAllCharts();
-            window.addEventListener('resize', updateAllCharts);
-        }
-        
         function showInitialMessage(containerSelector, message) {
-             d3.select(containerSelector).selectAll("*").remove();
-             const svg = d3.select(containerSelector);
-             const containerNode = svg.node();
-             if(!containerNode) return;
-             
-             const width = containerNode.getBoundingClientRect().width;
-             const height = containerNode.getBoundingClientRect().height;
-
-             svg.append("text")
-                .attr("x", width / 2)
-                .attr("y", height / 2)
-                .attr("text-anchor", "middle")
-                .attr("class", "text-slate-500 text-lg select-none")
-                .text(message);
+            const svg = d3.select(containerSelector);
+            if (svg.empty()) return;
+            svg.selectAll("*").remove();
+            const { width, height } = svg.node().getBoundingClientRect();
+            svg.append("text").attr("x", width / 2).attr("y", height / 2).attr("text-anchor", "middle").attr("class", "text-slate-500 text-lg select-none").text(message);
         }
 
-        // --- FILTER SETUP ---
-        function populateFilters() {
+        function populateFilters(data, selectorGroup) {
             const uniqueValues = {
-                year: [...new Set(masterData.map(d => d.Year))].sort((a, b) => b - a),
-                competition: [...new Set(masterData.map(d => d.Competition))].sort(),
-                gender: [...new Set(masterData.map(d => d.Gender))].sort(),
-                phase: [...new Set(masterData.map(d => d.Phase))]
+                year: [...new Set(data.map(d => d.Year))].sort((a, b) => b - a),
+                competition: [...new Set(data.map(d => d.Competition))].sort(),
+                gender: [...new Set(data.map(d => d.Gender))].sort(),
+                phase: [...new Set(data.map(d => d.Phase))]
             };
-            
             const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
             uniqueValues.phase.sort((a, b) => {
                 const regex = /^([A-Za-z]+)(\d*)$/;
                 const matchA = a.match(regex) || [a, a, ''];
                 const matchB = b.match(regex) || [b, b, ''];
-                
-                const prefixA = matchA[1] === 'Final' ? 'Final' : matchA[1];
-                const prefixB = matchB[1] === 'Final' ? 'Final' : matchB[1];
-                
-                const numA = parseInt(matchA[2] || '0', 10);
-                const numB = parseInt(matchB[2] || '0', 10);
-
-                const orderA = phaseSortOrder[prefixA] || 99;
-                const orderB = phaseSortOrder[prefixB] || 99;
-
+                const orderA = phaseSortOrder[matchA[1] === 'Final' ? 'Final' : matchA[1]] || 99;
+                const orderB = phaseSortOrder[matchB[1] === 'Final' ? 'Final' : matchB[1]] || 99;
                 if (orderA !== orderB) return orderA - orderB;
-                return numA - numB;
+                return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
-
-
-            for (const key in selectors) {
-                selectors[key].selectAll("option").data(uniqueValues[key]).join("option").attr("value", d => d).text(d => d);
+            for (const key in selectorGroup) {
+                selectorGroup[key].selectAll("option").data(uniqueValues[key]).join("option").attr("value", d => d).text(d => d);
             }
-            Object.values(selectors).forEach(sel => sel.on("change", updateAllCharts));
+            if (selectorGroup === selectorsFull) {
+                Object.values(selectorGroup).forEach(sel => sel.on("change", updateAllChartsFull));
+            } else {
+                Object.values(selectorGroup).forEach(sel => sel.on("change", updateAllChartsCompact));
+            }
         }
 
-        // --- GENERIC PIE CHART DRAWER ---
+        // --- GENERIC PIE CHART ---
         function drawPieChartAndLegend(chartSelector, legendSelector, data, colorScale) {
             const chartContainer = d3.select(chartSelector);
             const legendContainer = d3.select(legendSelector);
             chartContainer.selectAll("*").remove();
             legendContainer.selectAll("*").remove();
-
             const dataForPie = data.filter(d => d.value > 0);
             const totalValue = d3.sum(data, d => d.value);
-
             if (totalValue === 0) {
-                chartContainer.append("p").attr("class", "text-slate-500 text-center text-sm").text("No data.");
-            } else {
-                const svg = chartContainer.append("svg").attr("viewBox", "0 0 250 250").style("width", "100%").style("height", "100%");
-                const width = 250, height = 250;
-                const radius = Math.min(width, height) / 2 - 15; 
-                
-                const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
-
-                const pie = d3.pie().value(d => d.value).sort(null);
-                const arc = d3.arc().innerRadius(0).outerRadius(radius);
-
-                g.selectAll("path")
-                    .data(pie(dataForPie))
-                    .join("path")
-                    .attr("d", arc)
-                    .attr("fill", d => colorScale(d.data.label))
-                    .attr("stroke", "#1e293b")
-                    .style("stroke-width", "3px")
-                    .on("mouseover", (event, d) => {
-                        tooltip.transition().duration(200).style("opacity", .9);
-                        const percent = ((d.data.value / totalValue) * 100).toFixed(2);
-                        tooltip.html(`<strong>${d.data.label}</strong><br>${d.data.value} times (${percent}%)`)
-                            .style("left", (event.pageX + 10) + "px")
-                            .style("top", (event.pageY - 28) + "px");
-                    })
-                    .on("mouseout", () => {
-                        tooltip.transition().duration(500).style("opacity", 0);
-                    });
-
-                const labelArc = d3.arc().innerRadius(radius * 0.6).outerRadius(radius * 0.6);
-                g.selectAll('text.label')
-                    .data(pie(dataForPie))
-                    .join('text')
-                    .attr('class', 'label text-xs font-bold pointer-events-none')
-                    .attr('transform', d => `translate(${labelArc.centroid(d)})`)
-                    .attr('text-anchor', 'middle')
-                    .attr('fill', '#FFFFFF')
-                    .text(d => {
-                        const percent = (d.data.value / totalValue) * 100;
-                        return percent > 5 ? `${percent.toFixed(0)}%` : '';
-                    });
-            }
-
-            const legendItems = legendContainer.selectAll('div')
-                .data(data)
-                .join('div')
-                .attr('class', 'flex items-center space-x-2');
-            
-            legendItems.append('div')
-                .attr('class', 'w-3 h-3 rounded-sm')
-                .style('background-color', d => colorScale(d.label));
-
-            legendItems.append('span')
-                .attr('class', 'text-xs text-slate-300')
-                .text(d => {
-                    const percent = totalValue > 0 ? (d.value / totalValue) * 100 : 0;
-                    return `${d.label} (${percent.toFixed(2)}%)`;
-                });
-        }
-
-        // --- CHART DRAWING: LINE CHART ---
-        function drawLineChart(raceData, rampPositions) {
-            const svg = d3.select("#chart");
-            svg.selectAll("*").remove();
-
-             // Add checkered flag pattern definition
-            const defs = svg.append('defs');
-            const pattern = defs.append('pattern')
-                .attr('id', 'checkered-flag')
-                .attr('width', 8)
-                .attr('height', 8)
-                .attr('patternUnits', 'userSpaceOnUse');
-
-            pattern.append('rect').attr('width', 8).attr('height', 8).attr('fill', 'white');
-            pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
-            pattern.append('rect').attr('x', 4).attr('y', 4).attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
-
-
-            if (raceData.length === 0) {
-                showInitialMessage("#chart", "No data for this selection.");
-                d3.select("#legend").selectAll("*").remove();
+                chartContainer.html('<p class="text-slate-500 text-center text-sm">No data.</p>');
                 return;
             }
+            const svg = chartContainer.append("svg").attr("viewBox", "0 0 250 250").style("width", "100%").style("height", "100%");
+            const g = svg.append("g").attr("transform", "translate(125, 125)");
+            const pie = d3.pie().value(d => d.value).sort(null);
+            const arc = d3.arc().innerRadius(0).outerRadius(110);
+            g.selectAll("path").data(pie(dataForPie)).join("path").attr("d", arc).attr("fill", d => colorScale(d.data.label)).attr("stroke", "#1e293b").style("stroke-width", "3px")
+                .on("mouseover", (event, d) => {
+                    tooltip.transition().duration(200).style("opacity", .9);
+                    const percent = ((d.data.value / totalValue) * 100).toFixed(2);
+                    tooltip.html(`<strong>${d.data.label}</strong><br>${d.data.value} times (${percent}%)`).style("left", `${event.pageX + 10}px`).style("top", `${event.pageY - 28}px`);
+                }).on("mouseout", () => tooltip.transition().duration(500).style("opacity", 0));
+            const labelArc = d3.arc().innerRadius(66).outerRadius(66);
+            g.selectAll('text.label').data(pie(dataForPie)).join('text').attr('class', 'label text-xs font-bold pointer-events-none').attr('transform', d => `translate(${labelArc.centroid(d)})`).attr('text-anchor', 'middle').attr('fill', '#FFFFFF').text(d => ((d.data.value / totalValue) * 100 > 5 ? `${((d.data.value / totalValue) * 100).toFixed(0)}%` : ''));
+            const legendItems = legendContainer.selectAll('div').data(data).join('div').attr('class', 'flex items-center space-x-2');
+            legendItems.append('div').attr('class', 'w-3 h-3 rounded-sm').style('background-color', d => colorScale(d.label));
+            legendItems.append('span').attr('class', 'text-xs text-slate-300').text(d => `${d.label} (${(totalValue > 0 ? (d.value / totalValue) * 100 : 0).toFixed(2)}%)`);
+        }
 
-            const container = d3.select("#chart-container");
-            const width = container.node().getBoundingClientRect().width;
-            const height = container.node().getBoundingClientRect().height;
+        // --- FULL REPORT CHARTING ---
+        function drawLineChartFull(raceData, rampPositions, upstreamTactics) {
+            const svg = d3.select("#chart-full");
+            svg.selectAll("*").remove();
+            if (raceData.length === 0) {
+                showInitialMessage("#chart-full", "No data for this selection.");
+                d3.select("#legend-full").selectAll("*").remove();
+                return;
+            }
+            const { width, height } = d3.select("#chart-container-full").node().getBoundingClientRect();
             const margin = { top: 50, right: 20, bottom: 20, left: 90 };
-            const chartWidth = width - margin.left - margin.right;
-            const chartHeight = height - margin.top - margin.bottom;
-
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-            
-            const xScale = d3.scalePoint().domain(lineSortOrder).range([0, chartWidth]).padding(0.5);
-            const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, chartHeight]); // Adjusted domain for 1-4 positions + start
+            const courseDisplayOrderFull = ['1', 'Roll', '2', '3', '4', '5', '6', '7', '8', 'Finish'];
+            const lineSortOrderFull = ['Start', ...courseDisplayOrderFull];
+            const xScale = d3.scalePoint().domain(lineSortOrderFull).range([0, width - margin.left - margin.right]).padding(0.5);
+            const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
+            chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues(courseDisplayOrderFull).tickSize(-(height - margin.top - margin.bottom))).selectAll(".tick text").style("fill", d => ({ '1': '#228B22', '3': '#228B22', '4': '#228B22', '5': '#228B22', '6': '#228B22', '7': '#228B22', '2': '#DC143C', '8': '#DC143C', 'Roll': '#eab308' }[d] || '#94a3b8'));
+            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4, 5]).tickFormat(d => d === 5 ? '' : d).tickSize(-(width - margin.left - margin.right))).selectAll(".tick text").style("fill", d => d === 1 ? medalColors.gold : d === 2 ? medalColors.silver : d === 3 ? medalColors.bronze : '#94a3b8');
 
-            const xAxis = chart.append("g").attr("class", "x-axis")
-                .call(d3.axisTop(xScale).tickValues(courseDisplayOrder).tickSize(-chartHeight));
-            
-            xAxis.selectAll(".tick text")
-                .style("fill", d => ({
-                    'Ramp': '#eab308',
-                    '1': '#22c55e',
-                    '3': '#22c55e',
-                    '2': '#DC143C'
-                }[d] || '#94a3b8'));
-            
-            // Add checkered flag under 'Finish'
-            const finishTick = xAxis.selectAll(".tick")
-                .filter(d => d === 'Finish');
-
-            if (!finishTick.empty()) {
-                const finishText = finishTick.select('text');
-                const finishTextNode = finishText.node();
-                if (finishTextNode) {
-                    const bbox = finishTextNode.getBBox();
-                    finishTick.insert('rect', 'text')
-                        .attr('x', bbox.x - 4)
-                        .attr('y', bbox.y + bbox.height + 2)
-                        .attr('width', bbox.width + 8)
-                        .attr('height', 4)
-                        .attr('fill', 'url(#checkered-flag)');
-                }
-            }
-
-
-            const yAxis = chart.append("g").attr("class", "y-axis")
-                .call(d3.axisLeft(yScale)
-                    .tickValues([1, 2, 3, 4])
-                    .tickFormat(d3.format("d")) // Force integer format
-                    .tickSize(-chartWidth));
-
-            yAxis.selectAll(".tick text")
-                .style("fill", d => {
-                    if (d === 1) return medalColors.gold;
-                    if (d === 2) return medalColors.silver;
-                    if (d === 3) return medalColors.bronze;
-                    return '#94a3b8';
-                });
-
-            if (rampPositions.size > 0) {
-                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
-                
-                chart.append("text")
-                     .attr("x", -10)
-                     .attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2)
-                     .attr("text-anchor", "end")
-                     .style("font-size", "10px")
-                     .style("font-weight", "bold")
-                     .style("fill", "#94a3b8")
-                     .text("Ramp Pos:");
-
-                sortedRamps.forEach(([bib, pos], i) => {
-                    chart.append("text")
-                        .attr("x", -10)
-                        .attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12))
-                        .attr("text-anchor", "end")
-                        .style("fill", bibColors[bib])
-                        .style("font-size", "10px")
-                        .style("font-weight", "bold")
-                        .text(`${bibFullNames[bib]}: ${pos}`);
-                });
-            }
-                
             svg.append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 0)
@@ -444,151 +435,226 @@
                 .attr("y", margin.top / 2)
                 .attr("text-anchor", "middle")
                 .attr("class", "fill-slate-400 text-sm font-medium")
-                .text("Course Structure");
-            
+                .text("Course/ Gate");
+
+            if (rampPositions.size > 0) {
+                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
+                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibFullNames[bib]}: ${pos}`));
+            }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
-
+            groupedData.forEach((values, key) => chart.append("path").datum(values.sort((a, b) => lineSortOrderFull.indexOf(a.Gate) - lineSortOrderFull.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line));
             groupedData.forEach((values, key) => {
-                const sortedValues = values.sort((a, b) => lineSortOrder.indexOf(a.Gate) - lineSortOrder.indexOf(b.Gate));
-                chart.append("path").datum(sortedValues)
-                    .attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3)
-                    .attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("d", line);
-            });
-
-            groupedData.forEach((values, key) => {
-                chart.selectAll(`.dot-${key}`).data(values).join("circle")
-                    .attr("class", `dot-${key}`).attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position))
-                    .attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a").attr("stroke-width", 2)
-            });
-            
-            groupedData.forEach((values, key) => {
+                chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    if ((d.Gate === '2') && d.UpstreamTactic) { // Only show tactic at gate 2 now
-                        chart.append("text")
-                            .attr("x", xScale(d.Gate))
-                            .attr("y", yScale(d.Position) - 12)
-                            .attr("text-anchor", "middle")
-                            .style("fill", bibColors[key] || '#94a3b8')
-                            .style("font-size", "10px")
-                            .style("font-weight", "bold")
-                            .text(d.UpstreamTactic);
+                    if ((d.Gate === '2' || d.Gate === '8') && d.UpstreamTactic) {
+                        chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold").text(d.UpstreamTactic);
                     }
                 });
             });
-            
-            const legendContainer = d3.select("#legend");
+            const legendContainer = d3.select("#legend-full");
             legendContainer.selectAll("*").remove();
             const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
-            legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d] || '#64748b').attr("class", "rounded-sm mr-2");
-            legendItems.append("span").text(d => bibFullNames[d] || `Bib ${d}`).attr("class", "text-sm font-medium text-slate-300");
+            legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
+            legendItems.append("span").text(d => bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
-        
-        // --- UPDATE LOGIC ---
-        function updateAllCharts() {
-            if (masterData.length === 0) {
-                showInitialMessage("#chart", "No data available to display.");
+
+        // --- COMPACT REPORT CHARTING ---
+        function drawLineChartCompact(raceData, rampPositions) {
+            const svg = d3.select("#chart-compact");
+            svg.selectAll("*").remove();
+            const defs = svg.append('defs');
+            const pattern = defs.append('pattern').attr('id', 'checkered-flag').attr('width', 8).attr('height', 8).attr('patternUnits', 'userSpaceOnUse');
+            pattern.append('rect').attr('width', 8).attr('height', 8).attr('fill', 'white');
+            pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
+            pattern.append('rect').attr('x', 4).attr('y', 4).attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
+            if (raceData.length === 0) {
+                showInitialMessage("#chart-compact", "No data for this selection.");
+                d3.select("#legend-compact").selectAll("*").remove();
                 return;
             }
+            const { width, height } = d3.select("#chart-container-compact").node().getBoundingClientRect();
+            const margin = { top: 50, right: 20, bottom: 20, left: 90 };
+            const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
+            const courseDisplayOrderCompact = ["1", "1st Up", "Next Gate", "2nd Up", "Finish"];
+            const lineSortOrderCompact = ["Start", "Ramp", "1", "1st Up", "Next Gate", "2nd Up", "Finish"];
+            const xScale = d3.scalePoint().domain(lineSortOrderCompact).range([0, width - margin.left - margin.right]).padding(0.5);
+            const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
+            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues(courseDisplayOrderCompact).tickSize(-(height - margin.top - margin.bottom)));
+            xAxis.selectAll(".tick text").style("fill", d => ({
+                'Ramp': '#eab308',
+                '1': '#22c55e',
+                '1st Up': '#ef4444',
+                'Next Gate': '#22c55e',
+                '2nd Up': '#ef4444'
+            }[d] || '#94a3b8'));
+            const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
+            if (!finishTick.empty()) {
+                const bbox = finishTick.select('text').node().getBBox();
+                finishTick.insert('rect', 'text').attr('x', bbox.x - 4).attr('y', bbox.y + bbox.height + 2).attr('width', bbox.width + 8).attr('height', 4).attr('fill', 'url(#checkered-flag)');
+            }
+            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4]).tickFormat(d3.format("d")).tickSize(-(width - margin.left - margin.right))).selectAll(".tick text").style("fill", d => d === 1 ? medalColors.gold : d === 2 ? medalColors.silver : d === 3 ? medalColors.bronze : '#94a3b8');
 
+            svg.append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 0)
+                .attr("x", 0 - (height / 2))
+                .attr("dy", "1em")
+                .style("text-anchor", "middle")
+                .attr("class", "fill-slate-400 text-sm font-medium")
+                .text("Position in Race");
+
+            svg.append("text")
+                .attr("x", (width / 2) + (margin.left / 2))
+                .attr("y", margin.top / 2)
+                .attr("text-anchor", "middle")
+                .attr("class", "fill-slate-400 text-sm font-medium")
+                .text("Course/ Gate");
+
+            if (rampPositions.size > 0) {
+                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
+                sortedRamps.forEach(([bib, pos], i) => chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px").style("font-weight", "bold").text(`${bibFullNames[bib]}: ${pos}`));
+            }
+            const groupedData = d3.group(raceData, d => d.BIB);
+            const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
+            groupedData.forEach((values, key) => {
+                chart.append("path").datum(values.sort((a, b) => lineSortOrderCompact.indexOf(a.Gate) - lineSortOrderCompact.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
+                chart.selectAll(`.dot-${key}`).data(values).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                values.forEach(d => {
+                    if (d.Gate === '2' && d.UpstreamTactic) {
+                        chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold").text(d.UpstreamTactic);
+                    }
+                });
+            });
+            const legendContainer = d3.select("#legend-compact");
+            legendContainer.selectAll("*").remove();
+            const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
+            legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
+            legendItems.append("span").text(d => bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
+        }
+
+        // --- UPDATE ALL CHARTS (FULL) ---
+        function updateAllChartsFull() {
+            if (masterDataFull.length === 0) return;
             const selected = {
-                year: +selectors.year.property("value"),
-                competition: selectors.competition.property("value"),
-                gender: selectors.gender.property("value"),
-                phase: selectors.phase.property("value")
+                year: +selectorsFull.year.property("value"),
+                competition: selectorsFull.competition.property("value"),
+                gender: selectorsFull.gender.property("value"),
+                phase: selectorsFull.phase.property("value")
             };
-            
-            const currentRaceAllData = masterData.filter(d => 
-                d.Year === selected.year && d.Competition === selected.competition &&
-                d.Gender === selected.gender && d.Phase === selected.phase
-            );
-            
+            const currentRaceAllData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
             const finalPositions = new Map(), rampPositions = new Map(), upstreamTactics = new Map();
-
             currentRaceAllData.forEach(d => {
                 if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
-                if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition); // Get ramp position for each bib
+                if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition);
                 if (d.UpstreamTactic) upstreamTactics.set(`${d.BIB}-${d.Gate}`, d.UpstreamTactic);
             });
-
-            let lineChartReadyData = [];
+            let lineChartReadyDataFull = [];
             bibsInRace.forEach(bib => {
-                // Add unified start point
-                lineChartReadyData.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
+                lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
+                const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Gate !== 'Ramp' && d.Position);
+                athleteRaceData.forEach(d => {
+                    const key = `${d.BIB}-${d.Gate}`;
+                    if (upstreamTactics.has(key)) d.UpstreamTactic = upstreamTactics.get(key);
+                });
+                lineChartReadyDataFull.push(...athleteRaceData);
+                if (finalPositions.has(bib)) lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
+            });
+            drawLineChartFull(lineChartReadyDataFull, rampPositions);
+            const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
+            const uniqueFinalPositions = [];
+            const seenEntries = new Set();
+            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
+                const key = `${d.Phase}-${d.BIB}`;
+                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
+            });
+            const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
+            const allBibLabels = Object.values(bibFullNames).sort();
+            const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => bibColors[Object.keys(bibFullNames).find(key => bibFullNames[key] === label)]));
+            const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibWinnerPieData = allBibLabels.map(label => ({ label: label, value: bibWinnerCounts.get(label) || 0 }));
+            drawPieChartAndLegend("#pie-chart-bib-full", "#pie-legend-bib-full", bibWinnerPieData, bibColorScale);
+            const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const bibSecondPlaceCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibSecondPlacePieData = allBibLabels.map(label => ({ label: label, value: bibSecondPlaceCounts.get(label) || 0 }));
+            drawPieChartAndLegend("#pie-chart-bib-second-full", "#pie-legend-bib-second-full", bibSecondPlacePieData, bibColorScale);
+            const gate2Leaders = pieChartAggregateData.filter(d => d.Gate === '2' && d.Position === 1);
+            const finishPositionsOfLeaders = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
+            gate2Leaders.forEach(leader => {
+                const finalResult = uniqueFinalPositions.find(d => d.Phase === leader.Phase && d.BIB === leader.BIB);
+                if (finalResult) finishPositionsOfLeaders.set(finalResult.FinalPosition, (finishPositionsOfLeaders.get(finalResult.FinalPosition) || 0) + 1);
+            });
+            const gate2PieData = [1, 2, 3, 4].map(p => ({ label: `Finished ${p}${p === 1 ? 'st' : p === 2 ? 'nd' : p === 3 ? 'rd' : 'th'}`, value: finishPositionsOfLeaders.get(p) || 0 }));
+            const gate2ColorScale = d3.scaleOrdinal().domain(gate2PieData.map(d => d.label)).range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
+            drawPieChartAndLegend("#pie-chart-gate2-full", "#pie-legend-gate2-full", gate2PieData, gate2ColorScale);
+            const secondPlaceFinishers = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const secondPlaceGate2Positions = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
+            secondPlaceFinishers.forEach(finisher => {
+                const gate2Performance = pieChartAggregateData.find(d => d.Phase === finisher.Phase && d.BIB === finisher.BIB && d.Gate === '2');
+                if (gate2Performance) secondPlaceGate2Positions.set(gate2Performance.Position, (secondPlaceGate2Positions.get(gate2Performance.Position) || 0) + 1);
+            });
+            const gate2SecondPieData = [1, 2, 3, 4].map(p => ({ label: `${p}${p === 1 ? 'st' : p === 2 ? 'nd' : p === 3 ? 'rd' : 'th'} at Gate 2`, value: secondPlaceGate2Positions.get(p) || 0 }));
+            const gate2SecondColorScale = d3.scaleOrdinal().domain(gate2SecondPieData.map(d => d.label)).range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
+            drawPieChartAndLegend("#pie-chart-gate2-second-full", "#pie-legend-gate2-second-full", gate2SecondPieData, gate2SecondColorScale);
+        }
 
-                // Add Ramp Position
-                if (rampPositions.has(bib)) {
-                    lineChartReadyData.push({ BIB: bib, Gate: 'Ramp', Position: rampPositions.get(bib) });
-                }
-
+        // --- UPDATE ALL CHARTS (COMPACT) ---
+        function updateAllChartsCompact() {
+            if (masterDataCompact.length === 0) return;
+            const selected = {
+                year: +selectorsCompact.year.property("value"),
+                competition: selectorsCompact.competition.property("value"),
+                gender: selectorsCompact.gender.property("value"),
+                phase: selectorsCompact.phase.property("value")
+            };
+            const currentRaceAllData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
+            const finalPositions = new Map(), rampPositions = new Map(), upstreamTactics = new Map();
+            currentRaceAllData.forEach(d => {
+                if (d.FinalPosition) finalPositions.set(d.BIB, d.FinalPosition);
+                if (d.RampPosition) rampPositions.set(d.BIB, d.RampPosition);
+                if (d.UpstreamTactic) upstreamTactics.set(`${d.BIB}-${d.Gate}`, d.UpstreamTactic);
+            });
+            let lineChartReadyDataCompact = [];
+            bibsInRace.forEach(bib => {
+                lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
+                if (rampPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Ramp', Position: rampPositions.get(bib) });
                 const athleteRaceData = currentRaceAllData.filter(d => d.BIB === bib && d.Position);
                 athleteRaceData.forEach(d => {
                     const key = `${d.BIB}-${d.Gate}`;
                     if (upstreamTactics.has(key)) d.UpstreamTactic = upstreamTactics.get(key);
                 });
-                lineChartReadyData.push(...athleteRaceData);
-
-                // Add Finish position as the last point
-                if (finalPositions.has(bib)) {
-                    lineChartReadyData.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
-                }
+                lineChartReadyDataCompact.push(...athleteRaceData);
+                if (finalPositions.has(bib)) lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
             });
-            drawLineChart(lineChartReadyData, rampPositions);
-            
-            const pieChartAggregateData = masterData.filter(d =>
-                d.Year === selected.year &&
-                d.Competition === selected.competition &&
-                d.Gender === selected.gender
-            );
-
-            // --- DATA DEDUPLICATION ---
-            const finalPositionEntries = pieChartAggregateData.filter(d => d.FinalPosition > 0);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions);
+            const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
-            finalPositionEntries.forEach(d => {
+            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
                 const key = `${d.Phase}-${d.BIB}`;
-                if (!seenEntries.has(key)) {
-                    seenEntries.add(key);
-                    uniqueFinalPositions.push(d);
-                }
+                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
             });
-
-            const allBibLabels = Object.values(bibFullNames).sort();
-            const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => {
-                const bibKey = Object.keys(bibFullNames).find(key => bibFullNames[key] === label);
-                return bibColors[bibKey];
-            }));
-            
-            // Bib Winner Pie
             const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
+            const allBibLabels = Object.values(bibFullNames).sort();
+            const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => bibColors[Object.keys(bibFullNames).find(key => bibFullNames[key] === label)]));
             const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => bibFullNames[d.BIB]);
-            const bibWinnerPieData = allBibLabels.map(label => ({
-                label: label,
-                value: bibWinnerCounts.get(label) || 0
-            }));
-            drawPieChartAndLegend("#pie-chart-bib", "#pie-legend-bib", bibWinnerPieData, bibColorScale);
-
-            // Ramp Position Winner Pie
+            const bibWinnerPieData = allBibLabels.map(label => ({ label: label, value: bibWinnerCounts.get(label) || 0 }));
+            drawPieChartAndLegend("#pie-chart-bib-compact", "#pie-legend-bib-compact", bibWinnerPieData, bibColorScale);
             const rampWinnerCounts = d3.rollup(winnersData, v => v.length, d => d.RampPosition);
-            const rampLabels = [1, 2, 3, 4];
-            const rampWinnerPieData = rampLabels.map(pos => ({
-                label: `Ramp ${pos}`,
-                value: rampWinnerCounts.get(pos) || 0
-            }));
-            const rampColorScale = d3.scaleOrdinal()
-                .domain(rampWinnerPieData.map(d => d.label))
-                .range(['#a855f7', '#ec4899', '#f97316', '#84cc16']); // purple, pink, orange, lime
-            drawPieChartAndLegend("#pie-chart-ramp", "#pie-legend-ramp", rampWinnerPieData, rampColorScale);
+            const rampWinnerPieData = [1, 2, 3, 4].map(pos => ({ label: `Ramp ${pos}`, value: rampWinnerCounts.get(pos) || 0 }));
+            const rampColorScale = d3.scaleOrdinal().domain(rampWinnerPieData.map(d => d.label)).range(['#a855f7', '#ec4899', '#f97316', '#84cc16']);
+            drawPieChartAndLegend("#pie-chart-ramp-compact", "#pie-legend-ramp-compact", rampWinnerPieData, rampColorScale);
         }
-        
+
         // --- INITIALIZE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
-            const dataPath = 'data/Kayak_Cross_Data.csv';
-            showInitialMessage("#chart", "Loading data...");
-            loadDataAndInitialize(dataPath);
+            loadInitialData();
         });
-
     </script>
 </body>
+
 </html>
