@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,40 +12,58 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .x-axis path, .y-axis path {
+
+        .x-axis path,
+        .y-axis path {
             display: none;
         }
-        .x-axis .tick line, .y-axis .tick line {
-            stroke: #334155; /* slate-700 */
-            stroke-dasharray: 2,2;
+
+        .x-axis .tick line,
+        .y-axis .tick line {
+            stroke: #334155;
+            /* slate-700 */
+            stroke-dasharray: 2, 2;
         }
+
         .x-axis .tick text {
-            fill: #94a3b8; /* slate-400 */
+            fill: #94a3b8;
+            /* slate-400 */
             font-size: 12px;
             font-weight: 600;
         }
+
         /* Custom styling for Y-axis ticks */
         .y-axis .tick text {
-             fill: #94a3b8; /* slate-400 */
-             font-size: 14px;
-             font-weight: 700; /* bold */
+            fill: #94a3b8;
+            /* slate-400 */
+            font-size: 14px;
+            font-weight: 700;
+            /* bold */
         }
+
         .domain {
             display: none;
         }
+
         .dark-select {
-            background-color: #1e2b3b; /* slate-800 */
-            border-color: #475569; /* slate-600 */
-            color: #e2e8f0; /* slate-200 */
+            background-color: #1e2b3b;
+            /* slate-800 */
+            border-color: #475569;
+            /* slate-600 */
+            color: #e2e8f0;
+            /* slate-200 */
         }
+
         .tooltip {
             position: absolute;
             text-align: left;
             padding: 8px;
             font: 12px sans-serif;
-            background: #1e293b; /* slate-800 */
+            background: #1e293b;
+            /* slate-800 */
             color: white;
-            border: 1px solid #334155; /* slate-700 */
+            border: 1px solid #334155;
+            /* slate-700 */
             border-radius: 8px;
             pointer-events: none;
             opacity: 0;
@@ -52,39 +71,48 @@
         }
     </style>
 </head>
+
 <body class="bg-slate-900 text-slate-200 antialiased">
     <div class="tooltip"></div>
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-slate-100">In Competition Analysis - KX</h1>
-            <p class="text-slate-400 mt-1">Default data loaded. Upload a custom CSV file or select a race to visualize.</p>
+            <p class="text-slate-400 mt-1">Default data loaded. Upload a custom CSV file or select a race to visualize.
+            </p>
         </header>
 
         <!-- File Upload & Filters -->
         <div class="max-w-7xl mx-auto space-y-8">
-             <div class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700">
+            <div class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700">
                 <div>
-                    <label for="csv-upload" class="block text-sm font-medium text-slate-300 mb-1">Upload Custom CSV File</label>
-                    <input type="file" id="csv-upload" accept=".csv" class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/10 file:text-indigo-300 hover:file:bg-indigo-500/20"/>
+                    <label for="csv-upload" class="block text-sm font-medium text-slate-300 mb-1">Upload Custom CSV
+                        File</label>
+                    <input type="file" id="csv-upload" accept=".csv"
+                        class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/10 file:text-indigo-300 hover:file:bg-indigo-500/20" />
                 </div>
             </div>
             <div id="filter-controls" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                         <label for="year-select" class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                        <select id="year-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        <select id="year-select"
+                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                     </div>
                     <div>
-                        <label for="competition-select" class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
-                        <select id="competition-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        <label for="competition-select"
+                            class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
+                        <select id="competition-select"
+                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                     </div>
                     <div>
                         <label for="gender-select" class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                        <select id="gender-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        <select id="gender-select"
+                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                     </div>
                     <div>
                         <label for="phase-select" class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
-                        <select id="phase-select" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        <select id="phase-select"
+                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                     </div>
                 </div>
             </div>
@@ -102,17 +130,37 @@
                 </div>
             </div>
 
-            <!-- Right Column: Pie Charts -->
-            <div class="lg:col-span-2 grid grid-rows-2 gap-8">
-                <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
-                    <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib Color</h3>
-                    <div id="pie-chart-bib" class="w-full max-w-[180px] mx-auto aspect-square"></div>
+            <!-- Right Column: Pie Charts (2x2 Grid) -->
+            <div class="lg:col-span-2 grid grid-cols-2 gap-4">
+                <!-- Row 1: Winners -->
+                <div
+                    class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib
+                        Color</h3>
+                    <div id="pie-chart-bib" class="w-full max-w-[140px] mx-auto aspect-square"></div>
                     <div id="pie-legend-bib" class="flex flex-col items-center gap-y-1 mt-2"></div>
                 </div>
-                <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
-                    <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp Position</h3>
-                    <div id="pie-chart-ramp" class="w-full max-w-[180px] mx-auto aspect-square"></div>
+                <div
+                    class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp
+                        Position</h3>
+                    <div id="pie-chart-ramp" class="w-full max-w-[140px] mx-auto aspect-square"></div>
                     <div id="pie-legend-ramp" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                </div>
+                <!-- Row 2: 2nd Place -->
+                <div
+                    class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight">Overall 2nd Place %
+                        by Bib Color</h3>
+                    <div id="pie-chart-bib-2" class="w-full max-w-[140px] mx-auto aspect-square"></div>
+                    <div id="pie-legend-bib-2" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                </div>
+                <div
+                    class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight">2nd Place % by Ramp
+                        Position</h3>
+                    <div id="pie-chart-ramp-2" class="w-full max-w-[140px] mx-auto aspect-square"></div>
+                    <div id="pie-legend-ramp-2" class="flex flex-col items-center gap-y-1 mt-2"></div>
                 </div>
             </div>
         </div>
@@ -123,9 +171,9 @@
         // --- DATA STATE & CONSTANTS ---
         let masterData = [];
 
-        // Updated to use course-agnostic labels
-        const courseDisplayOrder = ["1", "1st Up", "Next Gate", "2nd Up", "Finish"];
-        const lineSortOrder = ["Start", "Ramp", "1", "1st Up", "Next Gate", "2nd Up", "Finish"];
+        // Base orders - will be dynamically filtered
+        const courseDisplayOrderBase = ["1", "1st Up", "Next Gate", "2nd Up", "Special Gate", "Finish"];
+        const lineSortOrderBase = ["Start", "Ramp", "1", "1st Up", "Next Gate", "2nd Up", "Special Gate", "Finish"];
 
         const bibColors = {
             'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308'
@@ -139,7 +187,7 @@
             silver: '#C0C0C0',
             bronze: '#A97142'
         };
-        
+
         // --- DOM SELECTORS ---
         const selectors = {
             year: d3.select("#year-select"),
@@ -153,7 +201,7 @@
         const tooltip = d3.select(".tooltip");
 
         // --- FILE HANDLING ---
-        fileUpload.on("change", function(event) {
+        fileUpload.on("change", function (event) {
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -162,7 +210,7 @@
         });
 
         // --- DATA LOADING & INITIALIZATION ---
-        
+
         async function loadDataAndInitialize(path) {
             try {
                 const response = await fetch(path);
@@ -202,17 +250,17 @@
             updateAllCharts();
             window.addEventListener('resize', updateAllCharts);
         }
-        
-        function showInitialMessage(containerSelector, message) {
-             d3.select(containerSelector).selectAll("*").remove();
-             const svg = d3.select(containerSelector);
-             const containerNode = svg.node();
-             if(!containerNode) return;
-             
-             const width = containerNode.getBoundingClientRect().width;
-             const height = containerNode.getBoundingClientRect().height;
 
-             svg.append("text")
+        function showInitialMessage(containerSelector, message) {
+            d3.select(containerSelector).selectAll("*").remove();
+            const svg = d3.select(containerSelector);
+            const containerNode = svg.node();
+            if (!containerNode) return;
+
+            const width = containerNode.getBoundingClientRect().width;
+            const height = containerNode.getBoundingClientRect().height;
+
+            svg.append("text")
                 .attr("x", width / 2)
                 .attr("y", height / 2)
                 .attr("text-anchor", "middle")
@@ -228,16 +276,16 @@
                 gender: [...new Set(masterData.map(d => d.Gender))].sort(),
                 phase: [...new Set(masterData.map(d => d.Phase))]
             };
-            
+
             const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
             uniqueValues.phase.sort((a, b) => {
                 const regex = /^([A-Za-z]+)(\d*)$/;
                 const matchA = a.match(regex) || [a, a, ''];
                 const matchB = b.match(regex) || [b, b, ''];
-                
+
                 const prefixA = matchA[1] === 'Final' ? 'Final' : matchA[1];
                 const prefixB = matchB[1] === 'Final' ? 'Final' : matchB[1];
-                
+
                 const numA = parseInt(matchA[2] || '0', 10);
                 const numB = parseInt(matchB[2] || '0', 10);
 
@@ -270,8 +318,8 @@
             } else {
                 const svg = chartContainer.append("svg").attr("viewBox", "0 0 250 250").style("width", "100%").style("height", "100%");
                 const width = 250, height = 250;
-                const radius = Math.min(width, height) / 2 - 15; 
-                
+                const radius = Math.min(width, height) / 2 - 15;
+
                 const g = svg.append("g").attr("transform", `translate(${width / 2}, ${height / 2})`);
 
                 const pie = d3.pie().value(d => d.value).sort(null);
@@ -313,7 +361,7 @@
                 .data(data)
                 .join('div')
                 .attr('class', 'flex items-center space-x-2');
-            
+
             legendItems.append('div')
                 .attr('class', 'w-3 h-3 rounded-sm')
                 .style('background-color', d => colorScale(d.label));
@@ -327,11 +375,11 @@
         }
 
         // --- CHART DRAWING: LINE CHART ---
-        function drawLineChart(raceData, rampPositions) {
+        function drawLineChart(raceData, rampPositions, sortOrder, displayOrder) {
             const svg = d3.select("#chart");
             svg.selectAll("*").remove();
 
-             // Add checkered flag pattern definition
+            // Add checkered flag pattern definition
             const defs = svg.append('defs');
             const pattern = defs.append('pattern')
                 .attr('id', 'checkered-flag')
@@ -358,23 +406,24 @@
             const chartHeight = height - margin.top - margin.bottom;
 
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-            
-            const xScale = d3.scalePoint().domain(lineSortOrder).range([0, chartWidth]).padding(0.5);
+
+            const xScale = d3.scalePoint().domain(sortOrder).range([0, chartWidth]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, chartHeight]); // Adjusted domain for 1-4 positions + start
 
             const xAxis = chart.append("g").attr("class", "x-axis")
-                .call(d3.axisTop(xScale).tickValues(courseDisplayOrder).tickSize(-chartHeight));
-            
+                .call(d3.axisTop(xScale).tickValues(displayOrder).tickSize(-chartHeight));
+
             xAxis.selectAll(".tick text")
                 .style("fill", d => ({
                     'Ramp': '#eab308',
                     '1': '#22c55e',
-                    '1st Up': '#ef4444', 
-                    'Next Gate': '#22c55e', // Changed to green
-                    '2nd Up': '#ef4444', 
+                    '1st Up': '#ef4444',
+                    'Next Gate': '#22c55e',
+                    '2nd Up': '#ef4444',
+                    'Special Gate': '#a855f7', // Purple for Special Gate
                     'Finish': '#94a3b8'
                 }[d] || '#94a3b8'));
-            
+
             // Add checkered flag under 'Finish'
             const finishTick = xAxis.selectAll(".tick")
                 .filter(d => d === 'Finish');
@@ -410,15 +459,15 @@
 
             if (rampPositions.size > 0) {
                 const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
-                
+
                 chart.append("text")
-                     .attr("x", -10)
-                     .attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2)
-                     .attr("text-anchor", "end")
-                     .style("font-size", "10px")
-                     .style("font-weight", "bold")
-                     .style("fill", "#94a3b8")
-                     .text("Ramp Pos:");
+                    .attr("x", -10)
+                    .attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2)
+                    .attr("text-anchor", "end")
+                    .style("font-size", "10px")
+                    .style("font-weight", "bold")
+                    .style("fill", "#94a3b8")
+                    .text("Ramp Pos:");
 
                 sortedRamps.forEach(([bib, pos], i) => {
                     chart.append("text")
@@ -431,7 +480,7 @@
                         .text(`${bibFullNames[bib]}: ${pos}`);
                 });
             }
-                
+
             svg.append("text")
                 .attr("transform", "rotate(-90)")
                 .attr("y", 0)
@@ -447,12 +496,12 @@
                 .attr("text-anchor", "middle")
                 .attr("class", "fill-slate-400 text-sm font-medium")
                 .text("Course Structure");
-            
+
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
 
             groupedData.forEach((values, key) => {
-                const sortedValues = values.sort((a, b) => lineSortOrder.indexOf(a.Gate) - lineSortOrder.indexOf(b.Gate));
+                const sortedValues = values.sort((a, b) => sortOrder.indexOf(a.Gate) - sortOrder.indexOf(b.Gate));
                 chart.append("path").datum(sortedValues)
                     .attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3)
                     .attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("d", line);
@@ -463,7 +512,7 @@
                     .attr("class", `dot-${key}`).attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position))
                     .attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a").attr("stroke-width", 2)
             });
-            
+
             groupedData.forEach((values, key) => {
                 values.forEach(d => {
                     if ((d.Gate === '2') && d.UpstreamTactic) { // Only show tactic at gate 2 now
@@ -478,14 +527,14 @@
                     }
                 });
             });
-            
+
             const legendContainer = d3.select("#legend");
             legendContainer.selectAll("*").remove();
             const legendItems = legendContainer.selectAll("div").data(Array.from(groupedData.keys()).sort()).join("div").attr("class", "flex items-center");
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d] || '#64748b').attr("class", "rounded-sm mr-2");
             legendItems.append("span").text(d => bibFullNames[d] || `Bib ${d}`).attr("class", "text-sm font-medium text-slate-300");
         }
-        
+
         // --- UPDATE LOGIC ---
         function updateAllCharts() {
             if (masterData.length === 0) {
@@ -499,12 +548,12 @@
                 gender: selectors.gender.property("value"),
                 phase: selectors.phase.property("value")
             };
-            
-            const currentRaceAllData = masterData.filter(d => 
+
+            const currentRaceAllData = masterData.filter(d =>
                 d.Year === selected.year && d.Competition === selected.competition &&
                 d.Gender === selected.gender && d.Phase === selected.phase
             );
-            
+
             const bibsInRace = [...new Set(currentRaceAllData.map(d => d.BIB))];
             const finalPositions = new Map(), rampPositions = new Map(), upstreamTactics = new Map();
 
@@ -536,8 +585,14 @@
                     lineChartReadyData.push({ BIB: bib, Gate: 'Finish', Position: finalPositions.get(bib) });
                 }
             });
-            drawLineChart(lineChartReadyData, rampPositions);
-            
+
+            // --- DYNAMIC DOMAIN LOGIC ---
+            const hasSpecialGate = currentRaceAllData.some(d => d.Gate === "Special Gate");
+            const dynamicDisplayOrder = courseDisplayOrderBase.filter(g => g !== "Special Gate" || hasSpecialGate);
+            const dynamicSortOrder = lineSortOrderBase.filter(g => g !== "Special Gate" || hasSpecialGate);
+
+            drawLineChart(lineChartReadyData, rampPositions, dynamicSortOrder, dynamicDisplayOrder);
+
             const pieChartAggregateData = masterData.filter(d =>
                 d.Year === selected.year &&
                 d.Competition === selected.competition &&
@@ -561,7 +616,7 @@
                 const bibKey = Object.keys(bibFullNames).find(key => bibFullNames[key] === label);
                 return bibColors[bibKey];
             }));
-            
+
             // Bib Winner Pie
             const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
             const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => bibFullNames[d.BIB]);
@@ -570,6 +625,15 @@
                 value: bibWinnerCounts.get(label) || 0
             }));
             drawPieChartAndLegend("#pie-chart-bib", "#pie-legend-bib", bibWinnerPieData, bibColorScale);
+
+            // Bib 2nd Place Pie
+            const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const bibSecondCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibSecondPieData = allBibLabels.map(label => ({
+                label: label,
+                value: bibSecondCounts.get(label) || 0
+            }));
+            drawPieChartAndLegend("#pie-chart-bib-2", "#pie-legend-bib-2", bibSecondPieData, bibColorScale);
 
             // Ramp Position Winner Pie
             const rampWinnerCounts = d3.rollup(winnersData, v => v.length, d => d.RampPosition);
@@ -582,8 +646,16 @@
                 .domain(rampWinnerPieData.map(d => d.label))
                 .range(['#a855f7', '#ec4899', '#f97316', '#84cc16']); // purple, pink, orange, lime
             drawPieChartAndLegend("#pie-chart-ramp", "#pie-legend-ramp", rampWinnerPieData, rampColorScale);
+
+            // Ramp Position 2nd Place Pie
+            const rampSecondCounts = d3.rollup(secondPlaceData, v => v.length, d => d.RampPosition);
+            const rampSecondPieData = rampLabels.map(pos => ({
+                label: `Ramp ${pos}`,
+                value: rampSecondCounts.get(pos) || 0
+            }));
+            drawPieChartAndLegend("#pie-chart-ramp-2", "#pie-legend-ramp-2", rampSecondPieData, rampColorScale);
         }
-        
+
         // --- INITIALIZE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
             const dataPath = 'data/Kayak_Cross_Data.csv';
@@ -593,4 +665,5 @@
 
     </script>
 </body>
+
 </html>
