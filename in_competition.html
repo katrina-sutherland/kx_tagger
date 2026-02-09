@@ -172,8 +172,8 @@
         let masterData = [];
 
         // Base orders - will be dynamically filtered
-        const courseDisplayOrderBase = ["1", "1st Up", "Next Gate", "2nd Up", "Special Gate", "Finish"];
-        const lineSortOrderBase = ["Start", "Ramp", "1", "1st Up", "Next Gate", "2nd Up", "Special Gate", "Finish"];
+        const courseDisplayOrderBase = ["1", "1st Up", "Next Gate", "2nd Up", "SG", "Finish"];
+        const lineSortOrderBase = ["Start", "Ramp", "1", "1st Up", "Next Gate", "2nd Up", "SG", "Finish"];
 
         const bibColors = {
             'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308'
@@ -387,7 +387,7 @@
                     '1st Up': '#ef4444',
                     'Next Gate': '#22c55e',
                     '2nd Up': '#ef4444',
-                    'Special Gate': '#a855f7', // Purple for Special Gate
+                    'SG': '#a855f7', // Purple for SG
                     'Finish': '#94a3b8'
                 }[d] || '#94a3b8'));
 
@@ -554,9 +554,9 @@
             });
 
             // --- DYNAMIC DOMAIN LOGIC ---
-            const hasSpecialGate = currentRaceAllData.some(d => d.Gate === "Special Gate");
-            const dynamicDisplayOrder = courseDisplayOrderBase.filter(g => g !== "Special Gate" || hasSpecialGate);
-            const dynamicSortOrder = lineSortOrderBase.filter(g => g !== "Special Gate" || hasSpecialGate);
+            const hasSpecialGate = currentRaceAllData.some(d => d.Gate === "SG" || d.Gate === "Special Gate");
+            const dynamicDisplayOrder = courseDisplayOrderBase.filter(g => (g !== "SG" || hasSpecialGate));
+            const dynamicSortOrder = lineSortOrderBase.filter(g => (g !== "SG" || hasSpecialGate));
 
             drawLineChart(lineChartReadyData, rampPositions, dynamicSortOrder, dynamicDisplayOrder);
 
