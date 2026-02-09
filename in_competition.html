@@ -636,8 +636,10 @@
 
         async function loadDataAndInitialize() {
             try {
-                // Fetch ONLY the in-competition data as requested
-                const response = await fetch('data/Kayak_Cross_Data_IN_COMPETITION.csv');
+                // Fetch from GitHub raw URL with cache buster
+                const cacheBuster = new Date().getTime();
+                const url = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
+                const response = await fetch(url);
 
                 if (!response.ok) {
                     throw new Error(`Failed to load: Kayak_Cross_Data_IN_COMPETITION.csv. Status: ${response.status}`);
@@ -689,5 +691,3 @@
 
     </script>
 </body>
-
-</html>
