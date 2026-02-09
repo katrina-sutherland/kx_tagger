@@ -205,51 +205,18 @@
             const file = event.target.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = e => initializeDashboard(e.target.result);
+            reader.onload = e => {
+                masterData = d3.csvParse(e.target.result, parseRow);
+                if (masterData.length > 0) {
+                    filterControls.classed("hidden", false);
+                    chartsArea.classed("hidden", false);
+                    populateFilters();
+                    updateAllCharts();
+                }
+            };
             reader.readAsText(file);
         });
 
-        // --- DATA LOADING & INITIALIZATION ---
-
-        async function loadDataAndInitialize(path) {
-            try {
-                const response = await fetch(path);
-                if (!response.ok) {
-                    throw new Error(`Network response was not ok. Status: ${response.status}`);
-                }
-                const csvString = await response.text();
-                initializeDashboard(csvString);
-            } catch (error) {
-                console.error('Error loading or parsing CSV file:', error);
-                showInitialMessage("#chart", "Error: Could not load Kayak_Cross_Data.csv");
-            }
-        }
-
-        function initializeDashboard(csvString) {
-            masterData = d3.csvParse(csvString, d => {
-                let gate = d.Gate;
-                if (gate === 'Course') gate = 'Roll';
-                else if (gate && gate.startsWith('Gate ')) gate = gate.replace('Gate ', '');
-                return {
-                    Year: +d.Year,
-                    Competition: d.Competition,
-                    Gender: d.Gender,
-                    Phase: d.Phase,
-                    Gate: gate,
-                    BIB: d.BIB,
-                    Position: +d.Order,
-                    RampPosition: +d['Ramp Position'],
-                    FinalPosition: +d['Final Position'],
-                    UpstreamTactic: d['Upstream Tactic']
-                };
-            });
-
-            filterControls.classed("hidden", false);
-            chartsArea.classed("hidden", false);
-            populateFilters();
-            updateAllCharts();
-            window.addEventListener('resize', updateAllCharts);
-        }
 
         function showInitialMessage(containerSelector, message) {
             d3.select(containerSelector).selectAll("*").remove();
@@ -656,11 +623,59 @@
             drawPieChartAndLegend("#pie-chart-ramp-2", "#pie-legend-ramp-2", rampSecondPieData, rampColorScale);
         }
 
+        // --- DATA LOADING & INITIALIZATION ---
+
+        async function loadDataAndInitialize() {
+            try {
+                // Fetch ONLY the in-competition data as requested
+                const response = await fetch('data/Kayak_Cross_Data_IN_COMPETITION.csv');
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load: Kayak_Cross_Data_IN_COMPETITION.csv. Status: ${response.status}`);
+                }
+
+                const csvString = await response.text();
+                masterData = d3.csvParse(csvString, parseRow);
+
+                if (masterData.length === 0) {
+                    showInitialMessage("#chart", "No data found in Kayak_Cross_Data_IN_COMPETITION.csv.");
+                    return;
+                }
+
+                filterControls.classed("hidden", false);
+                chartsArea.classed("hidden", false);
+                populateFilters();
+                updateAllCharts();
+                window.addEventListener('resize', updateAllCharts);
+
+            } catch (error) {
+                console.error('Error loading or parsing CSV file:', error);
+                showInitialMessage("#chart", "Error: Could not load Kayak_Cross_Data_IN_COMPETITION.csv from /data/ directory.");
+            }
+        }
+
+        function parseRow(d) {
+            let gate = d.Gate;
+            if (gate === 'Course') gate = 'Roll';
+            else if (gate && gate.startsWith('Gate ')) gate = gate.replace('Gate ', '');
+            return {
+                Year: +d.Year,
+                Competition: d.Competition,
+                Gender: d.Gender,
+                Phase: d.Phase,
+                Gate: gate,
+                BIB: d.BIB,
+                Position: +d.Order,
+                RampPosition: +d['Ramp Position'],
+                FinalPosition: +d['Final Position'],
+                UpstreamTactic: d['Upstream Tactic']
+            };
+        }
+
         // --- INITIALIZE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
-            const dataPath = 'data/Kayak_Cross_Data.csv';
             showInitialMessage("#chart", "Loading data...");
-            loadDataAndInitialize(dataPath);
+            loadDataAndInitialize();
         });
 
     </script>
