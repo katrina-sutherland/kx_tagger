@@ -2159,3 +2159,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,W,H2,Next Gate,R,4,Down-Right,2,,,,
 2026,WRR,W,H2,Next Gate,B,2,Down-Right,3,,,,
 2026,WRR,W,H2,Next Gate,Y,1,Down-Right,4,,,,
+2026,WRR,W,H3,Ramp,G,4,Assigned,,,,MACKIE,
+2026,WRR,W,H3,Ramp,R,3,Assigned,,,,PANKOVA,
+2026,WRR,W,H3,Ramp,B,2,Assigned,,,,WYLIE,
+2026,WRR,W,H3,Ramp,Y,1,Assigned,,,,DAVIES,
