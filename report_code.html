@@ -407,8 +407,12 @@
         }
 
         function parseCsvData(csvString) {
-            return d3.csvParse(csvString, (d, i) => {
-                // ROBUST PARSING: Check for multiple possible column headers to handle inconsistencies between files
+            return d3.csvParse(csvString, (d) => {
+                // Trim all values to prevent matching issues with hidden spaces
+                for (let key in d) {
+                    if (d[key] && typeof d[key] === 'string') d[key] = d[key].trim();
+                }
+
                 const year = +d.Year || 0;
                 const competition = d.Competition || '';
                 const gender = d.Gender || '';
@@ -419,19 +423,15 @@
                 if (gate.startsWith('Gate ')) gate = gate.replace('Gate ', '');
                 else if (gate === 'Course') gate = 'Roll';
 
-                const bib = d.BIB || d.Bib || ''; // Check both case variants
-                const position = +(d.Order || d.Position || 0); // Check Order or Position
+                const bib = d.BIB || d.Bib || '';
+                const position = +(d.Order || d.Position || 0);
                 const rampPosition = +(d['Ramp Position'] || d['RampPosition'] || 0);
                 const finalPosition = +(d['Final Position'] || d['FinalPosition'] || 0);
                 const upstreamTactic = d['Upstream Tactic'] || d['UpstreamTactic'] || '';
 
-                // Check multiple variations for Athlete Name
                 const athleteName = d['Athlete Name'] || d['Athlete'] || d['Name'] || '';
-
-                // UPDATED: Capture Action AND Fault specific columns
                 const action = d.Action || d.action || d.Notes || d.notes || '';
                 const faultVal = d.Fault || d.fault || '';
-                // Capture overall/finish rank if available
                 const finishRank = d['Finish Rank'] || d['FinishRank'] || d.Rank || d.rank || d['Overall Rank'] || d['OverallRank'] || '';
 
                 return {
@@ -447,7 +447,7 @@
                     UpstreamTactic: upstreamTactic,
                     AthleteName: athleteName,
                     Action: action,
-                    FaultVal: faultVal, // New dedicated property
+                    FaultVal: faultVal,
                     FinishRank: finishRank
                 };
             });
@@ -552,9 +552,9 @@
             const cacheBuster = now.getTime();
 
             try {
-                // EXPLICIT FETCHING
-                const urlFull = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
-                const urlCompact = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
+                // LOCAL FETCHING (Relative paths)
+                const urlFull = `csv/kx_race_analysis.csv?t=${cacheBuster}`;
+                const urlCompact = `csv/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
 
                 const [responseFull, responseCompact] = await Promise.all([
                     fetch(urlFull),
