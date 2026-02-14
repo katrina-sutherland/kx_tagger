@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,27 +9,83 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .x-axis path, .y-axis path { display: none; }
-        .x-axis .tick line, .y-axis .tick line { stroke: #334155; stroke-dasharray: 2,2; }
-        .x-axis .tick text { fill: #94a3b8; font-size: 12px; font-weight: 600; }
-        .y-axis .tick text { fill: #94a3b8; font-size: 14px; font-weight: 700; }
-        .domain { display: none; }
-        .dark-select, .dark-input { background-color: #1e293b; border-color: #475569; color: #e2e8f0; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .x-axis path,
+        .y-axis path {
+            display: none;
+        }
+
+        .x-axis .tick line,
+        .y-axis .tick line {
+            stroke: #334155;
+            stroke-dasharray: 2, 2;
+        }
+
+        .x-axis .tick text {
+            fill: #94a3b8;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .y-axis .tick text {
+            fill: #94a3b8;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .domain {
+            display: none;
+        }
+
+        .dark-select,
+        .dark-input {
+            background-color: #1e293b;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+
         .tooltip {
-            position: absolute; text-align: left; padding: 8px; font: 12px sans-serif;
-            background: #1e293b; color: white; border: 1px solid #334155; border-radius: 8px;
-            pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 50;
+            position: absolute;
+            text-align: left;
+            padding: 8px;
+            font: 12px sans-serif;
+            background: #1e293b;
+            color: white;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 50;
         }
-        .chart-card { transition: border-color 0.3s ease-in-out; }
+
+        .chart-card {
+            transition: border-color 0.3s ease-in-out;
+        }
+
         @keyframes pulse-green {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(34, 197, 94, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
         }
-        .live-indicator { animation: pulse-green 2s infinite; }
+
+        .live-indicator {
+            animation: pulse-green 2s infinite;
+        }
     </style>
 </head>
+
 <body class="bg-slate-900 text-slate-200 antialiased">
     <div class="tooltip"></div>
     <div class="container mx-auto p-4 md:p-8">
@@ -37,22 +94,27 @@
                 <h1 class="text-3xl font-bold text-slate-100 pointer-events-auto inline-block">Kayak Cross Analysis</h1>
             </div>
             <!-- Expanded width for error messages -->
-            <div id="last-updated" class="lg:ml-auto text-[10px] md:text-xs text-slate-500 font-mono z-10 relative flex items-center gap-2 max-w-md text-right overflow-hidden whitespace-nowrap text-ellipsis">
+            <div id="last-updated"
+                class="lg:ml-auto text-[10px] md:text-xs text-slate-500 font-mono z-10 relative flex items-center gap-2 max-w-md text-right overflow-hidden whitespace-nowrap text-ellipsis">
             </div>
         </header>
 
         <div class="max-w-7xl mx-auto mb-8 border-b border-slate-700">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                <button id="tab-full" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
+                <button id="tab-full"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
                     Full Report
                 </button>
-                <button id="tab-compact" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                <button id="tab-compact"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
                     In-Competition Report
                 </button>
-                <button id="tab-athlete" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                <button id="tab-athlete"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
                     Athlete Profile
                 </button>
-                <button id="tab-summary" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                <button id="tab-summary"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
                     Season Summary
                 </button>
             </nav>
@@ -61,23 +123,32 @@
         <!-- FULL REPORT CONTAINER -->
         <div id="report-full">
             <div class="max-w-7xl mx-auto space-y-8">
-                <div id="filter-controls-full" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
+                <div id="filter-controls-full"
+                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <label for="year-select-full" class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                            <select id="year-select-full" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="year-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Year</label>
+                            <select id="year-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
-                            <label for="competition-select-full" class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
-                            <select id="competition-select-full" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="competition-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
+                            <select id="competition-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
-                            <label for="gender-select-full" class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                            <select id="gender-select-full" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="gender-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                            <select id="gender-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
-                            <label for="phase-select-full" class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
-                            <select id="phase-select-full" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="phase-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
+                            <select id="phase-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                     </div>
                 </div>
@@ -87,36 +158,43 @@
                 <!-- Wrapper for Chart and Fault Analysis to keep them in the same column -->
                 <div class="lg:col-span-3 flex flex-col gap-8">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race
+                            Analysis</h3>
                         <div id="legend-full" class="flex justify-center space-x-4 mb-4"></div>
                         <div id="chart-container-full" class="w-full h-[600px]">
                             <svg id="chart-full" class="w-full h-full"></svg>
                         </div>
                     </div>
                     <!-- NEW SEPARATE CONTAINER FOR FAULT ANALYSIS -->
-                    <div id="fault-analysis-full" class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
+                    <div id="fault-analysis-full"
+                        class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
                 </div>
 
                 <div class="lg:col-span-2 grid grid-cols-2 gap-4">
                     <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by Bib Color</h3>
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by
+                            Bib Color</h3>
                         <div id="pie-chart-bib-full" class="w-full h-40 flex items-center justify-center"></div>
                         <div id="pie-legend-bib-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                     <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd Place % by Bib Color</h3>
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd
+                            Place % by Bib Color</h3>
                         <div id="pie-chart-bib-second-full" class="w-full h-40 flex items-center justify-center"></div>
                         <div id="pie-legend-bib-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                     <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish Position % when Leading at 1st Upstream</h3>
-                         <div id="pie-chart-gate2-full" class="w-full h-40 flex items-center justify-center"></div>
-                         <div id="pie-legend-gate2-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish Position
+                            % when Leading at 1st Upstream</h3>
+                        <div id="pie-chart-gate2-full" class="w-full h-40 flex items-center justify-center"></div>
+                        <div id="pie-legend-gate2-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
-                     <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st Upstream When Overall Finish 2nd</h3>
-                             <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center"></div>
-                             <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st
+                            Upstream When Overall Finish 2nd</h3>
+                        <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center">
+                        </div>
+                        <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                     </div>
                 </div>
             </div>
@@ -125,52 +203,84 @@
         <!-- COMPACT / IN-COMPETITION REPORT CONTAINER -->
         <div id="report-compact" class="hidden">
             <div class="max-w-7xl mx-auto space-y-8">
-                <div id="filter-controls-compact" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
+                <div id="filter-controls-compact"
+                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <label for="year-select-compact" class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                            <select id="year-select-compact" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="year-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Year</label>
+                            <select id="year-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
-                            <label for="competition-select-compact" class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
-                            <select id="competition-select-compact" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="competition-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
+                            <select id="competition-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
-                            <label for="gender-select-compact" class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                            <select id="gender-select-compact" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="gender-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                            <select id="gender-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
-                            <label for="phase-select-compact" class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
-                            <select id="phase-select-compact" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="phase-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
+                            <select id="phase-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                     </div>
                 </div>
             </div>
             <!-- Added items-start to prevent column stretching -->
-            <div id="charts-area-compact" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            <div id="charts-area-compact"
+                class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
                 <!-- Wrapper for Chart and Fault Analysis to keep them in the same column -->
-                <div class="lg:col-span-2 flex flex-col gap-8">
+                <div class="lg:col-span-3 flex flex-col gap-8">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
+                        <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race
+                            Analysis</h3>
                         <div id="legend-compact" class="flex justify-center space-x-4 mb-4"></div>
                         <div id="chart-container-compact" class="w-full h-[600px]">
                             <svg id="chart-compact" class="w-full h-full"></svg>
                         </div>
                     </div>
                     <!-- NEW SEPARATE CONTAINER FOR FAULT ANALYSIS -->
-                    <div id="fault-analysis-compact" class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
+                    <div id="fault-analysis-compact"
+                        class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
                 </div>
 
-                <div class="lg:col-span-1 grid grid-rows-2 gap-8">
-                          <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
-                              <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Overall Win % by Bib Color</h3>
-                              <div id="pie-chart-bib-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
-                              <div id="pie-legend-bib-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
-                          </div>
-                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
-                        <h3 class="text-base font-semibold text-slate-100 mb-2 text-center leading-tight">Win % by Ramp Position</h3>
-                        <div id="pie-chart-ramp-compact" class="w-full max-w-[180px] mx-auto aspect-square"></div>
+                <div class="lg:col-span-2 grid grid-cols-2 gap-4">
+                    <div
+                        class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                        <h3 class="text-xs font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win
+                            %<br>by Bib Color</h3>
+                        <div id="pie-chart-bib-compact" class="w-full h-32 flex items-center justify-center"></div>
+                        <div id="pie-legend-bib-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                    </div>
+                    <div
+                        class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                        <h3 class="text-xs font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd
+                            Place %<br>by Bib Color</h3>
+                        <div id="pie-chart-bib-second-compact" class="w-full h-32 flex items-center justify-center">
+                        </div>
+                        <div id="pie-legend-bib-second-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                    </div>
+                    <div
+                        class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                        <h3 class="text-xs font-semibold text-slate-100 mb-4 text-center leading-tight">Win %<br>by Ramp
+                            Position</h3>
+                        <div id="pie-chart-ramp-compact" class="w-full h-32 flex items-center justify-center"></div>
                         <div id="pie-legend-ramp-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                    </div>
+                    <div
+                        class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
+                        <h3 class="text-xs font-semibold text-slate-100 mb-4 text-center leading-tight">2nd Place
+                            %<br>by Ramp Position</h3>
+                        <div id="pie-chart-ramp-second-compact" class="w-full h-32 flex items-center justify-center">
+                        </div>
+                        <div id="pie-legend-ramp-second-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
                     </div>
                 </div>
             </div>
@@ -179,35 +289,48 @@
         <!-- ATHLETE PROFILE CONTAINER -->
         <div id="report-athlete" class="hidden">
             <div class="max-w-7xl mx-auto space-y-8"> <!-- Expanded max-width for columns -->
-                <div id="athlete-search-controls" class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <div>
-                                    <label for="year-select-athlete" class="block text-sm font-medium text-slate-300 mb-2">Year</label>
-                                    <select id="year-select-athlete" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                                </div>
-                                <div>
-                                    <label for="competition-select-athlete" class="block text-sm font-medium text-slate-300 mb-2">Competition</label>
-                                    <select id="competition-select-athlete" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                                </div>
-                                <div>
-                                    <label for="gender-select-athlete" class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
-                                    <select id="gender-select-athlete" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700 pt-6">
-                                <div>
-                                    <label for="athlete-select-1" class="block text-sm font-medium text-slate-300 mb-2">Athlete 1</label>
-                                    <select id="athlete-select-1" class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                                </div>
-                                <div>
-                                    <label for="athlete-select-2" class="block text-sm font-medium text-slate-300 mb-2">Athlete 2</label>
-                                    <select id="athlete-select-2" class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                                </div>
-                                <div>
-                                    <label for="athlete-select-3" class="block text-sm font-medium text-slate-300 mb-2">Athlete 3</label>
-                                    <select id="athlete-select-3" class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                                </div>
-                            </div>
+                <div id="athlete-search-controls"
+                    class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="year-select-athlete"
+                                class="block text-sm font-medium text-slate-300 mb-2">Year</label>
+                            <select id="year-select-athlete"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="competition-select-athlete"
+                                class="block text-sm font-medium text-slate-300 mb-2">Competition</label>
+                            <select id="competition-select-athlete"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="gender-select-athlete"
+                                class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
+                            <select id="gender-select-athlete"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700 pt-6">
+                        <div>
+                            <label for="athlete-select-1" class="block text-sm font-medium text-slate-300 mb-2">Athlete
+                                1</label>
+                            <select id="athlete-select-1"
+                                class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="athlete-select-2" class="block text-sm font-medium text-slate-300 mb-2">Athlete
+                                2</label>
+                            <select id="athlete-select-2"
+                                class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="athlete-select-3" class="block text-sm font-medium text-slate-300 mb-2">Athlete
+                                3</label>
+                            <select id="athlete-select-3"
+                                class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
                 </div>
                 <!-- REMOVED space-y-8, updated in JS -->
                 <div id="athlete-profile-area" class="mt-8">
@@ -221,16 +344,20 @@
                 <div class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label for="year-select-summary" class="block text-sm font-medium text-slate-300 mb-2">Year</label>
-                            <select id="year-select-summary" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="year-select-summary"
+                                class="block text-sm font-medium text-slate-300 mb-2">Year</label>
+                            <select id="year-select-summary"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
-                            <label for="athlete-select-summary" class="block text-sm font-medium text-slate-300 mb-2">Athlete</label>
-                            <select id="athlete-select-summary" class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                            <label for="athlete-select-summary"
+                                class="block text-sm font-medium text-slate-300 mb-2">Athlete</label>
+                            <select id="athlete-select-summary"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="summary-content-area" class="mt-8">
                     <!-- Summary Table will be injected here -->
                 </div>
@@ -245,7 +372,7 @@
         const bibColors = { 'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308' };
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
-        
+
         // Declare DOM variables
         let tooltip, tabFull, tabCompact, tabAthlete, tabSummary;
         let reportFull, reportCompact, reportAthlete, reportSummary, lastUpdatedEl;
@@ -286,24 +413,24 @@
                 const competition = d.Competition || '';
                 const gender = d.Gender || '';
                 const phase = d.Phase || '';
-                
+
                 // Gate parsing logic
                 let gate = d.Gate || '';
                 if (gate.startsWith('Gate ')) gate = gate.replace('Gate ', '');
                 else if (gate === 'Course') gate = 'Roll';
-                
+
                 const bib = d.BIB || d.Bib || ''; // Check both case variants
                 const position = +(d.Order || d.Position || 0); // Check Order or Position
                 const rampPosition = +(d['Ramp Position'] || d['RampPosition'] || 0);
                 const finalPosition = +(d['Final Position'] || d['FinalPosition'] || 0);
                 const upstreamTactic = d['Upstream Tactic'] || d['UpstreamTactic'] || '';
-                
+
                 // Check multiple variations for Athlete Name
                 const athleteName = d['Athlete Name'] || d['Athlete'] || d['Name'] || '';
-                
+
                 // UPDATED: Capture Action AND Fault specific columns
                 const action = d.Action || d.action || d.Notes || d.notes || '';
-                const faultVal = d.Fault || d.fault || ''; 
+                const faultVal = d.Fault || d.fault || '';
                 // Capture overall/finish rank if available
                 const finishRank = d['Finish Rank'] || d['FinishRank'] || d.Rank || d.rank || d['Overall Rank'] || d['OverallRank'] || '';
 
@@ -329,29 +456,29 @@
         // --- GLOBAL COMPETITION SCANNER ---
         function scanCompetitionStructure(year, competition, allData) {
             const compData = allData.filter(d => d.Year === year && d.Competition === competition);
-            
+
             if (compData.length === 0) {
-                return { orderedGates: ['1','2','3','4','5','6','Roll','7','8'], upstreamGates: ['2', '8'] };
+                return { orderedGates: ['1', '2', '3', '4', '5', '6', 'Roll', '7', '8'], upstreamGates: ['2', '8'] };
             }
 
             const detectedUpstreams = new Set();
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
-                
+
                 const action = d.Action || "";
                 const tactic = d.UpstreamTactic || "";
                 const isUpstreamAction = (action.includes('Up') || action.includes('up'));
                 const isUpstreamTactic = (tactic.trim().length > 0);
-                
+
                 if (isUpstreamAction || isUpstreamTactic) {
                     detectedUpstreams.add(gate);
                 }
             });
 
-            const runs = {}; 
+            const runs = {};
             compData.forEach(d => {
-                const runId = `${d.Phase}-${d.Gender}-${d.BIB}`; 
+                const runId = `${d.Phase}-${d.Gender}-${d.BIB}`;
                 if (!runs[runId]) runs[runId] = [];
                 if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp') {
                     runs[runId].push(d.Gate);
@@ -367,9 +494,9 @@
 
             if (finalOrder.length === 0) {
                 const uniqueGates = [...new Set(compData.map(d => d.Gate))].filter(g => g && g !== 'Start' && g !== 'Finish' && g !== 'Ramp');
-                uniqueGates.sort((a,b) => {
-                      if (a === 'Roll') return 0;
-                      return parseInt(a) - parseInt(b);
+                uniqueGates.sort((a, b) => {
+                    if (a === 'Roll') return 0;
+                    return parseInt(a) - parseInt(b);
                 });
                 return { orderedGates: uniqueGates, upstreamGates: Array.from(detectedUpstreams) };
             }
@@ -385,14 +512,14 @@
             tabCompact = d3.select("#tab-compact");
             tabAthlete = d3.select("#tab-athlete");
             tabSummary = d3.select("#tab-summary");
-            
+
             reportFull = d3.select("#report-full");
             reportCompact = d3.select("#report-compact");
             reportAthlete = d3.select("#report-athlete");
             reportSummary = d3.select("#report-summary");
-            
+
             lastUpdatedEl = d3.select("#last-updated");
-            
+
             selectorsFull = {
                 year: d3.select("#year-select-full"),
                 competition: d3.select("#competition-select-full"),
@@ -408,7 +535,7 @@
                 phase: d3.select("#phase-select-compact")
             };
             filterControlsCompact = d3.select("#filter-controls-compact");
-            
+
             selectorsAthlete = {
                 year: d3.select("#year-select-athlete"),
                 competition: d3.select("#competition-select-athlete"),
@@ -431,7 +558,7 @@
 
                 const [responseFull, responseCompact] = await Promise.all([
                     fetch(urlFull),
-                    fetch(urlCompact) 
+                    fetch(urlCompact)
                 ]);
 
                 if (!responseFull.ok) throw new Error(`Failed to load Full Report CSV`);
@@ -453,22 +580,22 @@
                     populateFilters(masterDataFull, selectorsFull);
                     forceDefaults(selectorsFull, masterDataFull);
                     updateAllChartsFull();
-                    
+
                     // Setup Season Summary (using full data)
                     setupSeasonSummaryTab();
                 } else {
                     console.warn("Full Report data is empty.");
                 }
-                
+
                 // Setup Compact Report
                 if (masterDataCompact.length > 0) {
                     filterControlsCompact.classed("hidden", false);
                     populateFilters(masterDataCompact, selectorsCompact);
                     forceDefaults(selectorsCompact, masterDataCompact);
                     updateAllChartsCompact();
-                    
+
                     // Setup Athlete Profile (Using Compact/In-Comp Data)
-                    setupAthleteProfileTab(); 
+                    setupAthleteProfileTab();
                 } else {
                     console.warn("In-Competition Report data is empty.");
                 }
@@ -497,13 +624,13 @@
         }
 
         function showInitialMessage(containerSelector, message) {
-             const svg = d3.select(containerSelector);
-             if (svg.empty()) return;
-             svg.selectAll("*").remove();
-             const { width, height } = svg.node().getBoundingClientRect();
-             svg.append("text").attr("x", width / 2).attr("y", height / 2).attr("text-anchor", "middle").attr("class", "text-slate-500 text-lg select-none").text(message);
+            const svg = d3.select(containerSelector);
+            if (svg.empty()) return;
+            svg.selectAll("*").remove();
+            const { width, height } = svg.node().getBoundingClientRect();
+            svg.append("text").attr("x", width / 2).attr("y", height / 2).attr("text-anchor", "middle").attr("class", "text-slate-500 text-lg select-none").text(message);
         }
-        
+
         function populateFilters(data, selectorGroup) {
             const uniqueValues = {
                 year: [...new Set(data.map(d => d.Year))].sort((a, b) => b - a),
@@ -524,25 +651,25 @@
             for (const key in selectorGroup) {
                 const options = key === 'year' ? uniqueValues[key] : ['All', ...uniqueValues[key]];
                 selectorGroup[key].selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
-                
+
                 if (key === 'year' && selectorGroup === selectorsFull) selectorGroup[key].on("change", updateAllChartsFull);
                 else if (key === 'year' && selectorGroup === selectorsCompact) selectorGroup[key].on("change", updateAllChartsCompact);
                 else if (selectorGroup === selectorsFull) selectorGroup[key].on("change", updateAllChartsFull);
                 else selectorGroup[key].on("change", updateAllChartsCompact);
             }
         }
-        
+
         function forceDefaults(selectorGroup, data) {
             const latestYear = d3.max(data, d => d.Year);
             if (latestYear) selectorGroup.year.property("value", latestYear);
-            
+
             const compsInYear = [...new Set(data.filter(d => d.Year === latestYear).map(d => d.Competition))].sort();
             if (compsInYear.length > 0) selectorGroup.competition.property("value", compsInYear[0]);
-            
+
             const genders = [...new Set(data.map(d => d.Gender))];
             if (genders.includes("Men")) selectorGroup.gender.property("value", "Men");
             else if (genders.length > 0) selectorGroup.gender.property("value", genders[0]);
-            
+
             const phases = [...new Set(data.map(d => d.Phase))];
             if (phases.includes("Final")) selectorGroup.phase.property("value", "Final");
             else if (phases.length > 0) selectorGroup.phase.property("value", phases[0]);
@@ -569,12 +696,12 @@
                     .join("option")
                     .attr("value", d => d)
                     .text(d => d);
-                
+
                 if (currentFilters[key] && (currentFilters[key] === 'All' || uniqueValues[key].includes(key === 'year' ? +currentFilters[key] : currentFilters[key]))) {
-                      selectorsAthlete[key].property("value", currentFilters[key]);
+                    selectorsAthlete[key].property("value", currentFilters[key]);
                 }
             }
-            
+
             Object.values(selectorsAthlete).forEach(sel => sel.on("change", updateAthleteSelectors));
             d3.selectAll(".athlete-select").on("change", updateAthleteProfiles);
 
@@ -583,7 +710,7 @@
 
         function updateAthleteSelectors() {
             const currentSelections = {};
-            d3.selectAll(".athlete-select").each(function() {
+            d3.selectAll(".athlete-select").each(function () {
                 const id = d3.select(this).attr("id");
                 currentSelections[id] = d3.select(this).property("value");
             });
@@ -610,37 +737,37 @@
             const uniqueAthleteNames = ['', ...[...new Set(athleteRampData.map(d => formatAthleteName(d.AthleteName)))].sort()];
 
             const selects = d3.selectAll(".athlete-select");
-            selects.html(""); 
+            selects.html("");
 
-            selects.each(function() {
+            selects.each(function () {
                 d3.select(this).selectAll("option")
                     .data(uniqueAthleteNames)
                     .join("option")
                     .attr("value", d => d)
                     .text(d => d || "Select Athlete...");
             });
-            
-            selects.each(function() {
+
+            selects.each(function () {
                 const id = d3.select(this).attr("id");
                 const previousValue = currentSelections[id];
                 if (previousValue && uniqueAthleteNames.includes(previousValue)) {
                     d3.select(this).property("value", previousValue);
                 }
             });
-            
+
             updateAthleteProfiles();
         }
-        
+
         function updateAthleteProfiles() {
             const mainContainer = d3.select("#athlete-profile-area");
-            mainContainer.html(""); 
+            mainContainer.html("");
 
             const selectedAthletes = [
                 d3.select("#athlete-select-1").property("value"),
                 d3.select("#athlete-select-2").property("value"),
                 d3.select("#athlete-select-3").property("value")
             ];
-            
+
             const athletesToDisplay = selectedAthletes.filter(name => name && name.trim() !== '');
 
             // NEW LOGIC: Dynamic Grid Classes
@@ -656,7 +783,7 @@
                 appendAthleteProfile(athleteName, mainContainer, count); // Passing count
             });
         }
-        
+
         function appendAthleteProfile(selectedFormattedName, container, totalCount) { // Accepting totalCount
             // 1. Get current filters to ensure we only look at the selected competition
             const year = selectorsAthlete.year.property("value");
@@ -674,12 +801,12 @@
             // 3. Find Athlete ID (Name) in this filtered context
             const originalAthleteEntry = contextData.find(d => formatAthleteName(d.AthleteName) === selectedFormattedName);
             if (!originalAthleteEntry) return;
-            
+
             const originalName = originalAthleteEntry.AthleteName;
-            
+
             // 4. Get Ramp entries (runs) for this athlete IN THIS CONTEXT ONLY
             const athleteRampEntries = contextData.filter(d => d.AthleteName === originalName && d.Gate === 'Ramp');
-            
+
             const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
             athleteRampEntries.sort((a, b) => {
                 const regex = /^([A-Za-z]+)(\d*)$/;
@@ -693,21 +820,21 @@
 
             const profileData = athleteRampEntries.map(rampEntry => {
                 const { Phase: phase, BIB: bib, RampPosition: rampPos } = rampEntry;
-                
+
                 // 5. Get full race data from CONTEXT DATA
                 const fullRaceDataForAthlete = contextData.filter(d => d.Phase === phase && d.BIB === bib);
-                
-                const upstreamData = fullRaceDataForAthlete.find(d => 
-                    d.Gate !== 'Ramp' && 
-                    d.Gate !== 'Start' && 
-                    d.Gate !== 'Finish' && 
-                    d.UpstreamTactic && 
+
+                const upstreamData = fullRaceDataForAthlete.find(d =>
+                    d.Gate !== 'Ramp' &&
+                    d.Gate !== 'Start' &&
+                    d.Gate !== 'Finish' &&
+                    d.UpstreamTactic &&
                     d.UpstreamTactic.trim() !== ''
                 );
-                
+
                 let tactic = upstreamData?.UpstreamTactic || 'N/A';
                 let direction = upstreamData?.Action || 'N/A';
-                
+
                 if (tactic === 'Left-Up' || tactic === 'Right-Up') {
                     tactic = 'in 1st Place';
                 }
@@ -726,10 +853,10 @@
 
             const card = container.append("div").attr("class", "bg-slate-800 rounded-xl shadow-md border border-slate-700 overflow-x-auto w-full");
             card.append("h3").attr("class", `font-bold text-slate-100 border-b border-slate-700 ${isCompact ? 'text-sm p-2' : 'text-lg p-4'}`).text(selectedFormattedName);
-            
+
             const table = card.append("table").attr("class", tableClass);
             const thead = table.append("thead").attr("class", "bg-slate-700/50");
-            
+
             // Defined column headers with alignment
             const columns = [
                 { text: 'Phase', cls: 'text-left' },
@@ -749,13 +876,13 @@
             profileData.forEach(d => {
                 const row = tbody.append("tr").attr("class", "border-t border-slate-700");
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.phase);
-                
+
                 // Centered Bib Cell
                 row.append("td").attr("class", `${cellClass} text-center`).html(`<div class="w-2 h-2 md:w-4 md:h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
-                
+
                 // Centered Ramp Cell
                 row.append("td").attr("class", `${cellClass} text-center`).text(d.rampPos);
-                
+
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.direction);
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.tactic);
             });
@@ -805,7 +932,7 @@
                             currentAthlete.displayTactic = `SPLIT - ${currentAthlete.Action}`;
                         }
                     } else {
-                         currentAthlete.displayTactic = currentAthlete.UpstreamTactic;
+                        currentAthlete.displayTactic = currentAthlete.UpstreamTactic;
                     }
                 }
             });
@@ -833,14 +960,14 @@
             const bibsInRace = [...new Set(raceData.map(d => d.BIB))];
             const athleteStats = bibsInRace.map(bib => {
                 const myFaults = faultData.filter(d => d.BIB === bib);
-                
+
                 // Name lookup (grab from first valid entry)
                 const nameEntry = raceData.find(d => d.BIB === bib && d.AthleteName);
                 const name = nameEntry ? formatAthleteName(nameEntry.AthleteName) : (bibFullNames[bib] || bib);
 
                 let isRAL = false;
                 let deepestFaultIndex = -1;
-                
+
                 const faultStrings = myFaults.map(f => {
                     const combinedRaw = (f.Gate + " " + f.FaultVal + " " + f.Action).toUpperCase();
                     if (combinedRaw.includes("RAL")) isRAL = true;
@@ -857,18 +984,18 @@
 
                     let gateIndex = orderedGates.indexOf(cleanGateName);
                     if (gateIndex > deepestFaultIndex) deepestFaultIndex = gateIndex;
-                    
+
                     // Construct display string
-                    if (combinedRaw.includes("RAL")) return "RAL"; 
+                    if (combinedRaw.includes("RAL")) return "RAL";
                     if (f.Gate && !f.Gate.toUpperCase().includes('FLT') && !f.Gate.toUpperCase().includes('FAULT')) return `FLT ${f.Gate}`;
                     else if (cleanGateName) return `FLT ${cleanGateName}`;
-                    return f.FaultVal || f.Action || "Fault"; 
+                    return f.FaultVal || f.Action || "Fault";
                 });
 
                 const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0);
                 const originalRank = finishEntry ? finishEntry.FinalPosition : 99;
                 const rampEntry = raceData.find(d => d.BIB === bib && d.Gate === 'Ramp');
-                
+
                 // Capture finish rank from any entry for this athlete in this race
                 const finishRankEntry = raceData.find(d => d.BIB === bib && d.FinishRank);
                 const overallRank = finishRankEntry ? finishRankEntry.FinishRank : '-';
@@ -894,12 +1021,12 @@
                     return a.originalRank - b.originalRank;
                 }
                 if (a.faultCount !== b.faultCount) {
-                     const groupA = a.faultCount === 0 ? 0 : (a.faultCount === 1 ? 1 : 2);
-                     const groupB = b.faultCount === 0 ? 0 : (b.faultCount === 1 ? 1 : 2);
-                     if (groupA !== groupB) return groupA - groupB;
+                    const groupA = a.faultCount === 0 ? 0 : (a.faultCount === 1 ? 1 : 2);
+                    const groupB = b.faultCount === 0 ? 0 : (b.faultCount === 1 ? 1 : 2);
+                    if (groupA !== groupB) return groupA - groupB;
                 }
                 if (a.faultCount === 0 && b.faultCount === 0) return a.originalRank - b.originalRank;
-                if (a.deepestFaultIndex !== b.deepestFaultIndex) return b.deepestFaultIndex - a.deepestFaultIndex; 
+                if (a.deepestFaultIndex !== b.deepestFaultIndex) return b.deepestFaultIndex - a.deepestFaultIndex;
                 return a.originalRank - b.originalRank;
             });
 
@@ -912,7 +1039,7 @@
         // --- FAULT ANALYSIS & RANKING LOGIC (Using Helper) ---
         function updateFaultAnalysis(containerSelector, raceData, orderedGates, bibToNameMap) {
             const container = d3.select(containerSelector);
-            container.html(""); 
+            container.html("");
 
             if (!raceData || raceData.length === 0) {
                 container.classed("hidden", true);
@@ -921,7 +1048,7 @@
 
             // Get Rankings
             const sortedAthletes = getCalculatedRaceResults(raceData, orderedGates);
-            
+
             // Check if ANY faults/RALs exist in the results
             const hasAnyFaults = sortedAthletes.some(a => a.faultCount > 0 || a.isRAL);
 
@@ -930,10 +1057,10 @@
             container.classed("hidden", false);
 
             if (!hasAnyFaults) {
-                 container.append("p")
+                container.append("p")
                     .attr("class", "text-slate-400 text-sm italic text-center")
                     .text("Note: NO Faults for this Race. Result remains unchanged.");
-                 return;
+                return;
             }
 
             // --- SORT LOGIC FOR FAULT STATUS LIST (FIXED BIB ORDER) ---
@@ -944,7 +1071,7 @@
 
             // Render
             const faultSection = container.append("div").attr("class", "grid grid-cols-1 md:grid-cols-2 gap-6");
-            
+
             // Left Column
             const statusBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
             statusBox.append("h4").attr("class", "text-base font-bold text-slate-300 mb-3 pb-2 border-b border-slate-700 uppercase tracking-wider").text("Fault Status");
@@ -963,7 +1090,7 @@
             // Right Column
             const rankBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
             const rankHeader = rankBox.append("div").attr("class", "mb-3 border-b border-slate-700 pb-2");
-            rankHeader.append("h4").attr("class", "text-base font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result"); 
+            rankHeader.append("h4").attr("class", "text-base font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result");
             const rankList = rankBox.append("div").attr("class", "space-y-2");
 
             sortedAthletes.forEach(athlete => {
@@ -975,7 +1102,7 @@
                 row.append("span").attr("class", "text-slate-200 truncate").text(athlete.name);
 
                 let reason = "Clean";
-                if (athlete.isRAL) reason = "RAL"; 
+                if (athlete.isRAL) reason = "RAL";
                 else if (athlete.faultCount > 0) {
                     const gateName = orderedGates[athlete.deepestFaultIndex] || "Start";
                     reason = athlete.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athlete.faultCount} Faults`;
@@ -993,7 +1120,7 @@
                 .join("option")
                 .attr("value", d => d)
                 .text(d => d);
-            
+
             // Listeners
             selectorsSummary.year.on("change", updateSeasonSummaryAthletes);
             selectorsSummary.athlete.on("change", generateSeasonSummary);
@@ -1005,9 +1132,9 @@
         function updateSeasonSummaryAthletes() {
             const selectedYear = +selectorsSummary.year.property("value");
             const yearData = masterDataFull.filter(d => d.Year === selectedYear);
-            
+
             const uniqueAthleteNames = [...new Set(yearData.map(d => formatAthleteName(d.AthleteName)))].filter(n => n).sort();
-            
+
             selectorsSummary.athlete.html("");
             selectorsSummary.athlete.append("option").text("Select Athlete...").attr("value", "");
             selectorsSummary.athlete.selectAll("option.val")
@@ -1016,7 +1143,7 @@
                 .attr("class", "val")
                 .attr("value", d => d)
                 .text(d => d);
-            
+
             // Clear report
             d3.select("#summary-content-area").html("");
         }
@@ -1033,7 +1160,7 @@
             // 1. Find all races (Comp + Phase) this athlete did
             // Filter global data for Year & Athlete
             const athleteYearData = masterDataFull.filter(d => d.Year === selectedYear && formatAthleteName(d.AthleteName) === selectedAthleteName);
-            
+
             if (athleteYearData.length === 0) {
                 container.html("<p class='text-center text-slate-400'>No data found for this athlete in the selected year.</p>");
                 return;
@@ -1042,7 +1169,7 @@
             // Group by Competition -> Phase
             // We need unique identifiers for a "race" = Comp + Phase (assuming 1 race per phase per comp)
             // But we actually need to process *each race context* which includes OTHER athletes to calc rank.
-            
+
             // Find unique Race Keys: Competition + Phase + Gender (Gender implied by athlete usually, but safer to check)
             const races = [];
             const processedKeys = new Set();
@@ -1080,22 +1207,22 @@
             Object.keys(racesByComp).forEach(compName => {
                 const compRaces = racesByComp[compName];
                 const finalRace = compRaces.find(r => r.phase === 'Final');
-                
+
                 if (finalRace) {
                     // Calculate rank for this final
-                     const fullRaceData = masterDataFull.filter(d => 
-                        d.Year === selectedYear && 
-                        d.Competition === compName && 
+                    const fullRaceData = masterDataFull.filter(d =>
+                        d.Year === selectedYear &&
+                        d.Competition === compName &&
                         d.Phase === 'Final' &&
                         d.Gender === finalRace.gender
                     );
                     const structure = scanCompetitionStructure(selectedYear, compName, masterDataFull);
                     const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
                     const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
-                    
+
                     if (athleteResult) {
-                         // Use Calculated Phase Rank as Finish Rank for Final
-                         competitionFinalRankMap[compName] = athleteResult.calculatedRank;
+                        // Use Calculated Phase Rank as Finish Rank for Final
+                        competitionFinalRankMap[compName] = athleteResult.calculatedRank;
                     }
                 }
             });
@@ -1103,7 +1230,7 @@
             // Render Table
             const table = container.append("div").attr("class", "overflow-x-auto bg-slate-800 rounded-xl border border-slate-700")
                 .append("table").attr("class", "w-full text-left text-sm text-slate-300");
-            
+
             const thead = table.append("thead").attr("class", "bg-slate-700/50 uppercase text-xs font-semibold text-slate-400");
             const headerRow = thead.append("tr");
             ["Competition", "Phase", "Bib", "Ramp", "Phase Rank", "Finish Rank", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
@@ -1112,9 +1239,9 @@
 
             races.forEach(race => {
                 // 1. Get Full Race Data context (all athletes in that race)
-                const fullRaceData = masterDataFull.filter(d => 
-                    d.Year === selectedYear && 
-                    d.Competition === race.competition && 
+                const fullRaceData = masterDataFull.filter(d =>
+                    d.Year === selectedYear &&
+                    d.Competition === race.competition &&
                     d.Phase === race.phase &&
                     d.Gender === race.gender
                 );
@@ -1132,23 +1259,23 @@
                     const tr = tbody.append("tr").attr("class", "border-t border-slate-700 hover:bg-slate-700/30");
                     tr.append("td").attr("class", "p-3 font-medium text-white").text(race.competition);
                     tr.append("td").attr("class", "p-3").text(race.phase);
-                    
+
                     // Bib
                     const bibCell = tr.append("td").attr("class", "p-3");
                     bibCell.append("div").attr("class", "w-4 h-4 rounded-sm inline-block align-middle mr-2").style("background-color", bibColors[athleteResult.bib]);
                     bibCell.append("span").text(athleteResult.bib);
 
                     tr.append("td").attr("class", "p-3").text(athleteResult.rampPosition);
-                    
+
                     // Phase Rank (Result)
                     const phaseRank = athleteResult.calculatedRank;
                     // User requested no highlighting for Phase Rank, only white
-                    const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold text-white"); 
+                    const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold text-white");
                     resCell.text(phaseRank);
-                    
+
                     // Finish Rank (Overall)
                     let finalFinishRank = athleteResult.finishRank;
-                    
+
                     // APPLY OVERRIDE: If we found a rank from the Final phase for this competition, use it.
                     if (competitionFinalRankMap[race.competition] !== undefined) {
                         finalFinishRank = competitionFinalRankMap[race.competition];
@@ -1156,10 +1283,10 @@
                         // Just in case map logic missed it but we are in final now
                         finalFinishRank = phaseRank;
                     }
-                    
+
                     const finishRankVal = parseInt(finalFinishRank, 10);
-                    const finishCell = tr.append("td").attr("class", "p-3 font-mono font-bold"); 
-                    
+                    const finishCell = tr.append("td").attr("class", "p-3 font-mono font-bold");
+
                     if (!isNaN(finishRankVal)) {
                         if (finishRankVal === 1) finishCell.classed("text-yellow-400", true);
                         else if (finishRankVal === 2) finishCell.classed("text-gray-300", true);
@@ -1175,8 +1302,8 @@
                     let note = "-";
                     if (athleteResult.isRAL) note = "RAL";
                     else if (athleteResult.faultCount > 0) {
-                         const gateName = structure.orderedGates[athleteResult.deepestFaultIndex] || "Start";
-                         note = athleteResult.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athleteResult.faultCount} Faults`;
+                        const gateName = structure.orderedGates[athleteResult.deepestFaultIndex] || "Start";
+                        note = athleteResult.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athleteResult.faultCount} Faults`;
                     }
                     tr.append("td").attr("class", "p-3 text-slate-500 italic").text(note);
                 }
@@ -1203,10 +1330,10 @@
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
             xAxis.selectAll(".tick text").style("fill", d => {
-                 if (d === 'Finish' || d === 'Start') return '#94a3b8';
-                 if (d === 'Roll') return '#eab308';
-                 if (upstreamGates.includes(d)) return '#DC143C';
-                 return '#22c55e';
+                if (d === 'Finish' || d === 'Start') return '#94a3b8';
+                if (d === 'Roll') return '#eab308';
+                if (upstreamGates.includes(d)) return '#DC143C';
+                return '#22c55e';
             });
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
@@ -1225,14 +1352,14 @@
                 sortedRamps.forEach(([bib, pos], i) => {
                     const fullName = bibToNameMap.get(bib);
                     const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
-                      const textNode = chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
-                      textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
-                      textNode.append("tspan").style("font-weight", "normal").text(pos);
+                    const textNode = chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
+                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
+                    textNode.append("tspan").style("font-weight", "normal").text(pos);
                 });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
-            const labelYPositions = { };
+            const labelYPositions = {};
             upstreamGates.forEach(g => labelYPositions[g] = []);
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
@@ -1242,9 +1369,9 @@
                     if (upstreamGates.includes(d.Gate) && d.displayTactic) {
                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
-                        let yPos = yBase - 12; 
+                        let yPos = yBase - 12;
                         const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
-                        if (collision) yPos = yBase + 20; 
+                        if (collision) yPos = yBase + 20;
                         labelYPositions[d.Gate].push(yPos);
                         const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yPos).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
                         if (d.displayTactic.includes(' - ')) {
@@ -1259,20 +1386,20 @@
             });
             const legendContainer = d3.select("#legend-full");
             legendContainer.selectAll("*").remove();
-            
+
             // Legend Sorting Logic
             const legendItems = legendContainer.selectAll("div")
-                .data(Array.from(groupedData.keys()).sort((a, b) => { 
-                    const order = ['R', 'G', 'B', 'Y']; 
-                    return order.indexOf(a) - order.indexOf(b); 
+                .data(Array.from(groupedData.keys()).sort((a, b) => {
+                    const order = ['R', 'G', 'B', 'Y'];
+                    return order.indexOf(a) - order.indexOf(b);
                 }))
                 .join("div")
                 .attr("class", "flex items-center");
-                
+
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
             legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
-        
+
         function drawLineChartCompact(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
             const svg = d3.select("#chart-compact");
             svg.selectAll("*").remove();
@@ -1289,14 +1416,14 @@
             const { width, height } = d3.select("#chart-container-compact").node().getBoundingClientRect();
             const margin = { top: 50, right: 20, bottom: 20, left: 90 };
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
-            const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5); 
+            const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
             xAxis.selectAll(".tick text").style("fill", d => {
-                 if (d === 'Finish' || d === 'Start') return '#94a3b8';
-                 if (d === 'Roll') return '#eab308';
-                 if (upstreamGates.includes(d)) return '#DC143C';
-                 return '#22c55e';
+                if (d === 'Finish' || d === 'Start') return '#94a3b8';
+                if (d === 'Roll') return '#eab308';
+                if (upstreamGates.includes(d)) return '#DC143C';
+                return '#22c55e';
             });
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
@@ -1319,19 +1446,19 @@
             }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
-            const labelYPositions = { };
-             upstreamGates.forEach(g => labelYPositions[g] = []);
+            const labelYPositions = {};
+            upstreamGates.forEach(g => labelYPositions[g] = []);
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 const pointsData = values.filter(d => d.Gate !== 'Start');
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
                     if (upstreamGates.includes(d.Gate) && d.displayTactic) {
-                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
+                        if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
-                        let yPos = yBase - 12; 
+                        let yPos = yBase - 12;
                         const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
-                        if (collision) yPos = yBase + 20; 
+                        if (collision) yPos = yBase + 20;
                         labelYPositions[d.Gate].push(yPos);
                         const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yPos).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
                         if (d.displayTactic.includes(' - ')) {
@@ -1346,20 +1473,20 @@
             });
             const legendContainer = d3.select("#legend-compact");
             legendContainer.selectAll("*").remove();
-            
+
             // Legend Sorting Logic (Updated)
             const legendItems = legendContainer.selectAll("div")
-                .data(Array.from(groupedData.keys()).sort((a, b) => { 
-                    const order = ['R', 'G', 'B', 'Y']; 
-                    return order.indexOf(a) - order.indexOf(b); 
+                .data(Array.from(groupedData.keys()).sort((a, b) => {
+                    const order = ['R', 'G', 'B', 'Y'];
+                    return order.indexOf(a) - order.indexOf(b);
                 }))
                 .join("div")
                 .attr("class", "flex items-center");
-                
+
             legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
             legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
-        
+
         function updateAllChartsFull() {
             if (masterDataFull.length === 0) return;
             const selected = {
@@ -1378,7 +1505,7 @@
                 bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
             currentRaceData.forEach(d => {
-                if(d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
+                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
             const courseDisplayOrder = structure.orderedGates;
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
@@ -1396,7 +1523,7 @@
                 }
             });
             drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
-            
+
             // Add Fault Analysis Call
             updateFaultAnalysis("#fault-analysis-full", currentRaceData, structure.orderedGates, bibToNameMap);
 
@@ -1427,10 +1554,10 @@
             const gate2ColorScale = d3.scaleOrdinal().domain(gate2PieData.map(d => d.label)).range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
             drawPieChartAndLegend("#pie-chart-gate2-full", "#pie-legend-gate2-full", gate2PieData, gate2ColorScale);
             const secondPlaceFinishers = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
-            const secondPlaceGate2Positions = new Map([[1,0], [2,0], [3,0], [4,0]]);
+            const secondPlaceGate2Positions = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
             secondPlaceFinishers.forEach(finisher => {
                 const gate2Performance = pieChartAggregateData.find(d => d.Phase === finisher.Phase && d.BIB === finisher.BIB && d.Gate === '2');
-                if(gate2Performance) secondPlaceGate2Positions.set(gate2Performance.Position, (secondPlaceGate2Positions.get(gate2Performance.Position) || 0) + 1);
+                if (gate2Performance) secondPlaceGate2Positions.set(gate2Performance.Position, (secondPlaceGate2Positions.get(gate2Performance.Position) || 0) + 1);
             });
             const gate2SecondPieData = [1, 2, 3, 4].map(p => ({ label: `${p}${p === 1 ? 'st' : p === 2 ? 'nd' : p === 3 ? 'rd' : 'th'} at Gate 2`, value: secondPlaceGate2Positions.get(p) || 0 }));
             const gate2SecondColorScale = d3.scaleOrdinal().domain(gate2SecondPieData.map(d => d.label)).range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
@@ -1440,7 +1567,7 @@
         // --- UPDATE ALL CHARTS (COMPACT) ---
         function updateAllChartsCompact() {
             if (masterDataCompact.length === 0) return;
-             const selected = {
+            const selected = {
                 year: +selectorsCompact.year.property("value"),
                 competition: selectorsCompact.competition.property("value"),
                 gender: selectorsCompact.gender.property("value"),
@@ -1477,7 +1604,7 @@
                 }
             });
             drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
-            
+
             // Add Fault Analysis Call
             updateFaultAnalysis("#fault-analysis-compact", currentRaceData, structure.orderedGates, bibToNameMap);
 
@@ -1489,15 +1616,30 @@
                 if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
             });
             const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
+            const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
             const allBibLabels = Object.values(bibFullNames).sort();
             const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => bibColors[Object.keys(bibFullNames).find(key => bibFullNames[key] === label)]));
+
+            // Overall Win % by Bib Color
             const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => bibFullNames[d.BIB]);
             const bibWinnerPieData = allBibLabels.map(label => ({ label: label, value: bibWinnerCounts.get(label) || 0 }));
             drawPieChartAndLegend("#pie-chart-bib-compact", "#pie-legend-bib-compact", bibWinnerPieData, bibColorScale);
+
+            // Overall 2nd Place % by Bib Color
+            const bibSecondCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibSecondPieData = allBibLabels.map(label => ({ label: label, value: bibSecondCounts.get(label) || 0 }));
+            drawPieChartAndLegend("#pie-chart-bib-second-compact", "#pie-legend-bib-second-compact", bibSecondPieData, bibColorScale);
+
+            // Win % by Ramp Position
             const rampWinnerCounts = d3.rollup(winnersData, v => v.length, d => d.RampPosition);
             const rampWinnerPieData = [1, 2, 3, 4].map(pos => ({ label: `Ramp ${pos}`, value: rampWinnerCounts.get(pos) || 0 }));
             const rampColorScale = d3.scaleOrdinal().domain(rampWinnerPieData.map(d => d.label)).range(['#a855f7', '#ec4899', '#f97316', '#84cc16']);
             drawPieChartAndLegend("#pie-chart-ramp-compact", "#pie-legend-ramp-compact", rampWinnerPieData, rampColorScale);
+
+            // 2nd Place % by Ramp Position
+            const rampSecondCounts = d3.rollup(secondPlaceData, v => v.length, d => d.RampPosition);
+            const rampSecondPieData = [1, 2, 3, 4].map(pos => ({ label: `Ramp ${pos}`, value: rampSecondCounts.get(pos) || 0 }));
+            drawPieChartAndLegend("#pie-chart-ramp-second-compact", "#pie-legend-ramp-second-compact", rampSecondPieData, rampColorScale);
         }
 
         // --- INITIALIZE PAGE ---
@@ -1506,4 +1648,5 @@
         });
     </script>
 </body>
+
 </html>
