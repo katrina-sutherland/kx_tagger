@@ -2183,3 +2183,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,W,H3,Finish,G,4,Finish,2,2,,,
 2026,WRR,W,H3,Finish,Y,1,Finish,3,3,,,
 2026,WRR,W,H3,Finish,B,2,Finish,4,4,,,
+2026,WRR,W,H4,Ramp,R,4,Assigned,,,,WOODS,
+2026,WRR,W,H4,Ramp,G,3,Assigned,,,,DAVIDSON,
+2026,WRR,W,H4,Ramp,Y,2,Assigned,,,,ALFER,
+2026,WRR,W,H4,Ramp,B,1,Assigned,,,,STEPHENSON,
