@@ -1400,7 +1400,7 @@
             legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
 
-        function drawLineChartCompact(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
+        function drawLineChartCompact(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates, rollGates = []) {
             const svg = d3.select("#chart-compact");
             svg.selectAll("*").remove();
             if (raceData.length === 0) {
@@ -1421,9 +1421,9 @@
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
             xAxis.selectAll(".tick text").style("fill", d => {
                 if (d === 'Finish' || d === 'Start') return '#94a3b8';
-                if (d === 'Roll') return '#eab308';
-                if (upstreamGates.includes(d)) return '#DC143C';
-                return '#22c55e';
+                if (d === 'Roll' || rollGates.includes(d)) return '#eab308'; // Yellow for Rolls
+                if (d === '1st Up' || d === '2nd Up' || upstreamGates.includes(d)) return '#ef4444'; // Red for Upstreams
+                return '#22c55e'; // Green for Downstreams
             });
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
@@ -1585,25 +1585,71 @@
             currentRaceData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
-            const fullCourseDisplayOrder = structure.orderedGates;
-            const compactGatesToShow = new Set(['1', '2', '3', '8', 'Roll']);
-            structure.upstreamGates.forEach(g => compactGatesToShow.add(g));
-            const courseDisplayOrder = fullCourseDisplayOrder.filter(gate => compactGatesToShow.has(gate));
-            const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
+            // --- SEMI-STATIC COURSE MAPPING (Replicated from report_in_comp.html) ---
+            const gateMapping = {};
+            const upstreamGates = structure.upstreamGates;
+            const orderedGates = structure.orderedGates;
+
+            // Map logic: Identify indices of upstreams
+            if (orderedGates.includes('1')) gateMapping['1'] = '1';
+            if (upstreamGates.length > 0) gateMapping[upstreamGates[0]] = '1st Up';
+            if (upstreamGates.length > 1) gateMapping[upstreamGates[1]] = '2nd Up';
+
+            // "Next Gate" is usually gate 3, or between upstreams
+            const nextGateCandidate = orderedGates.find(g => g === '3');
+            if (nextGateCandidate) gateMapping[nextGateCandidate] = 'Next Gate';
+
+            // Special Gate Logic
+            const sgGate = currentRaceData.find(d => d.Gate === "SG" || d.Gate === "Special Gate");
+            if (sgGate) gateMapping[sgGate.Gate] = 'SG';
+
+            const baseOrder = ["1", "1st Up", "Next Gate", "2nd Up"];
+            if (sgGate) baseOrder.push("SG");
+
+            // Filter baseOrder to only show gates that exist in data (optional, but cleaner)
+            const courseDisplayOrder = baseOrder.filter(label => Object.values(gateMapping).includes(label));
+            const lineAndScaleDomain = ['Start', 'Ramp', ...courseDisplayOrder, 'Finish'];
+
             const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataCompact = [];
             bibsInRace.forEach(bib => {
                 const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
                 const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
                 const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
+
                 lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
+
+                if (rampPositions.has(bib)) {
+                    lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Ramp', Position: rampPositions.get(bib) });
+                }
+
                 const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
-                lineChartReadyDataCompact.push(...gateData);
+                // Apply Mappings
+                const mappedGateData = gateData.map(d => ({
+                    ...d,
+                    Gate: gateMapping[d.Gate] || d.Gate
+                })).filter(d => courseDisplayOrder.includes(d.Gate));
+
+                lineChartReadyDataCompact.push(...mappedGateData);
+
                 if (finalPosition) {
                     lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
                 }
             });
-            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
+
+            // --- ROLL DETECTION ---
+            const rollGates = [];
+            currentRaceData.forEach(d => {
+                const actionStr = (d.Action || "").toLowerCase();
+                const gateStr = (d.Gate || "").toLowerCase();
+                if (gateStr === 'roll' || gateStr.includes('roll') || actionStr.includes('roll')) {
+                    const mapped = gateMapping[d.Gate] || d.Gate;
+                    if (!rollGates.includes(mapped)) rollGates.push(mapped);
+                }
+            });
+
+            const mappedUpstreamGates = upstreamGates.map(g => gateMapping[g] || g);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, mappedUpstreamGates, rollGates);
 
             // Add Fault Analysis Call
             updateFaultAnalysis("#fault-analysis-compact", currentRaceData, structure.orderedGates, bibToNameMap);
