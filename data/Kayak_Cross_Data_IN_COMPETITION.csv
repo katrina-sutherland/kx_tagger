@@ -2239,3 +2239,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,W,H6,Finish,G,2,Finish,2,2,,,
 2026,WRR,W,H6,Finish,Y,4,Finish,3,3,,,
 2026,WRR,W,H6,Finish,B,1,Finish,4,4,,,
+2026,WRR,W,H7,Ramp,Y,1,Assigned,,,,WATSON,
+2026,WRR,W,H7,Ramp,B,2,Assigned,,,,WATSON,
+2026,WRR,W,H7,Ramp,R,3,Assigned,,,,HILGERTOVA,
+2026,WRR,W,H7,Ramp,G,4,Assigned,,,,SRIBAR,
