@@ -916,12 +916,19 @@
             legendItems.append('span').attr('class', 'text-xs text-slate-300').text(d => `${d.label} (${(totalValue > 0 ? (d.value / totalValue) * 100 : 0).toFixed(2)}%)`);
         }
 
-        function calculateTacticLogic(raceData, upstreamGates) {
-            upstreamGates.forEach(gate => {
+        function calculateTacticLogic(raceData, upstreamGates, gateMapping = {}) {
+            // Only apply Split/Follow logic to gates that are labeled as UP gates
+            const uppers = upstreamGates.filter(g => {
+                const label = gateMapping[g] || g;
+                return label.includes('Up');
+            });
+
+            uppers.forEach(gate => {
                 const gateEvents = raceData.filter(d => d.Gate === gate).sort((a, b) => a.Position - b.Position);
                 if (gateEvents.length === 0) return;
                 const leader = gateEvents[0];
-                leader.displayTactic = leader.UpstreamTactic;
+                leader.displayTactic = leader.UpstreamTactic || ""; // Leader doesn't get Split/Follow labels
+
                 for (let i = 1; i < gateEvents.length; i++) {
                     const currentAthlete = gateEvents[i];
                     const athleteAhead = gateEvents[i - 1];
@@ -936,9 +943,12 @@
                     }
                 }
             });
+
+            // For all other gates (Down gates), clear the tactic logic display
             raceData.forEach(d => {
-                if (!upstreamGates.includes(d.Gate)) {
-                    d.displayTactic = d.UpstreamTactic;
+                const label = gateMapping[d.Gate] || d.Gate;
+                if (!label.includes('Up')) {
+                    d.displayTactic = "";
                 }
             });
         }
@@ -1329,10 +1339,19 @@
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
+
+            // Color both text AND grid lines
+            xAxis.selectAll(".tick line").style("stroke", d => {
+                if (d === 'Finish' || d === 'Start') return '#334155';
+                if (d === 'Roll') return '#eab308';
+                if (d.includes('Up') || upstreamGates.includes(d)) return '#ef4444'; // Red for UP
+                return '#22c55e'; // Green for DOWN
+            }).style("stroke-opacity", d => (d === 'Finish' || d === 'Start') ? 0.2 : 0.4);
+
             xAxis.selectAll(".tick text").style("fill", d => {
                 if (d === 'Finish' || d === 'Start') return '#94a3b8';
                 if (d === 'Roll') return '#eab308';
-                if (upstreamGates.includes(d)) return '#DC143C';
+                if (d.includes('Up') || upstreamGates.includes(d)) return '#ef4444';
                 return '#22c55e';
             });
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
@@ -1373,7 +1392,14 @@
                         const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
                         if (collision) yPos = yBase + 20;
                         labelYPositions[d.Gate].push(yPos);
-                        const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yPos).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        const tacticColor = (d.Gate.includes('Up') || upstreamGates.includes(d.Gate)) ? '#ef4444' : '#22c55e';
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos)
+                            .attr("text-anchor", "middle")
+                            .style("fill", tacticColor)
+                            .style("font-size", "10px")
+                            .style("font-weight", "bold");
                         if (d.displayTactic.includes(' - ')) {
                             const parts = d.displayTactic.split(' - ');
                             textEl.append("tspan").text(parts[0] + ' - ');
@@ -1419,10 +1445,19 @@
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
+
+            // Color both text AND grid lines
+            xAxis.selectAll(".tick line").style("stroke", d => {
+                if (d === 'Finish' || d === 'Start') return '#334155';
+                if (d === 'Roll' || rollGates.includes(d)) return '#eab308';
+                if (d.includes('Up') || upstreamGates.includes(d)) return '#ef4444'; // Red for UP
+                return '#22c55e'; // Green for DOWN
+            }).style("stroke-opacity", d => (d === 'Finish' || d === 'Start') ? 0.2 : 0.4);
+
             xAxis.selectAll(".tick text").style("fill", d => {
                 if (d === 'Finish' || d === 'Start') return '#94a3b8';
                 if (d === 'Roll' || rollGates.includes(d)) return '#eab308'; // Yellow for Rolls
-                if (d === '1st Up' || d === '2nd Up' || upstreamGates.includes(d)) return '#ef4444'; // Red for Upstreams
+                if (d.includes('Up') || upstreamGates.includes(d)) return '#ef4444'; // Red for Upstreams
                 return '#22c55e'; // Green for Downstreams
             });
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
@@ -1460,7 +1495,14 @@
                         const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
                         if (collision) yPos = yBase + 20;
                         labelYPositions[d.Gate].push(yPos);
-                        const textEl = chart.append("text").attr("x", xScale(d.Gate)).attr("y", yPos).attr("text-anchor", "middle").style("fill", bibColors[key] || '#94a3b8').style("font-size", "10px").style("font-weight", "bold");
+                        const tacticColor = (d.Gate.includes('Up') || upstreamGates.includes(d.Gate)) ? '#ef4444' : '#22c55e';
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos)
+                            .attr("text-anchor", "middle")
+                            .style("fill", tacticColor)
+                            .style("font-size", "10px")
+                            .style("font-weight", "bold");
                         if (d.displayTactic.includes(' - ')) {
                             const parts = d.displayTactic.split(' - ');
                             textEl.append("tspan").text(parts[0] + ' - ');
@@ -1497,7 +1539,7 @@
             };
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
             const currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
-            calculateTacticLogic(currentRaceData, structure.upstreamGates);
+            calculateTacticLogic(currentRaceData, structure.upstreamGates); // Full report uses raw gate names
             const bibToNameMap = new Map();
             const rampPositions = new Map();
             const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
@@ -1575,7 +1617,18 @@
             };
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataCompact);
             const currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
-            calculateTacticLogic(currentRaceData, structure.upstreamGates);
+
+            // Pass gateMapping to calculateTacticLogic so it knows which raw gates are mapped to "Up" gates
+            const gateMapping = {};
+            const upstreamGates = structure.upstreamGates;
+            const orderedGates = structure.orderedGates;
+            if (orderedGates.includes('1')) gateMapping['1'] = '1';
+            if (upstreamGates.length > 0) gateMapping[upstreamGates[0]] = '1st Up';
+            if (upstreamGates.length > 1) gateMapping[upstreamGates[1]] = '2nd Up';
+            const nextGateCandidate = orderedGates.find(g => g === '3' || g === 'Next Gate');
+            if (nextGateCandidate) gateMapping[nextGateCandidate] = 'Next Gate';
+
+            // Population of map variables
             const bibToNameMap = new Map();
             const rampPositions = new Map();
             const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
@@ -1585,20 +1638,6 @@
             currentRaceData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
-            // --- FLEXIBLE COURSE MAPPING (Physical Order from Data) ---
-            const gateMapping = {};
-            const upstreamGates = structure.upstreamGates;
-            const orderedGates = structure.orderedGates;
-
-            // 1. Identify and Map Special Labels
-            if (orderedGates.includes('1')) gateMapping['1'] = '1';
-            if (upstreamGates.length > 0) gateMapping[upstreamGates[0]] = '1st Up';
-            if (upstreamGates.length > 1) gateMapping[upstreamGates[1]] = '2nd Up';
-
-            // "Next Gate" candidate (Gate 3 or explicit labeling)
-            const nextGateCandidate = orderedGates.find(g => g === '3' || g === 'Next Gate');
-            if (nextGateCandidate) gateMapping[nextGateCandidate] = 'Next Gate';
-
             // Special Gate Logic
             const sgGateEntry = currentRaceData.find(d => d.Gate === "SG" || d.Gate === "Special Gate");
             if (sgGateEntry) gateMapping[sgGateEntry.Gate] = 'SG';
