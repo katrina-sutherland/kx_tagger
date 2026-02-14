@@ -378,36 +378,6 @@
         let reportFull, reportCompact, reportAthlete, reportSummary, lastUpdatedEl;
         let selectorsFull, filterControlsFull, selectorsCompact, filterControlsCompact, selectorsAthlete, selectorsSummary;
 
-        // --- CORE HELPERS (Fixing the ReferenceError) ---
-        function formatAthleteName(name) {
-            if (!name || typeof name !== 'string') return '';
-            const parts = name.trim().split(/\s+/);
-            if (parts.length >= 2) {
-                const lastName = parts[0].toUpperCase();
-                const firstName = parts.slice(1).map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(' ');
-                return `${lastName} ${firstName}`;
-            }
-            return name.toUpperCase();
-        }
-
-        // Robust Gate Color Logic
-        function getGateColor(d, upstreamGates, rollGates) {
-            const val = String(d).toUpperCase();
-            if (val === 'START' || val === 'FINISH') return '#334155';
-            
-            // Check for Roll
-            if (val === 'ROLL' || (rollGates && rollGates.map(g => String(g).toUpperCase()).includes(val))) {
-                return '#eab308'; // Yellow
-            }
-            
-            // Check for Upstream
-            const isUp = val.includes('UP') || (upstreamGates && upstreamGates.map(g => String(g).toUpperCase()).includes(val));
-            if (isUp) return '#ef4444'; // Red
-            
-            // Default: Downstream
-            return '#22c55e'; // Green
-        }
-
         // --- TAB HANDLING ---
         function setActiveTab(activeTab) {
             const tabs = [tabFull, tabCompact, tabAthlete, tabSummary];
@@ -422,6 +392,32 @@
             reports.forEach((report, index) => {
                 report.classed("hidden", tabs[index].node() !== activeTab.node());
             });
+        }
+
+        // --- CORE HELPERS ---
+        function formatAthleteName(name) {
+            if (!name || typeof name !== 'string') return '';
+            const parts = name.trim().split(/\s+/);
+            if (parts.length >= 2) {
+                const lastName = parts[0].toUpperCase();
+                const firstName = parts.slice(1).map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(' ');
+                return `${lastName} ${firstName}`;
+            }
+            return name.toUpperCase();
+        }
+
+        // Helper to show messages in chart areas
+        function showInitialMessage(containerSelector, message) {
+            const svg = d3.select(containerSelector);
+            if (svg.empty()) return;
+            svg.selectAll("*").remove();
+            const { width, height } = svg.node().getBoundingClientRect();
+            svg.append("text")
+                .attr("x", width / 2)
+                .attr("y", height / 2)
+                .attr("text-anchor", "middle")
+                .attr("class", "text-slate-500 text-lg select-none")
+                .text(message);
         }
 
         // --- DATA PARSING ---
