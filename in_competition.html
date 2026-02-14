@@ -77,102 +77,91 @@
     <div class="container mx-auto p-4 md:p-8">
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-slate-100">In Competition Analysis - KX</h1>
-            <p class="text-slate-400 mt-1">Default data loaded. Upload a custom CSV file or select a race to visualize.
-            </p>
+            <p class="text-slate-400 mt-1">Analyzing official competition data for Kayak Cross.</p>
         </header>
 
-        <!-- File Upload & Filters -->
-        <div class="max-w-7xl mx-auto space-y-8">
-            <div class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700">
+        <div id="filter-controls" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                    <label for="csv-upload" class="block text-sm font-medium text-slate-300 mb-1">Upload Custom CSV
-                        File</label>
-                    <input type="file" id="csv-upload" accept=".csv"
-                        class="block w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-500/10 file:text-indigo-300 hover:file:bg-indigo-500/20" />
+                    <label for="year-select" class="block text-sm font-medium text-slate-300 mb-1">Year</label>
+                    <select id="year-select"
+                        class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                 </div>
-            </div>
-            <div id="filter-controls" class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                        <label for="year-select" class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                        <select id="year-select"
-                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                    </div>
-                    <div>
-                        <label for="competition-select"
-                            class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
-                        <select id="competition-select"
-                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                    </div>
-                    <div>
-                        <label for="gender-select" class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                        <select id="gender-select"
-                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                    </div>
-                    <div>
-                        <label for="phase-select" class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
-                        <select id="phase-select"
-                            class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                    </div>
+                <div>
+                    <label for="competition-select"
+                        class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
+                    <select id="competition-select"
+                        class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                </div>
+                <div>
+                    <label for="gender-select" class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                    <select id="gender-select"
+                        class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                </div>
+                <div>
+                    <label for="phase-select" class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
+                    <select id="phase-select"
+                        class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                 </div>
             </div>
         </div>
+    </div>
 
 
-        <!-- Main Content Grid -->
-        <div id="charts-area" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 hidden">
-            <!-- Left Column: Line Chart -->
-            <div class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
-                <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
-                <div id="legend" class="flex justify-center space-x-4 mb-4"></div>
-                <div id="chart-container" class="w-full h-[600px]">
-                    <svg id="chart" class="w-full h-full"></svg>
-                </div>
-            </div>
-
-            <!-- Right Column: Pie Charts (2x2 Grid) -->
-            <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 h-fit">
-                <!-- Card 1: Win % by Bib -->
-                <div
-                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
-                    <h3
-                        class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
-                        Overall Win %<br>by Bib Color</h3>
-                    <div id="pie-chart-bib" class="w-full h-32 mx-auto"></div>
-                    <div id="pie-legend-bib" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
-                </div>
-
-                <!-- Card 2: 2nd Place % by Bib -->
-                <div
-                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
-                    <h3
-                        class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
-                        Overall 2nd Place %<br>by Bib Color</h3>
-                    <div id="pie-chart-bib-2" class="w-full h-32 mx-auto"></div>
-                    <div id="pie-legend-bib-2" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
-                </div>
-
-                <!-- Card 3: Win % by Ramp -->
-                <div
-                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
-                    <h3
-                        class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
-                        Win %<br>by Ramp Position</h3>
-                    <div id="pie-chart-ramp" class="w-full h-32 mx-auto"></div>
-                    <div id="pie-legend-ramp" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
-                </div>
-
-                <!-- Card 4: 2nd Place % by Ramp -->
-                <div
-                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
-                    <h3
-                        class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
-                        2nd Place %<br>by Ramp Position</h3>
-                    <div id="pie-chart-ramp-2" class="w-full h-32 mx-auto"></div>
-                    <div id="pie-legend-ramp-2" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
-                </div>
+    <!-- Main Content Grid -->
+    <div id="charts-area" class="max-w-7xl mx-auto mt-8 grid grid-cols-1 lg:grid-cols-5 gap-8 hidden">
+        <!-- Left Column: Line Chart -->
+        <div class="lg:col-span-3 bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
+            <h3 class="text-xl font-semibold text-slate-100 mb-4 text-center">CLSX Head to Head Race Analysis</h3>
+            <div id="legend" class="flex justify-center space-x-4 mb-4"></div>
+            <div id="chart-container" class="w-full h-[600px]">
+                <svg id="chart" class="w-full h-full"></svg>
             </div>
         </div>
+
+        <!-- Right Column: Pie Charts (2x2 Grid) -->
+        <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 h-fit">
+            <!-- Card 1: Win % by Bib -->
+            <div
+                class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
+                <h3
+                    class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
+                    Overall Win %<br>by Bib Color</h3>
+                <div id="pie-chart-bib" class="w-full h-32 mx-auto"></div>
+                <div id="pie-legend-bib" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
+            </div>
+
+            <!-- Card 2: 2nd Place % by Bib -->
+            <div
+                class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
+                <h3
+                    class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
+                    Overall 2nd Place %<br>by Bib Color</h3>
+                <div id="pie-chart-bib-2" class="w-full h-32 mx-auto"></div>
+                <div id="pie-legend-bib-2" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
+            </div>
+
+            <!-- Card 3: Win % by Ramp -->
+            <div
+                class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
+                <h3
+                    class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
+                    Win %<br>by Ramp Position</h3>
+                <div id="pie-chart-ramp" class="w-full h-32 mx-auto"></div>
+                <div id="pie-legend-ramp" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
+            </div>
+
+            <!-- Card 4: 2nd Place % by Ramp -->
+            <div
+                class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 flex flex-col justify-center min-h-[220px]">
+                <h3
+                    class="text-sm font-semibold text-slate-100 mb-2 text-center leading-tight uppercase tracking-wider">
+                    2nd Place %<br>by Ramp Position</h3>
+                <div id="pie-chart-ramp-2" class="w-full h-32 mx-auto"></div>
+                <div id="pie-legend-ramp-2" class="flex flex-col items-center gap-y-1 mt-2 text-[10px]"></div>
+            </div>
+        </div>
+    </div>
 
     </div>
 
@@ -204,28 +193,9 @@
             gender: d3.select("#gender-select"),
             phase: d3.select("#phase-select")
         };
-        const fileUpload = d3.select("#csv-upload");
         const filterControls = d3.select("#filter-controls");
         const chartsArea = d3.select("#charts-area");
         const tooltip = d3.select(".tooltip");
-
-        // --- FILE HANDLING ---
-        fileUpload.on("change", function (event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                masterData = d3.csvParse(e.target.result, parseRow);
-                if (masterData.length > 0) {
-                    filterControls.classed("hidden", false);
-                    chartsArea.classed("hidden", false);
-                    populateFilters();
-                    updateAllCharts();
-                }
-            };
-            reader.readAsText(file);
-        });
-
 
         function showInitialMessage(containerSelector, message) {
             d3.select(containerSelector).selectAll("*").remove();
@@ -635,24 +605,25 @@
         // --- DATA LOADING & INITIALIZATION ---
 
         async function loadDataAndInitialize() {
+            const csvFileName = 'data/Kayak_Cross_Data_IN_COMPETITION.csv';
+            const cacheBuster = new Date().getTime();
+            const url = `${csvFileName}?t=${cacheBuster}`;
+
             try {
-                // Fetch from GitHub raw URL with cache buster
-                const cacheBuster = new Date().getTime();
-                const url = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
+                console.log(`Loading data from: ${url}`);
                 const response = await fetch(url);
-
                 if (!response.ok) {
-                    throw new Error(`Failed to load: Kayak_Cross_Data_IN_COMPETITION.csv. Status: ${response.status}`);
+                    throw new Error(`Failed to load ${csvFileName}`);
                 }
-
                 const csvString = await response.text();
                 masterData = d3.csvParse(csvString, parseRow);
 
                 if (masterData.length === 0) {
-                    showInitialMessage("#chart", "No data found in Kayak_Cross_Data_IN_COMPETITION.csv.");
+                    showInitialMessage("#chart", "No data found in the competition file.");
                     return;
                 }
 
+                console.log(`Loaded ${masterData.length} rows of data.`);
                 filterControls.classed("hidden", false);
                 chartsArea.classed("hidden", false);
                 populateFilters();
@@ -661,7 +632,7 @@
 
             } catch (error) {
                 console.error('Error loading or parsing CSV file:', error);
-                showInitialMessage("#chart", "Error: Could not load Kayak_Cross_Data_IN_COMPETITION.csv from /data/ directory.");
+                showInitialMessage("#chart", "Error: Could not load Kayak_Cross_Data_IN_COMPETITION.csv. Please ensure it exists in the data folder.");
             }
         }
 
@@ -691,3 +662,5 @@
 
     </script>
 </body>
+
+</html>
