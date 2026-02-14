@@ -1612,7 +1612,7 @@
                 .map(g => gateMapping[g])
                 .filter(label => label); // Only keep gates that are mapped to our meaningful labels
 
-            const lineAndScaleDomain = ['Start', 'Ramp', ...courseDisplayOrder, 'Finish'];
+            const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
 
             const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataCompact = [];
@@ -1622,10 +1622,6 @@
                 const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
 
                 lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-
-                if (rampPositions.has(bib)) {
-                    lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Ramp', Position: rampPositions.get(bib) });
-                }
 
                 const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
                 // Apply Mappings
