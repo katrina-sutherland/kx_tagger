@@ -2335,3 +2335,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,M,H2,Finish,R,4,Finish,2,2,,,
 2026,WRR,M,H2,Finish,B,2,Finish,3,3,,,
 2026,WRR,M,H2,Finish,Y,1,Finish,4,4,,,
+2026,WRR,M,H3,Ramp,R,4,Assigned,,,,KRATOCHVILL,
+2026,WRR,M,H3,Ramp,G,3,Assigned,,,,CROSBEE,
+2026,WRR,M,H3,Ramp,B,2,Assigned,,,,,
+2026,WRR,M,H3,Ramp,Y,1,Assigned,,,,,
