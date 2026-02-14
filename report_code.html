@@ -1585,29 +1585,33 @@
             currentRaceData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
-            // --- SEMI-STATIC COURSE MAPPING (Replicated from report_in_comp.html) ---
+            // --- FLEXIBLE COURSE MAPPING (Physical Order from Data) ---
             const gateMapping = {};
             const upstreamGates = structure.upstreamGates;
             const orderedGates = structure.orderedGates;
 
-            // Map logic: Identify indices of upstreams
+            // 1. Identify and Map Special Labels
             if (orderedGates.includes('1')) gateMapping['1'] = '1';
             if (upstreamGates.length > 0) gateMapping[upstreamGates[0]] = '1st Up';
             if (upstreamGates.length > 1) gateMapping[upstreamGates[1]] = '2nd Up';
 
-            // "Next Gate" is usually gate 3, or between upstreams
-            const nextGateCandidate = orderedGates.find(g => g === '3');
+            // "Next Gate" candidate (Gate 3 or explicit labeling)
+            const nextGateCandidate = orderedGates.find(g => g === '3' || g === 'Next Gate');
             if (nextGateCandidate) gateMapping[nextGateCandidate] = 'Next Gate';
 
             // Special Gate Logic
-            const sgGate = currentRaceData.find(d => d.Gate === "SG" || d.Gate === "Special Gate");
-            if (sgGate) gateMapping[sgGate.Gate] = 'SG';
+            const sgGateEntry = currentRaceData.find(d => d.Gate === "SG" || d.Gate === "Special Gate");
+            if (sgGateEntry) gateMapping[sgGateEntry.Gate] = 'SG';
 
-            const baseOrder = ["1", "1st Up", "Next Gate", "2nd Up"];
-            if (sgGate) baseOrder.push("SG");
+            // Roll Detection
+            if (orderedGates.includes('Roll')) gateMapping['Roll'] = 'Roll';
 
-            // Filter baseOrder to only show gates that exist in data (optional, but cleaner)
-            const courseDisplayOrder = baseOrder.filter(label => Object.values(gateMapping).includes(label));
+            // 2. Construct Display Order strictly from physical data sequence
+            // This ensures if SG is between 1st Up and Next Gate, it shows as such.
+            const courseDisplayOrder = orderedGates
+                .map(g => gateMapping[g])
+                .filter(label => label); // Only keep gates that are mapped to our meaningful labels
+
             const lineAndScaleDomain = ['Start', 'Ramp', ...courseDisplayOrder, 'Finish'];
 
             const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
