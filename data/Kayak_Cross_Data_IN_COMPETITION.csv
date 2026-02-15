@@ -2724,3 +2724,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,M,SF1,Finish,B,1,Finish,2,2,,,
 2026,WRR,M,SF1,Finish,G,3,Finish,3,3,,,
 2026,WRR,M,SF1,Finish,Y,2,Finish,4,4,,,
+2026,WRR,M,SF2,Ramp,R,4,Assigned,,,,KREJCI,
+2026,WRR,M,SF2,Ramp,G,3,Assigned,,,,RUDORFER,
+2026,WRR,M,SF2,Ramp,B,2,Assigned,,,,LONG,
+2026,WRR,M,SF2,Ramp,Y,1,Assigned,,,,KOZLOV,
