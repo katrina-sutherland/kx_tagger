@@ -2476,3 +2476,5 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,M,H8,Finish,B,2,Finish-Right-Up,2,2,FOLLOW,,
 2026,WRR,M,H8,Finish,G,3,Finish-Right-Up,3,3,FOLLOW,,
 2026,WRR,M,H8,Finish,Y,1,Finish-Right-Up,4,4,FOLLOW,,
+2026,WRR,W,QF1,Ramp,R,4,Assigned,,,,KNEBLOVA,
+2026,WRR,W,QF1,Ramp,G,3,Assigned,,,,MINAZOVA,
