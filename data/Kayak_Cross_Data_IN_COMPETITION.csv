@@ -2643,3 +2643,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,M,QF3,Finish,R,4,Finish,2,2,,,
 2026,WRR,M,QF3,Finish,B,2,Finish,3,3,,,
 2026,WRR,M,QF3,Finish,Y,1,Finish,4,4,,,
+2026,WRR,M,QF4,Ramp,R,4,Assigned,,,,KREJCI,
+2026,WRR,M,QF4,Ramp,G,3,Assigned,,,,POPE,
+2026,WRR,M,QF4,Ramp,B,2,Assigned,,,,LONG,
+2026,WRR,M,QF4,Ramp,Y,1,Assigned,,,,HEGER,
