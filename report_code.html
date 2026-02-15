@@ -369,7 +369,11 @@
         // --- DATA STATE & CONSTANTS ---
         let masterDataFull = [];
         let masterDataCompact = [];
-        const bibColors = { 'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308' };
+        // FIXED: Added lowercase keys to bibColors to satisfy lowerCase references in fault analysis
+        const bibColors = { 
+            'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308',
+            'r': '#ef4444', 'g': '#22c55e', 'b': '#3b82f6', 'y': '#eab308'
+        };
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
 
@@ -429,7 +433,7 @@
                 .text(message);
         }
 
-        // FIXED: Define missing getGateColor helper
+        // FIXED: Define missing getGateColor helper required by line charts
         function getGateColor(gate, upstreamGates, rollGates = []) {
             const g = String(gate).toUpperCase();
             if (g === 'START' || g === 'FINISH' || g === 'RAMP') return '#475569';
@@ -634,11 +638,13 @@
                 const timeString = now.toLocaleTimeString();
                 lastUpdatedEl.html(`<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Last Updated: ${timeString}`);
 
-                // Setup tabs events
-                tabFull.on("click", () => { setActiveTab(tabFull); if (masterDataFull.length > 0) updateAllChartsFull(); });
-                tabCompact.on("click", () => { setActiveTab(tabCompact); if (masterDataCompact.length > 0) updateAllChartsCompact(); });
-                tabAthlete.on("click", () => { setActiveTab(tabAthlete); });
-                tabSummary.on("click", () => { setActiveTab(tabSummary); });
+                // Setup tabs events only once
+                if (!tabFull.on("click")) {
+                    tabFull.on("click", () => { setActiveTab(tabFull); if (masterDataFull.length > 0) updateAllChartsFull(); });
+                    tabCompact.on("click", () => { setActiveTab(tabCompact); if (masterDataCompact.length > 0) updateAllChartsCompact(); });
+                    tabAthlete.on("click", () => { setActiveTab(tabAthlete); });
+                    tabSummary.on("click", () => { setActiveTab(tabSummary); });
+                }
 
                 window.addEventListener('resize', () => {
                     if (!reportFull.classed('hidden')) updateAllChartsFull();
@@ -698,6 +704,7 @@
 
         // --- ATHLETE PROFILE ---
         function setupAthleteProfileTab() {
+            // NOTE: This explicitly uses masterDataCompact (In-Competition Data)
             const currentFilters = {
                 year: selectorsAthlete.year.property("value"),
                 competition: selectorsAthlete.competition.property("value"),
@@ -790,23 +797,27 @@
 
             const athletesToDisplay = selectedAthletes.filter(name => name && name.trim() !== '');
 
+            // NEW LOGIC: Dynamic Grid Classes
             const count = athletesToDisplay.length;
             let gridClass = "grid-cols-1";
             if (count === 2) gridClass = "grid-cols-1 md:grid-cols-2";
-            if (count >= 3) gridClass = "grid-cols-1 md:grid-cols-3";
+            if (count >= 3) gridClass = "grid-cols-1 md:grid-cols-3"; // More aggressive 3-col breakpoint
 
+            // Reduced gap to help fit columns
             mainContainer.attr("class", `mt-8 grid gap-4 items-start ${gridClass}`);
 
             athletesToDisplay.forEach(athleteName => {
-                appendAthleteProfile(athleteName, mainContainer, count);
+                appendAthleteProfile(athleteName, mainContainer, count); // Passing count
             });
         }
 
-        function appendAthleteProfile(selectedFormattedName, container, totalCount) {
+        function appendAthleteProfile(selectedFormattedName, container, totalCount) { // Accepting totalCount
+            // 1. Get current filters to ensure we only look at the selected competition
             const year = selectorsAthlete.year.property("value");
             const comp = selectorsAthlete.competition.property("value");
             const gender = selectorsAthlete.gender.property("value");
 
+            // 2. Create Context Data based on COMPACT DATA (In Competition)
             let contextData = masterDataCompact;
             if (year !== 'All') contextData = contextData.filter(d => d.Year === +year);
             if (comp !== 'All') contextData = contextData.filter(d => d.Competition === comp);
@@ -814,10 +825,13 @@
 
             if (!selectedFormattedName) return;
 
+            // 3. Find Athlete ID (Name) in this filtered context
             const originalAthleteEntry = contextData.find(d => formatAthleteName(d.AthleteName) === selectedFormattedName);
             if (!originalAthleteEntry) return;
 
             const originalName = originalAthleteEntry.AthleteName;
+
+            // 4. Get Ramp entries (runs) for this athlete IN THIS CONTEXT ONLY
             const athleteRampEntries = contextData.filter(d => d.AthleteName === originalName && d.Gate === 'Ramp');
 
             const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
@@ -833,22 +847,34 @@
 
             const profileData = athleteRampEntries.map(rampEntry => {
                 const { Phase: phase, BIB: bib, RampPosition: rampPos } = rampEntry;
+
+                // 5. Get full race data from CONTEXT DATA
                 const fullRaceDataForAthlete = contextData.filter(d => d.Phase === phase && d.BIB === bib);
+
                 const upstreamData = fullRaceDataForAthlete.find(d =>
-                    d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.UpstreamTactic && d.UpstreamTactic.trim() !== ''
+                    d.Gate !== 'Ramp' &&
+                    d.Gate !== 'Start' &&
+                    d.Gate !== 'Finish' &&
+                    d.UpstreamTactic &&
+                    d.UpstreamTactic.trim() !== ''
                 );
+
                 let tactic = upstreamData?.UpstreamTactic || 'N/A';
                 let direction = upstreamData?.Action || 'N/A';
+
                 if (tactic === 'Left-Up' || tactic === 'Right-Up') {
                     tactic = 'in 1st Place';
                 }
+
                 return { phase, bib, rampPos, direction, tactic };
             });
 
+            // Styling Logic based on density
             const isCompact = totalCount >= 3;
+            // Use smaller text and padding if we are showing 3 columns on a potentially medium screen
             const tableClass = isCompact ? "w-full text-left text-[10px] lg:text-xs" : "w-full text-left text-sm";
             const cellClass = isCompact ? "p-1.5" : "p-3";
-            const headerSize = isCompact ? "text-[10px] md:text-xs" : "text-xs md:text-sm";
+            const headerSize = isCompact ? "text-[10px] md:text-xs" : "text-xs md:text-sm"; // Header text size
 
             if (profileData.length === 0) return;
 
@@ -858,10 +884,11 @@
             const table = card.append("table").attr("class", tableClass);
             const thead = table.append("thead").attr("class", "bg-slate-700/50");
 
+            // Defined column headers with alignment
             const columns = [
                 { text: 'Phase', cls: 'text-left' },
-                { text: 'Bib', cls: 'text-center' },
-                { text: 'Ramp', cls: 'text-center' },
+                { text: 'Bib', cls: 'text-center' }, // Centered Header
+                { text: 'Ramp', cls: 'text-center' }, // Centered Header
                 { text: 'Direction', cls: 'text-left' },
                 { text: 'Tactic', cls: 'text-left' }
             ];
@@ -876,8 +903,13 @@
             profileData.forEach(d => {
                 const row = tbody.append("tr").attr("class", "border-t border-slate-700");
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.phase);
+
+                // Centered Bib Cell
                 row.append("td").attr("class", `${cellClass} text-center`).html(`<div class="w-2 h-2 md:w-4 md:h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
+
+                // Centered Ramp Cell
                 row.append("td").attr("class", `${cellClass} text-center`).text(d.rampPos);
+
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.direction);
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.tactic);
             });
@@ -912,16 +944,23 @@
         }
 
         function calculateTacticLogic(raceData, upstreamGates, gateMapping = {}) {
+            // Identify which gates are strictly Upstreams (Case-Insensitive check)
             const uppers = upstreamGates.filter(g => {
                 const label = (gateMapping[g] || g).toUpperCase();
                 return label.includes('UP');
             });
+
+            // 1. Clear displayTactic for ALL entries first
             raceData.forEach(d => d.displayTactic = "");
+
+            // 2. Only apply logic to these identified upstream gates
             uppers.forEach(gate => {
                 const gateEvents = raceData.filter(d => d.Gate === gate).sort((a, b) => a.Position - b.Position);
                 if (gateEvents.length === 0) return;
+                
                 const leader = gateEvents[0];
                 leader.displayTactic = leader.UpstreamTactic || "";
+
                 for (let i = 1; i < gateEvents.length; i++) {
                     const currentAthlete = gateEvents[i];
                     const athleteAhead = gateEvents[i - 1];
@@ -938,7 +977,10 @@
             });
         }
 
+        // --- NEW: Helper Function to Calculate Rankings for a given race dataset ---
+        // This abstracts the sorting logic so it can be used by both the Fault Analysis view and the Season Summary
         function getCalculatedRaceResults(raceData, orderedGates) {
+            // 1. Identify Faults
             const faultData = raceData.filter(d => {
                 const checkString = (str) => {
                     if (!str) return false;
@@ -948,9 +990,12 @@
                 return checkString(d.Action) || checkString(d.Gate) || checkString(d.FaultVal);
             });
 
+            // 2. Aggregate Data per Athlete
             const bibsInRace = [...new Set(raceData.map(d => d.BIB))];
             const athleteStats = bibsInRace.map(bib => {
                 const myFaults = faultData.filter(d => d.BIB === bib);
+
+                // Name lookup (grab from first valid entry)
                 const nameEntry = raceData.find(d => d.BIB === bib && d.AthleteName);
                 const name = nameEntry ? formatAthleteName(nameEntry.AthleteName) : (bibFullNames[bib] || bib);
 
@@ -961,6 +1006,7 @@
                     const combinedRaw = (f.Gate + " " + f.FaultVal + " " + f.Action).toUpperCase();
                     if (combinedRaw.includes("RAL")) isRAL = true;
 
+                    // Normalize Gate name logic (same as original updateFaultAnalysis)
                     let gateName = f.Gate || "";
                     let cleanGateName = "";
                     if (f.Gate) cleanGateName = f.Gate.replace(/FLT|FAULT|DSQ|DNF|RAL/gi, '').trim();
@@ -973,6 +1019,7 @@
                     let gateIndex = orderedGates.indexOf(cleanGateName);
                     if (gateIndex > deepestFaultIndex) deepestFaultIndex = gateIndex;
 
+                    // Construct display string
                     if (combinedRaw.includes("RAL")) return "RAL";
                     if (f.Gate && !f.Gate.toUpperCase().includes('FLT') && !f.Gate.toUpperCase().includes('FAULT')) return `FLT ${f.Gate}`;
                     else if (cleanGateName) return `FLT ${cleanGateName}`;
@@ -982,16 +1029,25 @@
                 const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0);
                 const originalRank = finishEntry ? finishEntry.FinalPosition : 99;
                 const rampEntry = raceData.find(d => d.BIB === bib && d.Gate === 'Ramp');
+
+                // Capture finish rank from any entry for this athlete in this race
                 const finishRankEntry = raceData.find(d => d.BIB === bib && d.FinishRank);
                 const overallRank = finishRankEntry ? finishRankEntry.FinishRank : '-';
 
                 return {
-                    bib: bib, name: name, rampPosition: rampEntry ? rampEntry.RampPosition : '-',
-                    faults: faultStrings, faultCount: faultStrings.length, deepestFaultIndex: deepestFaultIndex,
-                    originalRank: originalRank, isRAL: isRAL, finishRank: overallRank
+                    bib: bib,
+                    name: name,
+                    rampPosition: rampEntry ? rampEntry.RampPosition : '-',
+                    faults: faultStrings,
+                    faultCount: faultStrings.length,
+                    deepestFaultIndex: deepestFaultIndex,
+                    originalRank: originalRank,
+                    isRAL: isRAL,
+                    finishRank: overallRank
                 };
             });
 
+            // 3. Sort (Calculate Rankings)
             const sortedAthletes = [...athleteStats].sort((a, b) => {
                 if (a.isRAL !== b.isRAL) return a.isRAL ? 1 : -1;
                 if (a.isRAL && b.isRAL) {
@@ -1008,46 +1064,77 @@
                 return a.originalRank - b.originalRank;
             });
 
+            // Add calculated rank property
             sortedAthletes.forEach((a, i) => a.calculatedRank = i + 1);
             return sortedAthletes;
         }
 
+
+        // --- FAULT ANALYSIS & RANKING LOGIC (Using Helper) ---
         function updateFaultAnalysis(containerSelector, raceData, orderedGates, bibToNameMap) {
             const container = d3.select(containerSelector);
             container.html("");
+
             if (!raceData || raceData.length === 0) {
                 container.classed("hidden", true);
                 return;
             }
+
+            // Get Rankings
             const sortedAthletes = getCalculatedRaceResults(raceData, orderedGates);
+
+            // Check if ANY faults/RALs exist in the results
             const hasAnyFaults = sortedAthletes.some(a => a.faultCount > 0 || a.isRAL);
+
+            console.log(`Fault Analysis: Has Faults? ${hasAnyFaults}`);
+
             container.classed("hidden", false);
+
             if (!hasAnyFaults) {
-                container.append("p").attr("class", "text-slate-400 text-sm italic text-center").text("Note: NO Faults for this Race. Result remains unchanged.");
+                container.append("p")
+                    .attr("class", "text-slate-400 text-sm italic text-center")
+                    .text("Note: NO Faults for this Race. Result remains unchanged.");
                 return;
             }
+
+            // --- SORT LOGIC FOR FAULT STATUS LIST (FIXED BIB ORDER) ---
             const bibOrder = ['R', 'G', 'B', 'Y'];
-            const statusListAthletes = [...sortedAthletes].sort((a, b) => bibOrder.indexOf(a.bib) - bibOrder.indexOf(b.bib));
+            const statusListAthletes = [...sortedAthletes].sort((a, b) => {
+                return bibOrder.indexOf(a.bib) - bibOrder.indexOf(b.bib);
+            });
+
+            // Render
             const faultSection = container.append("div").attr("class", "grid grid-cols-1 md:grid-cols-2 gap-6");
+
+            // Left Column
             const statusBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
             statusBox.append("h4").attr("class", "text-base font-bold text-slate-300 mb-3 pb-2 border-b border-slate-700 uppercase tracking-wider").text("Fault Status");
             const statusList = statusBox.append("div").attr("class", "space-y-2");
+
             statusListAthletes.forEach(athlete => {
                 const row = statusList.append("div").attr("class", "flex items-center justify-between text-sm border-b border-slate-800 pb-1 last:border-0");
                 const leftSide = row.append("div").attr("class", "flex items-center gap-2");
                 leftSide.append("div").attr("class", "w-3 h-3 rounded-sm").style("background-color", bibColors[athlete.bib]);
                 leftSide.append("span").attr("class", "text-slate-200 font-medium").text(athlete.name);
                 const faultText = athlete.faultCount > 0 ? athlete.faults.join(", ") : "-";
-                row.append("span").attr("class", athlete.faultCount > 0 ? "text-red-400 font-bold" : "text-slate-500").text(faultText);
+                const faultClass = athlete.faultCount > 0 ? "text-red-400 font-bold" : "text-slate-500";
+                row.append("span").attr("class", `${faultClass}`).text(faultText);
             });
+
+            // Right Column
             const rankBox = faultSection.append("div").attr("class", "bg-slate-900/50 p-4 rounded-lg border border-slate-700");
-            rankBox.append("h4").attr("class", "text-base font-bold text-slate-300 mb-3 pb-2 border-b border-slate-700 uppercase tracking-wider").text("Updated Phase Result");
+            const rankHeader = rankBox.append("div").attr("class", "mb-3 border-b border-slate-700 pb-2");
+            rankHeader.append("h4").attr("class", "text-base font-bold text-slate-300 uppercase tracking-wider inline-block").text("Updated Phase Result");
             const rankList = rankBox.append("div").attr("class", "space-y-2");
+
             sortedAthletes.forEach(athlete => {
+                const isWinner = athlete.calculatedRank === 1;
+                const colorClass = isWinner ? "text-yellow-400" : "text-slate-300";
                 const row = rankList.append("div").attr("class", "grid grid-cols-[1.5rem_1rem_1fr_auto] gap-x-3 items-center text-sm border-b border-slate-800 pb-1 last:border-0");
-                row.append("span").attr("class", `font-mono ${athlete.calculatedRank === 1 ? "text-yellow-400" : "text-slate-300"} text-right`).text(athlete.calculatedRank);
+                row.append("span").attr("class", `font-mono ${colorClass} text-right`).text(athlete.calculatedRank);
                 row.append("div").attr("class", "w-3 h-3 rounded-sm").style("background-color", bibColors[athlete.bib]);
                 row.append("span").attr("class", "text-slate-200 truncate").text(athlete.name);
+
                 let reason = "Clean";
                 if (athlete.isRAL) reason = "RAL";
                 else if (athlete.faultCount > 0) {
@@ -1058,156 +1145,547 @@
             });
         }
 
+        // --- SEASON SUMMARY LOGIC ---
         function setupSeasonSummaryTab() {
+            // Populate Year
             const uniqueYears = [...new Set(masterDataFull.map(d => d.Year))].sort((a, b) => b - a);
-            selectorsSummary.year.selectAll("option").data(uniqueYears).join("option").attr("value", d => d).text(d => d);
+            selectorsSummary.year.selectAll("option")
+                .data(uniqueYears)
+                .join("option")
+                .attr("value", d => d)
+                .text(d => d);
+
+            // Listeners
             selectorsSummary.year.on("change", updateSeasonSummaryAthletes);
             selectorsSummary.athlete.on("change", generateSeasonSummary);
+
+            // Init Athlete Dropdown
             updateSeasonSummaryAthletes();
         }
 
         function updateSeasonSummaryAthletes() {
             const selectedYear = +selectorsSummary.year.property("value");
-            const uniqueAthleteNames = [...new Set(masterDataFull.filter(d => d.Year === selectedYear).map(d => formatAthleteName(d.AthleteName)))].filter(n => n).sort();
-            selectorsSummary.athlete.html("").append("option").text("Select Athlete...").attr("value", "");
-            selectorsSummary.athlete.selectAll("option.val").data(uniqueAthleteNames).join("option").attr("class", "val").attr("value", d => d).text(d => d);
+            const yearData = masterDataFull.filter(d => d.Year === selectedYear);
+
+            const uniqueAthleteNames = [...new Set(yearData.map(d => formatAthleteName(d.AthleteName)))].filter(n => n).sort();
+
+            selectorsSummary.athlete.html("");
+            selectorsSummary.athlete.append("option").text("Select Athlete...").attr("value", "");
+            selectorsSummary.athlete.selectAll("option.val")
+                .data(uniqueAthleteNames)
+                .join("option")
+                .attr("class", "val")
+                .attr("value", d => d)
+                .text(d => d);
+
+            // Clear report
             d3.select("#summary-content-area").html("");
         }
 
         function generateSeasonSummary() {
-            const container = d3.select("#summary-content-area").html("");
+            const container = d3.select("#summary-content-area");
+            container.html("");
+
             const selectedYear = +selectorsSummary.year.property("value");
             const selectedAthleteName = selectorsSummary.athlete.property("value");
+
             if (!selectedAthleteName) return;
+
+            // 1. Find all races (Comp + Phase) this athlete did
             const athleteYearData = masterDataFull.filter(d => d.Year === selectedYear && formatAthleteName(d.AthleteName) === selectedAthleteName);
+
             if (athleteYearData.length === 0) {
-                container.html("<p class='text-center text-slate-400'>No data found.</p>");
+                container.html("<p class='text-center text-slate-400'>No data found for this athlete in the selected year.</p>");
                 return;
             }
-            const races = []; const processedKeys = new Set();
+
+            const races = [];
+            const processedKeys = new Set();
+
             athleteYearData.forEach(d => {
                 const key = `${d.Competition}|${d.Phase}|${d.Gender}`;
-                if (!processedKeys.has(key)) { processedKeys.add(key); races.push({ competition: d.Competition, phase: d.Phase, gender: d.Gender }); }
+                if (!processedKeys.has(key)) {
+                    processedKeys.add(key);
+                    races.push({ competition: d.Competition, phase: d.Phase, gender: d.Gender });
+                }
             });
+
+            // Sort Races: Alphabetical Comp, then Phase Order
             const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
             races.sort((a, b) => {
                 if (a.competition !== b.competition) return a.competition.localeCompare(b.competition);
-                const ma = a.phase.match(/^([A-Za-z]+)(\d*)$/) || [a.phase, a.phase, ''], mb = b.phase.match(/^([A-Za-z]+)(\d*)$/) || [b.phase, b.phase, ''];
-                const oa = phaseSortOrder[ma[1] === 'Final' ? 'Final' : ma[1]] || 99, ob = phaseSortOrder[mb[1] === 'Final' ? 'Final' : mb[1]] || 99;
-                return oa !== ob ? oa - ob : parseInt(ma[2] || '0') - parseInt(mb[2] || '0');
+                // Phase sort
+                const matchA = a.phase.match(/^([A-Za-z]+)(\d*)$/) || [a.phase, a.phase, ''];
+                const matchB = b.phase.match(/^([A-Za-z]+)(\d*)$/) || [b, b, ''];
+                const orderA = phaseSortOrder[matchA[1] === 'Final' ? 'Final' : matchA[1]] || 99;
+                const orderB = phaseSortOrder[matchB[1] === 'Final' ? 'Final' : matchB[1]] || 99;
+                if (orderA !== orderB) return orderA - orderB;
+                return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0');
             });
-            const table = container.append("div").attr("class", "overflow-x-auto bg-slate-800 rounded-xl border border-slate-700").append("table").attr("class", "w-full text-left text-sm text-slate-300");
+
+            // --- PRE-CALCULATE FINISH RANKS FOR COMPETITIONS WITH FINALS ---
+            const competitionFinalRankMap = {};
+            const racesByComp = {};
+            races.forEach(r => {
+                if (!racesByComp[r.competition]) racesByComp[r.competition] = [];
+                racesByComp[r.competition].push(r);
+            });
+
+            Object.keys(racesByComp).forEach(compName => {
+                const compRaces = racesByComp[compName];
+                const finalRace = compRaces.find(r => r.phase === 'Final');
+
+                if (finalRace) {
+                    const fullRaceData = masterDataFull.filter(d =>
+                        d.Year === selectedYear &&
+                        d.Competition === compName &&
+                        d.Phase === 'Final' &&
+                        d.Gender === finalRace.gender
+                    );
+                    const structure = scanCompetitionStructure(selectedYear, compName, masterDataFull);
+                    const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
+                    const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
+
+                    if (athleteResult) {
+                        competitionFinalRankMap[compName] = athleteResult.calculatedRank;
+                    }
+                }
+            });
+
+            // Render Table
+            const table = container.append("div").attr("class", "overflow-x-auto bg-slate-800 rounded-xl border border-slate-700")
+                .append("table").attr("class", "w-full text-left text-sm text-slate-300");
+
             const thead = table.append("thead").attr("class", "bg-slate-700/50 uppercase text-xs font-semibold text-slate-400");
-            thead.append("tr").selectAll("th").data(["Competition", "Phase", "Bib", "Ramp", "Rank", "Notes"]).join("th").attr("class", "p-3").text(d => d);
+            const headerRow = thead.append("tr");
+            ["Competition", "Phase", "Bib", "Ramp", "Phase Rank", "Finish Rank", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
+
             const tbody = table.append("tbody");
+
             races.forEach(race => {
-                const raceData = masterDataFull.filter(d => d.Year === selectedYear && d.Competition === race.competition && d.Phase === race.phase && d.Gender === race.gender);
-                const results = getCalculatedRaceResults(raceData, scanCompetitionStructure(selectedYear, race.competition, masterDataFull).orderedGates);
-                const res = results.find(r => r.name === selectedAthleteName);
-                if (res) {
-                    const tr = tbody.append("tr").attr("class", "border-t border-slate-700");
+                const fullRaceData = masterDataFull.filter(d =>
+                    d.Year === selectedYear &&
+                    d.Competition === race.competition &&
+                    d.Phase === race.phase &&
+                    d.Gender === race.gender
+                );
+                const structure = scanCompetitionStructure(selectedYear, race.competition, masterDataFull);
+                const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
+                const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
+
+                if (athleteResult) {
+                    const tr = tbody.append("tr").attr("class", "border-t border-slate-700 hover:bg-slate-700/30");
                     tr.append("td").attr("class", "p-3 font-medium text-white").text(race.competition);
                     tr.append("td").attr("class", "p-3").text(race.phase);
-                    tr.append("td").attr("class", "p-3").html(`<div class="w-4 h-4 rounded-sm inline-block align-middle mr-2" style="background-color:${bibColors[res.bib]}"></div>${res.bib}`);
-                    tr.append("td").attr("class", "p-3").text(res.rampPosition);
-                    tr.append("td").attr("class", "p-3 font-mono font-bold text-white").text(res.calculatedRank);
-                    tr.append("td").attr("class", "p-3 text-slate-500 italic").text(res.isRAL ? "RAL" : res.faultCount > 0 ? `${res.faultCount} Faults` : "Clean");
+
+                    const bibCell = tr.append("td").attr("class", "p-3");
+                    bibCell.append("div").attr("class", "w-4 h-4 rounded-sm inline-block align-middle mr-2").style("background-color", bibColors[athleteResult.bib]);
+                    bibCell.append("span").text(athleteResult.bib);
+
+                    tr.append("td").attr("class", "p-3").text(athleteResult.rampPosition);
+
+                    const phaseRank = athleteResult.calculatedRank;
+                    const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold text-white");
+                    resCell.text(phaseRank);
+
+                    let finalFinishRank = athleteResult.finishRank;
+                    if (competitionFinalRankMap[race.competition] !== undefined) {
+                        finalFinishRank = competitionFinalRankMap[race.competition];
+                    } else if (race.phase === 'Final') {
+                        finalFinishRank = phaseRank;
+                    }
+
+                    const finishRankVal = parseInt(finalFinishRank, 10);
+                    const finishCell = tr.append("td").attr("class", "p-3 font-mono font-bold");
+
+                    if (!isNaN(finishRankVal)) {
+                        if (finishRankVal === 1) finishCell.classed("text-yellow-400", true);
+                        else if (finishRankVal === 2) finishCell.classed("text-gray-300", true);
+                        else if (finishRankVal === 3) finishCell.classed("text-amber-600", true);
+                        else finishCell.classed("text-white", true);
+                    } else {
+                        finishCell.classed("text-white", true);
+                    }
+                    finishCell.text((!finalFinishRank || finalFinishRank === '-') ? '-' : finalFinishRank);
+
+                    let note = "-";
+                    if (athleteResult.isRAL) note = "RAL";
+                    else if (athleteResult.faultCount > 0) {
+                        const gateName = structure.orderedGates[athleteResult.deepestFaultIndex] || "Start";
+                        note = athleteResult.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athleteResult.faultCount} Faults`;
+                    }
+                    tr.append("td").attr("class", "p-3 text-slate-500 italic").text(note);
                 }
             });
         }
 
         function drawLineChartFull(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
-            const svg = d3.select("#chart-full"); svg.selectAll("*").remove();
-            if (raceData.length === 0) return showInitialMessage("#chart-full", "No data for this selection.");
+            const svg = d3.select("#chart-full");
+            svg.selectAll("*").remove();
+            const defs = svg.append('defs');
+            const pattern = defs.append('pattern').attr('id', 'checkered-flag-full').attr('width', 8).attr('height', 8).attr('patternUnits', 'userSpaceOnUse');
+            pattern.append('rect').attr('width', 8).attr('height', 8).attr('fill', 'white');
+            pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
+            pattern.append('rect').attr('x', 4).attr('y', 4).attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
+            
+            if (raceData.length === 0) {
+                showInitialMessage("#chart-full", "No data for this selection.");
+                d3.select("#legend-full").selectAll("*").remove();
+                return;
+            }
             const { width, height } = d3.select("#chart-container-full").node().getBoundingClientRect();
             const margin = { top: 50, right: 20, bottom: 20, left: 90 };
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
-            chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
-            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4, 5]).tickFormat(d => d === 5 ? '' : d).tickSize(-(width - margin.left - margin.right)));
+            
+            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
+
+            xAxis.selectAll(".tick line").style("stroke", d => getGateColor(d, upstreamGates, [])).style("stroke-opacity", d => ['START', 'FINISH'].includes(String(d).toUpperCase()) ? 0.2 : 0.4);
+            xAxis.selectAll(".tick text").style("fill", d => ['START', 'FINISH'].includes(String(d).toUpperCase()) ? '#94a3b8' : getGateColor(d, upstreamGates, []));
+            
+            const finishTick = xAxis.selectAll(".tick").filter(d => String(d).toUpperCase() === 'FINISH');
+            if (!finishTick.empty()) {
+                const finishTextNode = finishTick.select('text').node();
+                if (finishTextNode) {
+                    const bbox = finishTextNode.getBBox();
+                    finishTick.insert('rect', 'text').attr('x', bbox.x - 4).attr('y', bbox.y + bbox.height + 2).attr('width', bbox.width + 8).attr('height', 4).attr('fill', 'url(#checkered-flag-full)');
+                }
+            }
+            
+            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4, 5]).tickFormat(d => d === 5 ? '' : d).tickSize(-(width - margin.left - margin.right))).selectAll(".tick text").style("fill", d => d === 1 ? medalColors.gold : d === 2 ? medalColors.silver : d === 3 ? medalColors.bronze : '#94a3b8');
+            svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
+            svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
+            
+            if (rampPositions.size > 0) {
+                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 10) - 4).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
+                sortedRamps.forEach(([bib, pos], i) => {
+                    const fullName = bibToNameMap.get(bib);
+                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+                    const textNode = chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
+                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
+                    textNode.append("tspan").style("font-weight", "normal").text(pos);
+                });
+            }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
+            const labelYPositions = {};
+            
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
-                chart.selectAll(`.dot-${key}`).data(values.filter(d => d.Gate !== 'Start')).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                const pointsData = values.filter(d => d.Gate !== 'Start');
+                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    if (d.displayTactic) {
-                        chart.append("text").attr("x", xScale(d.Gate)).attr("y", yScale(d.Position) - 12).attr("text-anchor", "middle").style("fill", bibColors[key]).style("font-size", "10px").style("font-weight", "bold").text(d.displayTactic);
+                    // Check logic for upstreams
+                    const isUpstream = String(d.Gate).toUpperCase().includes('UP') || upstreamGates.map(g => String(g).toUpperCase()).includes(String(d.Gate).toUpperCase());
+                    
+                    if (isUpstream && d.displayTactic) {
+                        if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
+                        const yBase = yScale(d.Position);
+                        let yPos = yBase - 12;
+                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
+                        if (collision) yPos = yBase + 20;
+                        labelYPositions[d.Gate].push(yPos);
+                        
+                        // Text color matches BIB color
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos)
+                            .attr("text-anchor", "middle")
+                            .style("fill", bibColors[key])
+                            .style("font-size", "10px")
+                            .style("font-weight", "bold");
+                        
+                        if (d.displayTactic.includes(' - ')) {
+                            const parts = d.displayTactic.split(' - ');
+                            textEl.append("tspan").text(parts[0] + ' - ');
+                            textEl.append("tspan").style("font-size", "8px").style("font-weight", "normal").text(parts[1]);
+                        } else {
+                            textEl.text(d.displayTactic);
+                        }
                     }
                 });
             });
+            const legendContainer = d3.select("#legend-full");
+            legendContainer.selectAll("*").remove();
+            const legendItems = legendContainer.selectAll("div")
+                .data(Array.from(groupedData.keys()).sort((a, b) => ['R', 'G', 'B', 'Y'].indexOf(a) - ['R', 'G', 'B', 'Y'].indexOf(b)))
+                .join("div")
+                .attr("class", "flex items-center mx-2");
+            legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
+            legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
 
         function drawLineChartCompact(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates, rollGates = []) {
-            const svg = d3.select("#chart-compact"); svg.selectAll("*").remove();
-            if (raceData.length === 0) return showInitialMessage("#chart-compact", "No data for this selection.");
+            const svg = d3.select("#chart-compact");
+            svg.selectAll("*").remove();
+            const defs = svg.append('defs');
+            const pattern = defs.append('pattern').attr('id', 'checkered-flag-compact').attr('width', 8).attr('height', 8).attr('patternUnits', 'userSpaceOnUse');
+            pattern.append('rect').attr('width', 8).attr('height', 8).attr('fill', 'white');
+            pattern.append('rect').attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
+            pattern.append('rect').attr('x', 4).attr('y', 4).attr('width', 4).attr('height', 4).attr('fill', '#1e293b');
+
+            if (raceData.length === 0) {
+                showInitialMessage("#chart-compact", "No data for this selection.");
+                d3.select("#legend-compact").selectAll("*").remove();
+                return;
+            }
             const { width, height } = d3.select("#chart-container-compact").node().getBoundingClientRect();
             const margin = { top: 50, right: 20, bottom: 20, left: 90 };
             const chart = svg.append("g").attr("transform", `translate(${margin.left}, ${margin.top})`);
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
-            chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
-            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4]).tickFormat(d3.format("d")).tickSize(-(width - margin.left - margin.right)));
+            const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
+
+            xAxis.selectAll(".tick line").style("stroke", d => getGateColor(d, upstreamGates, rollGates)).style("stroke-opacity", d => ['START', 'FINISH'].includes(String(d).toUpperCase()) ? 0.2 : 0.4);
+            xAxis.selectAll(".tick text").style("fill", d => ['START', 'FINISH'].includes(String(d).toUpperCase()) ? '#94a3b8' : getGateColor(d, upstreamGates, rollGates));
+
+            const finishTick = xAxis.selectAll(".tick").filter(d => String(d).toUpperCase() === 'FINISH');
+            if (!finishTick.empty()) {
+                const bbox = finishTick.select('text').node().getBBox();
+                finishTick.insert('rect', 'text').attr('x', bbox.x - 4).attr('y', bbox.y + bbox.height + 2).attr('width', bbox.width + 8).attr('height', 4).attr('fill', 'url(#checkered-flag-compact)');
+            }
+            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).tickValues([1, 2, 3, 4]).tickFormat(d3.format("d")).tickSize(-(width - margin.left - margin.right))).selectAll(".tick text").style("fill", d => d === 1 ? medalColors.gold : d === 2 ? medalColors.silver : d === 3 ? medalColors.bronze : '#94a3b8');
+            svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
+            svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
+            
+            if (rampPositions.size > 0) {
+                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
+                sortedRamps.forEach(([bib, pos], i) => {
+                    const fullName = bibToNameMap.get(bib);
+                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+                    const textNode = chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
+                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
+                    textNode.append("tspan").style("font-weight", "normal").text(pos);
+                });
+            }
             const groupedData = d3.group(raceData, d => d.BIB);
             const line = d3.line().x(d => xScale(d.Gate)).y(d => yScale(d.Position));
+            const labelYPositions = {};
+            
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
-                chart.selectAll(`.dot-${key}`).data(values.filter(d => d.Gate !== 'Start')).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                const pointsData = values.filter(d => d.Gate !== 'Start');
+                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                values.forEach(d => {
+                    const isUpstream = String(d.Gate).toUpperCase().includes('UP') || upstreamGates.map(g => String(g).toUpperCase()).includes(String(d.Gate).toUpperCase());
+
+                    if (isUpstream && d.displayTactic) {
+                        if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
+                        const yBase = yScale(d.Position);
+                        let yPos = yBase - 12;
+                        const collision = labelYPositions[d.Gate].some(existingY => Math.abs(existingY - yPos) < 15);
+                        if (collision) yPos = yBase + 20;
+                        labelYPositions[d.Gate].push(yPos);
+
+                        const textEl = chart.append("text")
+                            .attr("x", xScale(d.Gate))
+                            .attr("y", yPos)
+                            .attr("text-anchor", "middle")
+                            .style("fill", bibColors[key]) // Writing matches line color
+                            .style("font-size", "10px")
+                            .style("font-weight", "bold");
+                            
+                        if (d.displayTactic.includes(' - ')) {
+                            const parts = d.displayTactic.split(' - ');
+                            textEl.append("tspan").text(parts[0] + ' - ');
+                            textEl.append("tspan").style("font-size", "8px").style("font-weight", "normal").text(parts[1]);
+                        } else {
+                            textEl.text(d.displayTactic);
+                        }
+                    }
+                });
             });
+            const legendContainer = d3.select("#legend-compact");
+            legendContainer.selectAll("*").remove();
+            const legendItems = legendContainer.selectAll("div")
+                .data(Array.from(groupedData.keys()).sort((a, b) => ['R', 'G', 'B', 'Y'].indexOf(a) - ['R', 'G', 'B', 'Y'].indexOf(b)))
+                .join("div")
+                .attr("class", "flex items-center mx-2");
+            legendItems.append("div").style("width", "12px").style("height", "12px").style("background-color", d => bibColors[d]).attr("class", "rounded-sm mr-2");
+            legendItems.append("span").text(d => bibToNameMap.get(d) || bibFullNames[d]).attr("class", "text-sm font-medium text-slate-300");
         }
 
         function updateAllChartsFull() {
             if (masterDataFull.length === 0) return;
-            const selected = { year: +selectorsFull.year.property("value"), competition: selectorsFull.competition.property("value"), gender: selectorsFull.gender.property("value"), phase: selectorsFull.phase.property("value") };
+            const selected = {
+                year: +selectorsFull.year.property("value"),
+                competition: selectorsFull.competition.property("value"),
+                gender: selectorsFull.gender.property("value"),
+                phase: selectorsFull.phase.property("value")
+            };
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
             const currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
-            calculateTacticLogic(currentRaceData, structure.upstreamGates);
-            const bibToNameMap = new Map(); const rampPositions = new Map();
-            currentRaceData.forEach(d => { if (d.Gate === 'Ramp' && d.AthleteName) bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName)); if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition); });
-            const domain = ['Start', ...structure.orderedGates, 'Finish'];
-            let lineChartData = [];
-            [...new Set(currentRaceData.map(d => d.BIB))].forEach(bib => {
-                const athleteData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPos = athleteData.find(d => d.FinalPosition > 0)?.FinalPosition;
-                lineChartData.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                lineChartData.push(...athleteData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0));
-                if (finalPos) lineChartData.push({ BIB: bib, Gate: 'Finish', Position: finalPos });
+            
+            calculateTacticLogic(currentRaceData, structure.upstreamGates); 
+            
+            const bibToNameMap = new Map();
+            const rampPositions = new Map();
+            currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName).forEach(d => {
+                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
-            drawLineChartFull(lineChartData, rampPositions, bibToNameMap, structure.orderedGates, domain, structure.upstreamGates);
+            currentRaceData.forEach(d => {
+                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
+            });
+            
+            const courseDisplayOrder = structure.orderedGates;
+            const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
+            let lineChartReadyDataFull = [];
+            bibsInRace.forEach(bib => {
+                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
+                lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
+                const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
+                lineChartReadyDataFull.push(...gateData);
+                if (finalPosition) {
+                    lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
+                }
+            });
+            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
             updateFaultAnalysis("#fault-analysis-full", currentRaceData, structure.orderedGates, bibToNameMap);
-            // Pie chart updates...
+
+            // Pie charts
+            const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
+            const uniqueFinalPositions = [];
+            const seenEntries = new Set();
+            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
+                const key = `${d.Phase}-${d.BIB}`;
+                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
+            });
+            const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
+            const allBibLabels = Object.values(bibFullNames).sort();
+            const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => bibColors[Object.keys(bibFullNames).find(key => bibFullNames[key] === label)]));
+            const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibWinnerPieData = allBibLabels.map(label => ({ label: label, value: bibWinnerCounts.get(label) || 0 }));
+            drawPieChartAndLegend("#pie-chart-bib-full", "#pie-legend-bib-full", bibWinnerPieData, bibColorScale);
+            
+            const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const bibSecondPlaceCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
+            const bibSecondPlacePieData = allBibLabels.map(label => ({ label: label, value: bibSecondPlaceCounts.get(label) || 0 }));
+            drawPieChartAndLegend("#pie-chart-bib-second-full", "#pie-legend-bib-second-full", bibSecondPlacePieData, bibColorScale);
+            
+            const gate2Leaders = pieChartAggregateData.filter(d => d.Gate === '2' && d.Position === 1);
+            const finishPositionsOfLeaders = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
+            gate2Leaders.forEach(leader => {
+                const finalResult = uniqueFinalPositions.find(d => d.Phase === leader.Phase && d.BIB === leader.BIB);
+                if (finalResult) finishPositionsOfLeaders.set(finalResult.FinalPosition, (finishPositionsOfLeaders.get(finalResult.FinalPosition) || 0) + 1);
+            });
+            const gate2PieData = [1, 2, 3, 4].map(p => ({ label: `Finished ${p}${p === 1 ? 'st' : p === 2 ? 'nd' : p === 3 ? 'rd' : 'th'}`, value: finishPositionsOfLeaders.get(p) || 0 }));
+            const gate2ColorScale = d3.scaleOrdinal().domain(gate2PieData.map(d => d.label)).range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
+            drawPieChartAndLegend("#pie-chart-gate2-full", "#pie-legend-gate2-full", gate2PieData, gate2ColorScale);
+            
+            const secondPlaceFinishers = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const secondPlaceGate2Positions = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
+            secondPlaceFinishers.forEach(finisher => {
+                const gate2Performance = pieChartAggregateData.find(d => d.Phase === finisher.Phase && d.BIB === finisher.BIB && d.Gate === '2');
+                if (gate2Performance) secondPlaceGate2Positions.set(gate2Performance.Position, (secondPlaceGate2Positions.get(gate2Performance.Position) || 0) + 1);
+            });
+            const gate2SecondPieData = [1, 2, 3, 4].map(p => ({ label: `${p}${p === 1 ? 'st' : p === 2 ? 'nd' : p === 3 ? 'rd' : 'th'} at Gate 2`, value: secondPlaceGate2Positions.get(p) || 0 }));
+            const gate2SecondColorScale = d3.scaleOrdinal().domain(gate2SecondPieData.map(d => d.label)).range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
+            drawPieChartAndLegend("#pie-chart-gate2-second-full", "#pie-legend-gate2-second-full", gate2SecondPieData, gate2SecondColorScale);
         }
 
         function updateAllChartsCompact() {
             if (masterDataCompact.length === 0) return;
-            const selected = { year: +selectorsCompact.year.property("value"), competition: selectorsCompact.competition.property("value"), gender: selectorsCompact.gender.property("value"), phase: selectorsCompact.phase.property("value") };
+            const selected = {
+                year: +selectorsCompact.year.property("value"),
+                competition: selectorsCompact.competition.property("value"),
+                gender: selectorsCompact.gender.property("value"),
+                phase: selectorsCompact.phase.property("value")
+            };
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataCompact);
             const currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+
             const mapping = { 'Roll': 'Roll' };
-            if (structure.orderedGates.includes('1')) mapping['1'] = '1';
-            if (structure.upstreamGates.length > 0) mapping[structure.upstreamGates[0]] = '1st Up';
-            if (structure.upstreamGates.length > 1) mapping[structure.upstreamGates[1]] = '2nd Up';
-            const nextGate = structure.orderedGates.find(g => g === '3' || g === 'Next Gate');
-            if (nextGate) mapping[nextGate] = 'Next Gate';
+            const upstreamGates = structure.upstreamGates;
+            const orderedGates = structure.orderedGates;
+            if (orderedGates.includes('1')) mapping['1'] = '1';
+            if (upstreamGates.length > 0) mapping[upstreamGates[0]] = '1st Up';
+            if (upstreamGates.length > 1) mapping[upstreamGates[1]] = '2nd Up';
+            const nextGateCandidate = orderedGates.find(g => g === '3' || g === 'Next Gate');
+            if (nextGateCandidate) mapping[nextGateCandidate] = 'Next Gate';
+
             calculateTacticLogic(currentRaceData, structure.upstreamGates, mapping);
-            const bibToNameMap = new Map(); const rampPositions = new Map();
-            currentRaceData.forEach(d => { if (d.Gate === 'Ramp' && d.AthleteName) bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName)); if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition); });
-            const displayOrder = structure.orderedGates.map(g => mapping[g]).filter(l => l);
-            const domain = ['Start', ...displayOrder, 'Finish'];
-            let lineChartData = [];
-            [...new Set(currentRaceData.map(d => d.BIB))].forEach(bib => {
-                const athleteData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPos = athleteData.find(d => d.FinalPosition > 0)?.FinalPosition;
-                lineChartData.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-                lineChartData.push(...athleteData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0).map(d => ({ ...d, Gate: mapping[d.Gate] || d.Gate })).filter(d => displayOrder.includes(d.Gate)));
-                if (finalPos) lineChartData.push({ BIB: bib, Gate: 'Finish', Position: finalPos });
+            
+            const bibToNameMap = new Map();
+            const rampPositions = new Map();
+            currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName).forEach(d => {
+                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
             });
-            drawLineChartCompact(lineChartData, rampPositions, bibToNameMap, displayOrder, domain, structure.upstreamGates);
+            currentRaceData.forEach(d => {
+                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
+            });
+
+            const displayOrder = orderedGates.map(g => mapping[g]).filter(label => label);
+            const lineAndScaleDomain = ['Start', ...displayOrder, 'Finish'];
+
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
+            let lineChartReadyDataCompact = [];
+            bibsInRace.forEach(bib => {
+                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
+
+                lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
+
+                const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
+                const mappedGateData = gateData.map(d => ({
+                    ...d,
+                    Gate: mapping[d.Gate] || d.Gate
+                })).filter(d => displayOrder.includes(d.Gate));
+
+                lineChartReadyDataCompact.push(...mappedGateData);
+
+                if (finalPosition) {
+                    lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
+                }
+            });
+
+            const rollGates = [];
+            currentRaceData.forEach(d => {
+                if ((d.Gate || "").toUpperCase().includes("ROLL") || (d.Action || "").toUpperCase().includes("ROLL")) {
+                    const mapped = mapping[d.Gate] || d.Gate;
+                    if (!rollGates.includes(mapped)) rollGates.push(mapped);
+                }
+            });
+
+            const mappedUpstreamGates = upstreamGates.map(g => mapping[g] || g);
+            drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, displayOrder, lineAndScaleDomain, mappedUpstreamGates, rollGates);
             updateFaultAnalysis("#fault-analysis-compact", currentRaceData, structure.orderedGates, bibToNameMap);
+
+            const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
+            const uniqueFinalPositions = [];
+            const seenEntries = new Set();
+            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
+                const key = `${d.Phase}-${d.BIB}`;
+                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
+            });
+            const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
+            const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
+            const allBibLabels = Object.values(bibFullNames).sort();
+            const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => bibColors[Object.keys(bibFullNames).find(key => bibFullNames[key] === label)]));
+
+            const bibWinnerCounts = d3.rollup(winnersData, v => v.length, d => bibFullNames[d.BIB]);
+            drawPieChartAndLegend("#pie-chart-bib-compact", "#pie-legend-bib-compact", allBibLabels.map(l => ({ label: l, value: bibWinnerCounts.get(l) || 0 })), bibColorScale);
+
+            const bibSecondCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
+            drawPieChartAndLegend("#pie-chart-bib-second-compact", "#pie-legend-bib-second-compact", allBibLabels.map(l => ({ label: l, value: bibSecondCounts.get(l) || 0 })), bibColorScale);
+
+            const rampWinnerCounts = d3.rollup(winnersData, v => v.length, d => d.RampPosition);
+            drawPieChartAndLegend("#pie-chart-ramp-compact", "#pie-legend-ramp-compact", [1, 2, 3, 4].map(pos => ({ label: `Ramp ${pos}`, value: rampWinnerCounts.get(pos) || 0 })), d3.scaleOrdinal().range(['#a855f7', '#ec4899', '#f97316', '#84cc16']));
+
+            const rampSecondCounts = d3.rollup(secondPlaceData, v => v.length, d => d.RampPosition);
+            drawPieChartAndLegend("#pie-chart-ramp-second-compact", "#pie-legend-ramp-second-compact", [1, 2, 3, 4].map(pos => ({ label: `Ramp ${pos}`, value: rampSecondCounts.get(pos) || 0 })), d3.scaleOrdinal().range(['#a855f7', '#ec4899', '#f97316', '#84cc16']));
         }
 
-        document.addEventListener('DOMContentLoaded', loadInitialData);
+        // --- INITIALIZE PAGE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInitialData();
+        });
     </script>
 </body>
 
