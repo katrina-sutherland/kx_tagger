@@ -2772,3 +2772,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,W,Final,Finish,B,2,Finish,2,2,,,
 2026,WRR,W,Final,Finish,G,3,Finish,3,3,,,
 2026,WRR,W,Final,Finish,R,4,Finish,4,4,,,
+2026,WRR,M,Final,Ramp,B,2,Assigned,,,,LONG,
+2026,WRR,M,Final,Ramp,R,4,Assigned,,,,NOVAK,
+2026,WRR,M,Final,Ramp,G,3,Assigned,,,,KREJCI,
+2026,WRR,M,Final,Ramp,Y,1,Assigned,,,,DELFOUR,
