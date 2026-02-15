@@ -2748,3 +2748,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,M,SF2,Finish,B,2,Finish,2,2,,,
 2026,WRR,M,SF2,Finish,G,3,Finish,3,3,,,
 2026,WRR,M,SF2,Finish,Y,1,Finish,4,4,,,
+2026,WRR,W,Final,Ramp,R,4,Assigned,,,,FOX,
+2026,WRR,W,Final,Ramp,G,3,Assigned,,,,WOODS,
+2026,WRR,W,Final,Ramp,B,2,Assigned,,,,KNEBLOVA,
+2026,WRR,W,Final,Ramp,Y,1,Assigned,,,,BEKOVA,
