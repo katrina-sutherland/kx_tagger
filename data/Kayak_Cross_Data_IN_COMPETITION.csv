@@ -2499,3 +2499,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,W,QF1,Finish,R,4,Finish,2,3,,,
 2026,WRR,W,QF1,Finish,Y,1,Finish,3,4,,,
 2026,WRR,W,QF1,Finish,G,3,Finish,4,2,,,
+2026,WRR,W,QF2,Ramp,R,4,Assigned,,,,WOODS,
+2026,WRR,W,QF2,Ramp,G,3,Assigned,,,,PANKOVA,
+2026,WRR,W,QF2,Ramp,B,2,Assigned,,,,MACKIE,
+2026,WRR,W,QF2,Ramp,Y,1,Assigned,,,,DAVIDSON,
