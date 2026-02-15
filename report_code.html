@@ -433,7 +433,7 @@
                 .text(message);
         }
 
-        // FIXED: Define missing getGateColor helper required by line charts
+        // FIXED: Added missing getGateColor helper
         function getGateColor(gate, upstreamGates, rollGates = []) {
             const g = String(gate).toUpperCase();
             if (g === 'START' || g === 'FINISH' || g === 'RAMP') return '#475569';
