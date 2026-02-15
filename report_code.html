@@ -913,13 +913,16 @@
                 if (d.RampPosition) rampMap.set(d.BIB, d.RampPosition);
             });
             
-            const domain = [...struct.orderedGates, 'Finish'];
+            // Domain starts at Ramp to show transition to first gate
+            const domain = ['Ramp', ...struct.orderedGates, 'Finish'];
             const lineData = [];
             const bibsInSelection = [...new Set(raw.map(d => d.BIB))];
             
             bibsInSelection.forEach(bib => {
                 const athlete = raw.filter(d => d.BIB === bib);
-                lineData.push(...athlete.filter(d => !['Ramp', 'Finish'].includes(d.Gate)));
+                // Common starting point at Ramp Pos
+                lineData.push({ BIB: bib, Gate: 'Ramp', Position: 2.5 });
+                lineData.push(...athlete.filter(d => !['Ramp', 'Finish', 'Start'].includes(d.Gate)));
                 const fin = athlete.find(d => d.FinalPosition > 0);
                 if (fin) lineData.push({ BIB: bib, Gate: 'Finish', Position: fin.FinalPosition });
             });
@@ -955,13 +958,16 @@
                 if (d.RampPosition) rampMap.set(d.BIB, d.RampPosition);
             });
             
-            const domain = [...struct.orderedGates, 'Finish'];
+            // Domain starts at Ramp to show transition to first gate
+            const domain = ['Ramp', ...struct.orderedGates, 'Finish'];
             const lineData = [];
             const bibsInSelection = [...new Set(raw.map(d => d.BIB))];
 
             bibsInSelection.forEach(bib => {
                 const athlete = raw.filter(d => d.BIB === bib);
-                lineData.push(...athlete.filter(d => !['Ramp', 'Finish'].includes(d.Gate)));
+                // Common starting point at Ramp Pos
+                lineData.push({ BIB: bib, Gate: 'Ramp', Position: 2.5 });
+                lineData.push(...athlete.filter(d => !['Ramp', 'Finish', 'Start'].includes(d.Gate)));
                 const fin = athlete.find(d => d.FinalPosition > 0);
                 if (fin) lineData.push({ BIB: bib, Gate: 'Finish', Position: fin.FinalPosition });
             });
