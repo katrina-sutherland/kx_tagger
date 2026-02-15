@@ -403,7 +403,7 @@
             if (svg.empty()) return;
             svg.selectAll("*").remove();
 
-            // Fixed: Use parent container dimensions if SVG hasn't fully rendered
+            // Use parent container dimensions
             const container = svg.node().parentNode;
             const width = container.clientWidth || 800;
             const height = container.clientHeight || 600;
@@ -417,7 +417,6 @@
                 .text(message);
         }
 
-        // Missing Helper Function
         function getGateColor(gate, upstreamGates, rollGates) {
             const g = String(gate).toUpperCase();
             if (g === 'START' || g === 'FINISH' || g === 'RAMP') return '#475569';
@@ -511,22 +510,17 @@
                 gender: d3.select("#gender-select-full"),
                 phase: d3.select("#phase-select-full")
             };
-            filterControlsFull = d3.select("#filter-controls-full");
-
             selectorsCompact = {
                 year: d3.select("#year-select-compact"),
                 competition: d3.select("#competition-select-compact"),
                 gender: d3.select("#gender-select-compact"),
                 phase: d3.select("#phase-select-compact")
             };
-            filterControlsCompact = d3.select("#filter-controls-compact");
-
             selectorsAthlete = {
                 year: d3.select("#year-select-athlete"),
                 competition: d3.select("#competition-select-athlete"),
                 gender: d3.select("#gender-select-athlete")
             };
-
             selectorsSummary = {
                 year: d3.select("#year-select-summary"),
                 athlete: d3.select("#athlete-select-summary")
@@ -547,7 +541,7 @@
                 masterDataCompact = parseCsvData(await responseCompact.text());
 
                 if (masterDataFull.length > 0) {
-                    filterControlsFull.classed("hidden", false);
+                    d3.select("#filter-controls-full").classed("hidden", false);
                     populateFilters(masterDataFull, selectorsFull);
                     forceDefaults(selectorsFull, masterDataFull);
                     updateAllChartsFull();
@@ -555,7 +549,7 @@
                 }
 
                 if (masterDataCompact.length > 0) {
-                    filterControlsCompact.classed("hidden", false);
+                    d3.select("#filter-controls-compact").classed("hidden", false);
                     populateFilters(masterDataCompact, selectorsCompact);
                     forceDefaults(selectorsCompact, masterDataCompact);
                     updateAllChartsCompact();
@@ -727,12 +721,12 @@
                 const athleteData = raceData.filter(d => d.BIB === bib);
                 const faults = athleteData.filter(d => (d.FaultVal || d.Action || d.Gate || "").toUpperCase().match(/FLT|FAULT|DSQ|DNF|RAL/));
                 const nameEntry = athleteData.find(d => d.AthleteName);
-                const isRAL = faults.some(f => (f.Gate + f.FaultVal + f.Action).toUpperCase().includes("RAL"));
                 return {
                     bib, name: nameEntry ? formatAthleteName(nameEntry.AthleteName) : bib, 
                     rampPosition: athleteData.find(d => d.Gate === 'Ramp')?.RampPosition || '-',
                     faults: faults.map(f => f.FaultVal || f.Gate || 'Fault'), 
-                    faultCount: faults.length, isRAL, originalRank: athleteData.find(d => d.FinalPosition > 0)?.FinalPosition || 99,
+                    faultCount: faults.length, isRAL: faults.some(f => (f.Gate + f.FaultVal + f.Action).toUpperCase().includes("RAL")),
+                    originalRank: athleteData.find(d => d.FinalPosition > 0)?.FinalPosition || 99,
                     finishRank: athleteData.find(d => d.FinishRank)?.FinishRank || '-'
                 };
             });
@@ -803,28 +797,50 @@
             });
         }
 
-        function drawLineChartFull(data, ramps, names, order, domain, upstreams) {
-            const svg = d3.select("#chart-full");
+        // Generic Chart Drawing Function
+        function drawLineChart(selector, data, names, order, domain, upstreams) {
+            const svg = d3.select(selector);
             svg.selectAll("*").remove();
-            if (data.length === 0) return showInitialMessage("#chart-full", "No data for selection");
-            const { width, height } = d3.select("#chart-container-full").node().getBoundingClientRect();
+            if (data.length === 0) return showInitialMessage(selector, "No data for selection");
+            
+            const container = d3.select(svg.node().parentNode);
+            const width = container.node().getBoundingClientRect().width;
+            const height = container.node().getBoundingClientRect().height || 600;
             const m = { t: 50, r: 20, b: 30, l: 60 };
+            
             const chart = svg.append("g").attr("transform", `translate(${m.l},${m.t})`);
             const x = d3.scalePoint().domain(domain).range([0, width - m.l - m.r]).padding(0.5);
-            const y = d3.scaleLinear().domain([0.8, 4.2]).range([0, height - m.t - m.b]);
+            const y = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - m.t - m.b]);
 
             chart.append("g").attr("class", "x-axis").call(d3.axisTop(x).tickSize(-(height - m.t - m.b)));
-            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(y).ticks(4).tickFormat(d3.format("d")).tickSize(-(width - m.l - m.r)));
+            chart.append("g").attr("class", "y-axis").call(d3.axisLeft(y).ticks(5).tickFormat(d3.format("d")).tickSize(-(width - m.l - m.r)));
 
             const grouped = d3.group(data, d => d.BIB);
             const line = d3.line().x(d => x(d.Gate)).y(d => y(d.Position));
 
             grouped.forEach((vals, bib) => {
-                chart.append("path").datum(vals.sort((a,b) => domain.indexOf(a.Gate) - domain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[bib]).attr("stroke-width", 3).attr("d", line);
-                chart.selectAll(`.dot-${bib}`).data(vals).join("circle").attr("cx", d => x(d.Gate)).attr("cy", d => y(d.Position)).attr("r", 4).attr("fill", bibColors[bib]);
+                chart.append("path")
+                    .datum(vals.sort((a,b) => domain.indexOf(a.Gate) - domain.indexOf(b.Gate)))
+                    .attr("fill", "none")
+                    .attr("stroke", bibColors[bib])
+                    .attr("stroke-width", 3)
+                    .attr("d", line);
+                
+                chart.selectAll(`.dot-${bib}`).data(vals).join("circle")
+                    .attr("cx", d => x(d.Gate))
+                    .attr("cy", d => y(d.Position))
+                    .attr("r", 4)
+                    .attr("fill", bibColors[bib]);
+                
                 vals.forEach(d => {
                     if (d.displayTactic) {
-                        chart.append("text").attr("x", x(d.Gate)).attr("y", y(d.Position) - 10).attr("text-anchor", "middle").attr("class", "text-[10px] font-bold").style("fill", bibColors[bib]).text(d.displayTactic);
+                        chart.append("text")
+                            .attr("x", x(d.Gate))
+                            .attr("y", y(d.Position) - 10)
+                            .attr("text-anchor", "middle")
+                            .attr("class", "text-[10px] font-bold")
+                            .style("fill", bibColors[bib])
+                            .text(d.displayTactic);
                     }
                 });
             });
@@ -842,12 +858,12 @@
             const lineData = [];
             [...new Set(raw.map(d => d.BIB))].forEach(bib => {
                 const athlete = raw.filter(d => d.BIB === bib);
-                lineData.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-                lineData.push(...athlete.filter(d => !['Ramp', 'Finish'].includes(d.Gate)));
+                lineData.push({ BIB: bib, Gate: 'Start', Position: 5 });
+                lineData.push(...athlete.filter(d => !['Ramp', 'Finish', 'Start'].includes(d.Gate)));
                 const fin = athlete.find(d => d.FinalPosition > 0);
                 if (fin) lineData.push({ BIB: bib, Gate: 'Finish', Position: fin.FinalPosition });
             });
-            drawLineChartFull(lineData, new Map(), bibMap, struct.orderedGates, domain, struct.upstreamGates);
+            drawLineChart("#chart-full", lineData, bibMap, struct.orderedGates, domain, struct.upstreamGates);
             updateFaultAnalysis("#fault-analysis-full", raw, struct.orderedGates);
         }
 
@@ -863,12 +879,12 @@
             const lineData = [];
             [...new Set(raw.map(d => d.BIB))].forEach(bib => {
                 const athlete = raw.filter(d => d.BIB === bib);
-                lineData.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-                lineData.push(...athlete.filter(d => !['Ramp', 'Finish'].includes(d.Gate)));
+                lineData.push({ BIB: bib, Gate: 'Start', Position: 5 });
+                lineData.push(...athlete.filter(d => !['Ramp', 'Finish', 'Start'].includes(d.Gate)));
                 const fin = athlete.find(d => d.FinalPosition > 0);
                 if (fin) lineData.push({ BIB: bib, Gate: 'Finish', Position: fin.FinalPosition });
             });
-            drawLineChartFull(lineData, new Map(), bibMap, struct.orderedGates, domain, struct.upstreamGates);
+            drawLineChart("#chart-compact", lineData, bibMap, struct.orderedGates, domain, struct.upstreamGates);
             updateFaultAnalysis("#fault-analysis-compact", raw, struct.orderedGates);
         }
 
