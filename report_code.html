@@ -805,7 +805,7 @@
         }
 
         // Generic Chart Drawing Function
-        function drawLineChart(selector, data, names, order, domain, upstreams) {
+        function drawLineChart(selector, data, names, order, domain, upstreams, rampPositions) {
             const svg = d3.select(selector);
             svg.selectAll("*").remove();
             if (data.length === 0) return showInitialMessage(selector, "No matching race data found.");
@@ -853,6 +853,37 @@
                     }
                 });
             });
+
+            // Ramp Position down in bottom left
+            if (rampPositions && rampPositions.size > 0) {
+                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                const yBase = height - m.t - m.b - (sortedRamps.length * 15);
+                
+                chart.append("text")
+                    .attr("x", -10)
+                    .attr("y", yBase - 15)
+                    .attr("text-anchor", "end")
+                    .style("font-size", "10px")
+                    .style("font-weight", "bold")
+                    .style("fill", "#94a3b8")
+                    .text("Ramp Pos:");
+
+                sortedRamps.forEach(([bib, pos], i) => {
+                    const fullName = names.get(bib);
+                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+                    const color = bibColors[bib] || bibColors[bib.toLowerCase()] || '#64748b';
+                    
+                    const textNode = chart.append("text")
+                        .attr("x", -10)
+                        .attr("y", yBase + (i * 14))
+                        .attr("text-anchor", "end")
+                        .style("fill", color)
+                        .style("font-size", "10px");
+                        
+                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
+                    textNode.append("tspan").style("font-weight", "normal").text(pos);
+                });
+            }
         }
 
         function updateAllChartsFull() {
@@ -876,21 +907,24 @@
 
             calculateTacticLogic(raw, struct.upstreamGates);
             const bibMap = new Map();
-            raw.filter(d => d.Gate === 'Ramp').forEach(d => bibMap.set(d.BIB, formatAthleteName(d.AthleteName)));
+            const rampMap = new Map();
+            raw.filter(d => d.Gate === 'Ramp').forEach(d => {
+                if (d.AthleteName) bibMap.set(d.BIB, formatAthleteName(d.AthleteName));
+                if (d.RampPosition) rampMap.set(d.BIB, d.RampPosition);
+            });
             
-            const domain = ['Start', ...struct.orderedGates, 'Finish'];
+            const domain = [...struct.orderedGates, 'Finish'];
             const lineData = [];
             const bibsInSelection = [...new Set(raw.map(d => d.BIB))];
             
             bibsInSelection.forEach(bib => {
                 const athlete = raw.filter(d => d.BIB === bib);
-                lineData.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                lineData.push(...athlete.filter(d => !['Ramp', 'Finish', 'Start'].includes(d.Gate)));
+                lineData.push(...athlete.filter(d => !['Ramp', 'Finish'].includes(d.Gate)));
                 const fin = athlete.find(d => d.FinalPosition > 0);
                 if (fin) lineData.push({ BIB: bib, Gate: 'Finish', Position: fin.FinalPosition });
             });
             
-            drawLineChart("#chart-full", lineData, bibMap, struct.orderedGates, domain, struct.upstreamGates);
+            drawLineChart("#chart-full", lineData, bibMap, struct.orderedGates, domain, struct.upstreamGates, rampMap);
             updateFaultAnalysis("#fault-analysis-full", raw, struct.orderedGates);
         }
 
@@ -915,21 +949,24 @@
 
             calculateTacticLogic(raw, struct.upstreamGates);
             const bibMap = new Map();
-            raw.filter(d => d.Gate === 'Ramp').forEach(d => bibMap.set(d.BIB, formatAthleteName(d.AthleteName)));
+            const rampMap = new Map();
+            raw.filter(d => d.Gate === 'Ramp').forEach(d => {
+                if (d.AthleteName) bibMap.set(d.BIB, formatAthleteName(d.AthleteName));
+                if (d.RampPosition) rampMap.set(d.BIB, d.RampPosition);
+            });
             
-            const domain = ['Start', ...struct.orderedGates, 'Finish'];
+            const domain = [...struct.orderedGates, 'Finish'];
             const lineData = [];
             const bibsInSelection = [...new Set(raw.map(d => d.BIB))];
 
             bibsInSelection.forEach(bib => {
                 const athlete = raw.filter(d => d.BIB === bib);
-                lineData.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                lineData.push(...athlete.filter(d => !['Ramp', 'Finish', 'Start'].includes(d.Gate)));
+                lineData.push(...athlete.filter(d => !['Ramp', 'Finish'].includes(d.Gate)));
                 const fin = athlete.find(d => d.FinalPosition > 0);
                 if (fin) lineData.push({ BIB: bib, Gate: 'Finish', Position: fin.FinalPosition });
             });
             
-            drawLineChart("#chart-compact", lineData, bibMap, struct.orderedGates, domain, struct.upstreamGates);
+            drawLineChart("#chart-compact", lineData, bibMap, struct.orderedGates, domain, struct.upstreamGates, rampMap);
             updateFaultAnalysis("#fault-analysis-compact", raw, struct.orderedGates);
         }
 
