@@ -2571,3 +2571,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,W,QF4,Finish,G,3,Finish,2,2,,,
 2026,WRR,W,QF4,Finish,Y,1,Finish,3,3,,,
 2026,WRR,W,QF4,Finish,B,2,Finish,4,4,,,
+2026,WRR,M,QF1,Ramp,R,4,Assigned,,,,NOVAK,
+2026,WRR,M,QF1,Ramp,G,3,Assigned,,,,DELFOUR,
+2026,WRR,M,QF1,Ramp,B,2,Assigned,,,,HOCEVAR,
+2026,WRR,M,QF1,Ramp,Y,1,Assigned,,,,PUCHNER,
