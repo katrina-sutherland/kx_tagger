@@ -2404,3 +2404,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,M,H5,Finish,R,4,Finish,2,2,,,
 2026,WRR,M,H5,Finish,Y,1,Finish,3,3,,,
 2026,WRR,M,H5,Finish,B,2,Finish,4,4,,,
+2026,WRR,M,H6,Ramp,R,4,Assigned,,,,GALEA,
+2026,WRR,M,H6,Ramp,G,3,Assigned,,,,KOZLOV,
+2026,WRR,M,H6,Ramp,B,2,Assigned,,,,FRIEDENSON,
+2026,WRR,M,H6,Ramp,Y,1,Assigned,,,,BILLAUT T,
