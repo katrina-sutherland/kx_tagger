@@ -2324,3 +2324,8 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WRR,W,QF2,1st Up,Y,1,Left-Up,3,,SPLIT,,
 2026,WRR,W,QF2,1st Up,B,2,Left-Up,4,,FOLLOW,,
 2026,WRR,W,QF2,Next Gate,R,4,Down-Right,1,,,,
+2026,WRR,W,QF2,Next Gate,G,3,Down-Right,2,,,,
+2026,WRR,W,QF2,Next Gate,B,2,Down-Right,3,,,,
+2026,WRR,W,QF2,Next Gate,Y,1,Down-Right,4,,,,
+2026,WRR,W,QF2,2nd Up,R,4,Left-Up,1,,Left-Up,,
+2026,WRR,W,QF2,2nd Up,G,3,Right-Up,2,,SPLIT,,
