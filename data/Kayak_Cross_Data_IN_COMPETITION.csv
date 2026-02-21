@@ -3020,3 +3020,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WC1,M,H2,Ramp,B,3,Assigned,,,,MACRAE Rhys,
 2026,WC1,M,H2,Ramp,Y,2,Assigned,,,,KOZLOV Ivan,
 2026,WC1,M,H2,Ramp,G,1,Assigned,,,,BASSETT Kaylen,
+2026,WC1,M,H2,1st Up,R,4,Left-Up,1,,Left-Up,,
+2026,WC1,M,H2,1st Up,B,3,Left-Up,2,,FOLLOW,,
+2026,WC1,M,H2,1st Up,G,1,Right-Up,3,,SPLIT,,
+2026,WC1,M,H2,1st Up,Y,2,Right-Up,4,,FOLLOW,,
