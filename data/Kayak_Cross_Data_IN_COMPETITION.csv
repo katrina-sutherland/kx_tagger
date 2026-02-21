@@ -2904,3 +2904,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WC1,W,H5,Ramp,G,3,Assigned,,,,ZWOLINSKA Klaudia,
 2026,WC1,W,H5,Ramp,Y,2,Assigned,,,,DAVIES Stella,
 2026,WC1,W,H5,Ramp,R,1,Assigned,,,,BEKOVA Katerina,
+2026,WC1,W,H5,1st Up,R,1,Right-Up,1,,Right-Up,,
+2026,WC1,W,H5,1st Up,B,4,Right-Up,2,,FOLLOW,,
+2026,WC1,W,H5,1st Up,Y,2,Right-Up,3,,FOLLOW,,
+2026,WC1,W,H5,1st Up,G,3,Left-Up,4,,SPLIT,,
