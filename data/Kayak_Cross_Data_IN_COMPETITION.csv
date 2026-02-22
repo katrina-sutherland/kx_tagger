@@ -3425,3 +3425,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WC1,W,SF2,Finish,Y,2,Finish,2,2,,,
 2026,WC1,W,SF2,Finish,B,1,Finish,3,3,,,
 2026,WC1,W,SF2,Finish,G,3,Finish,4,4,,,
+2026,WC1,M,SF1,Ramp,G,4,Assigned,,,,BUTCHER Finn,
+2026,WC1,M,SF1,Ramp,B,3,Assigned,,,,ANDERSON Timothy,
+2026,WC1,M,SF1,Ramp,Y,2,Assigned,,,,CROSBEE Mark,
+2026,WC1,M,SF1,Ramp,R,1,Assigned,,,,RUDORFER Martin,
