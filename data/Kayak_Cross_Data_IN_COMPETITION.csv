@@ -3497,3 +3497,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WC1,W,Final,Finish,G,3,Finish,2,2,,,
 2026,WC1,W,Final,Finish,R,4,Finish,3,3,,,
 2026,WC1,W,Final,Finish,B,1,Finish,4,4,,,
+2026,WC1,M,Final,Ramp,R,4,Assigned,,,,NOVAK Matyas,
+2026,WC1,M,Final,Ramp,B,3,Assigned,,,,DELFOUR Lucien,
+2026,WC1,M,Final,Ramp,Y,2,Assigned,,,,ANDERSON Timothy,
+2026,WC1,M,Final,Ramp,G,1,Assigned,,,,RUDORFER Martin,
