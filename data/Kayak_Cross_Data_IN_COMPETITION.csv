@@ -3477,3 +3477,7 @@ Year,Competition,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final Position
 2026,WC1,W,Final,Ramp,G,3,Assigned,,,,WOODS Kimberley,
 2026,WC1,W,Final,Ramp,Y,2,Assigned,,,,PANKOVA Zuzana,
 2026,WC1,W,Final,Ramp,B,1,Assigned,,,,DAVIDSON Codie,
+2026,WC1,W,Final,1st Up,B,1,Right-Up,1,,Right-Up,,
+2026,WC1,W,Final,1st Up,Y,2,Right-Up,2,,FOLLOW,,
+2026,WC1,W,Final,1st Up,R,4,Left-Up,3,,SPLIT,,
+2026,WC1,W,Final,1st Up,G,3,Left-Up,4,,FOLLOW,,
