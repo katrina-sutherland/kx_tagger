@@ -379,7 +379,15 @@
         let selectorsFull, filterControlsFull, selectorsCompact, filterControlsCompact, selectorsAthlete, selectorsSummary;
 
         // --- TAB HANDLING ---
-        function setActiveTab(activeTab) {
+        // Map tab elements to URL hash values for persistence across refreshes
+        const tabHashMap = {
+            'tab-full': 'full-report',
+            'tab-compact': 'in-competition',
+            'tab-athlete': 'athlete-profile',
+            'tab-summary': 'season-summary'
+        };
+
+        function setActiveTab(activeTab, updateHash = true) {
             const tabs = [tabFull, tabCompact, tabAthlete, tabSummary];
             const reports = [reportFull, reportCompact, reportAthlete, reportSummary];
 
@@ -392,6 +400,24 @@
             reports.forEach((report, index) => {
                 report.classed("hidden", tabs[index].node() !== activeTab.node());
             });
+
+            // Persist active tab in URL hash so refresh returns to the same tab
+            if (updateHash) {
+                const tabId = activeTab.attr('id');
+                const hashValue = tabHashMap[tabId] || 'full-report';
+                history.replaceState(null, null, '#' + hashValue);
+            }
+        }
+
+        function getTabFromHash() {
+            const hash = location.hash.replace('#', '');
+            const hashToTab = {
+                'full-report': tabFull,
+                'in-competition': tabCompact,
+                'athlete-profile': tabAthlete,
+                'season-summary': tabSummary
+            };
+            return hashToTab[hash] || null;
         }
 
         // --- DATA PARSING ---
@@ -609,6 +635,14 @@
                     tabCompact.on("click", () => { setActiveTab(tabCompact); if (masterDataCompact.length > 0) updateAllChartsCompact(); });
                     tabAthlete.on("click", () => { setActiveTab(tabAthlete); });
                     tabSummary.on("click", () => { setActiveTab(tabSummary); });
+                }
+
+                // Restore active tab from URL hash (so refresh stays on the same tab)
+                const savedTab = getTabFromHash();
+                if (savedTab && savedTab.node() !== tabFull.node()) {
+                    setActiveTab(savedTab, false);
+                    // Trigger chart rendering for the restored tab
+                    if (savedTab.node() === tabCompact.node() && masterDataCompact.length > 0) updateAllChartsCompact();
                 }
 
                 window.addEventListener('resize', () => {
@@ -1422,7 +1456,7 @@
             xAxis.selectAll(".tick text").style("fill", d => {
                 if (d === 'Finish' || d === 'Start') return '#94a3b8';
                 if (d === 'Roll' || rollGates.includes(d)) return '#eab308'; // Yellow for Rolls
-                if (d === '1st Up' || d === '2nd Up' || upstreamGates.includes(d)) return '#ef4444'; // Red for Upstreams
+                if (upstreamGates.includes(d)) return '#ef4444'; // Red for Upstreams
                 return '#22c55e'; // Green for Downstreams
             });
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
