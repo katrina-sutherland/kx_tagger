@@ -448,6 +448,7 @@
                 let gate = d.Gate || '';
                 if (gate.startsWith('Gate ')) gate = gate.replace('Gate ', '');
                 else if (gate === 'Course') gate = 'Roll';
+                else if (gate === 'Special') gate = 'SG';
 
                 const bib = d.BIB || d.Bib || '';
                 const position = +(d.Order || d.Position || 0);
@@ -975,6 +976,18 @@
                     d.displayTactic = d.UpstreamTactic;
                 }
             });
+
+            // --- SPECIAL GATE: Set displayTactic to L or R based on Action ---
+            raceData.forEach(d => {
+                if (d.Gate === 'SG') {
+                    const action = (d.Action || '').toLowerCase();
+                    if (action.includes('left')) {
+                        d.displayTactic = 'L';
+                    } else if (action.includes('right')) {
+                        d.displayTactic = 'R';
+                    }
+                }
+            });
         }
 
         // --- NEW: Helper Function to Calculate Rankings for a given race dataset ---
@@ -1400,7 +1413,8 @@
                 const pointsData = values.filter(d => d.Gate !== 'Start');
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    if (upstreamGates.includes(d.Gate) && d.displayTactic) {
+                    const showLabel = (upstreamGates.includes(d.Gate) || d.Gate === 'SG') && d.displayTactic;
+                    if (showLabel) {
                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
                         let yPos = yBase - 12;
@@ -1487,7 +1501,8 @@
                 const pointsData = values.filter(d => d.Gate !== 'Start');
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    if (upstreamGates.includes(d.Gate) && d.displayTactic) {
+                    const showLabel = (upstreamGates.includes(d.Gate) || d.Gate === 'SG') && d.displayTactic;
+                    if (showLabel) {
                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
                         let yPos = yBase - 12;
