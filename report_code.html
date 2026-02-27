@@ -531,6 +531,54 @@
             return { orderedGates: finalOrder, upstreamGates: Array.from(detectedUpstreams) };
         }
 
+        /**
+         * Derives gate order and upstream gates from a single race's data only.
+         * Use this for Full Report so gate order and upstream tactic logic match the tagged data
+         * for this competition and phase (not other phases).
+         * - orderedGates: gates that appear in this race, in the order given by fallbackOrderedGates.
+         * - upstreamGates: only gates where in THIS race we have Action containing 'Up' or gate is SG (Special).
+         *   Downstream gates are never treated as upstream, so FOLLOW/SPLIT logic applies only to Up and SG.
+         */
+        function getRaceStructure(raceData, fallbackOrderedGates) {
+            if (!raceData || raceData.length === 0) {
+                return { orderedGates: fallbackOrderedGates || [], upstreamGates: [] };
+            }
+
+            const gatesInRace = new Set();
+            raceData.forEach(d => {
+                const g = d.Gate;
+                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish') gatesInRace.add(g);
+            });
+
+            // Upstream: only gates where in this race we have Action containing 'Up' (upstream) or gate is SG (Special)
+            const upstreamGates = new Set();
+            raceData.forEach(d => {
+                const gate = d.Gate;
+                if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+                const action = (d.Action || '').toLowerCase();
+                if (action.includes('up') || gate === 'SG') upstreamGates.add(gate);
+            });
+
+            // Order: gates in this race, in fallback (competition) order so layout is consistent
+            let orderedGates = (fallbackOrderedGates && fallbackOrderedGates.length > 0)
+                ? fallbackOrderedGates.filter(g => gatesInRace.has(g))
+                : [];
+
+            if (orderedGates.length === 0) {
+                orderedGates = [...gatesInRace];
+                orderedGates.sort((a, b) => {
+                    if (a === 'Roll') return 0;
+                    if (b === 'Roll') return 1;
+                    if (a === 'SG') return 1;
+                    if (b === 'SG') return -1;
+                    const na = parseInt(a, 10); const nb = parseInt(b, 10);
+                    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+                    return String(a).localeCompare(String(b));
+                });
+            }
+
+            return { orderedGates, upstreamGates: Array.from(upstreamGates) };
+        }
 
         // --- INITIALIZATION ---
         async function loadInitialData() {
