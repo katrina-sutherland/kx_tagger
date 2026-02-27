@@ -488,19 +488,16 @@
                 return { orderedGates: ['1', '2', '3', '4', '5', '6', 'Roll', '7', '8'], upstreamGates: ['2', '8'] };
             }
 
+            // Only add gate to upstream list when Action is a primary upstream choice (Up, Up-Left, Up-Right), not carryover (Up-Up, FOLLOW, SPLIT)
             const detectedUpstreams = new Set();
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+                if (gate === 'SG') { detectedUpstreams.add(gate); return; }
 
-                const action = d.Action || "";
-                const tactic = d.UpstreamTactic || "";
-                const isUpstreamAction = (action.includes('Up') || action.includes('up'));
-                const isUpstreamTactic = (tactic.trim().length > 0);
-
-                if (isUpstreamAction || isUpstreamTactic) {
-                    detectedUpstreams.add(gate);
-                }
+                const action = (d.Action || "").trim().toLowerCase();
+                const isPrimaryUpstream = action === 'up' || action === 'up-left' || action === 'up-right';
+                if (isPrimaryUpstream) detectedUpstreams.add(gate);
             });
 
             const runs = {};
@@ -532,14 +529,14 @@
         }
 
         /**
-         * Derives gate order and upstream gates from a single race's data only.
-         * Use this for Full Report so gate order and upstream tactic logic match the tagged data
-         * for this competition and phase (not other phases).
+         * Derives gate order and upstream gates from a single race's data.
          * - orderedGates: gates that appear in this race, in the order given by fallbackOrderedGates.
-         * - upstreamGates: only gates where in THIS race we have Action containing 'Up' or gate is SG (Special).
-         *   Downstream gates are never treated as upstream, so FOLLOW/SPLIT logic applies only to Up and SG.
+         * - upstreamGates: only gates that are BOTH (a) in the competition's known upstream list and
+         *   (b) have upstream-style Action in this race. This prevents downstream gates (e.g. Gate 7)
+         *   from being marked upstream when the CSV has carryover (e.g. "Up-Up" from a previous gate).
+         *   SG (Special) is always treated as tactical if it appears in the race.
          */
-        function getRaceStructure(raceData, fallbackOrderedGates) {
+        function getRaceStructure(raceData, fallbackOrderedGates, competitionUpstreamGates) {
             if (!raceData || raceData.length === 0) {
                 return { orderedGates: fallbackOrderedGates || [], upstreamGates: [] };
             }
@@ -550,16 +547,28 @@
                 if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish') gatesInRace.add(g);
             });
 
-            // Upstream: only gates where in this race we have Action containing 'Up' (upstream) or gate is SG (Special)
-            const upstreamGates = new Set();
+            const compUpstreamSet = new Set(competitionUpstreamGates || []);
+
+            // Candidates: gates where this race has upstream-style Action or SG
+            const upstreamCandidates = new Set();
             raceData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
                 const action = (d.Action || '').toLowerCase();
-                if (action.includes('up') || gate === 'SG') upstreamGates.add(gate);
+                if (gate === 'SG') {
+                    upstreamCandidates.add(gate);
+                    return;
+                }
+                if (action.includes('up')) upstreamCandidates.add(gate);
             });
 
-            // Order: gates in this race, in fallback (competition) order so layout is consistent
+            // Only treat as upstream if gate is in the competition's upstream list (stops carryover at downstream gates)
+            const upstreamGates = new Set();
+            upstreamCandidates.forEach(g => {
+                if (g === 'SG' || compUpstreamSet.has(g)) upstreamGates.add(g);
+            });
+
+            // Order: gates in this race, in fallback (competition) order
             let orderedGates = (fallbackOrderedGates && fallbackOrderedGates.length > 0)
                 ? fallbackOrderedGates.filter(g => gatesInRace.has(g))
                 : [];
@@ -1019,9 +1028,10 @@
                     }
                 }
             });
+            // Non-upstream gates: clear displayTactic so no carryover from previous upstream is shown
             raceData.forEach(d => {
                 if (!upstreamGates.includes(d.Gate)) {
-                    d.displayTactic = d.UpstreamTactic;
+                    d.displayTactic = '';
                 }
             });
 
@@ -1594,7 +1604,14 @@
             };
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
             const currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
-            calculateTacticLogic(currentRaceData, structure.upstreamGates); // Full report uses raw gate names
+
+            // Gate order and upstream from race; upstream only where competition says upstream (stops carryover e.g. Gate 7)
+            const raceStructure = getRaceStructure(currentRaceData, structure.orderedGates, structure.upstreamGates);
+            const courseDisplayOrder = raceStructure.orderedGates.length > 0 ? raceStructure.orderedGates : structure.orderedGates;
+            const upstreamGatesFull = raceStructure.upstreamGates;
+
+            calculateTacticLogic(currentRaceData, upstreamGatesFull);
+
             const bibToNameMap = new Map();
             const rampPositions = new Map();
             const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
@@ -1604,7 +1621,6 @@
             currentRaceData.forEach(d => {
                 if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
             });
-            const courseDisplayOrder = structure.orderedGates;
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
             const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataFull = [];
@@ -1613,16 +1629,17 @@
                 const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
                 const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
                 lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                const gateData = athleteRaceData.filter(d => d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0);
+                const gateData = athleteRaceData.filter(d =>
+                    d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0 && courseDisplayOrder.includes(d.Gate)
+                );
                 lineChartReadyDataFull.push(...gateData);
                 if (finalPosition) {
                     lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
                 }
             });
-            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, structure.upstreamGates);
+            drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGatesFull);
 
-            // Add Fault Analysis Call
-            updateFaultAnalysis("#fault-analysis-full", currentRaceData, structure.orderedGates, bibToNameMap);
+            updateFaultAnalysis("#fault-analysis-full", currentRaceData, courseDisplayOrder, bibToNameMap);
 
             const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             const uniqueFinalPositions = [];
