@@ -496,7 +496,7 @@
                 if (gate === 'SG') { detectedUpstreams.add(gate); return; }
 
                 const action = (d.Action || "").trim().toLowerCase();
-                const isPrimaryUpstream = action === 'up' || action === 'up-left' || action === 'up-right';
+                const isPrimaryUpstream = action.includes('up') && action !== 'up';
                 if (isPrimaryUpstream) detectedUpstreams.add(gate);
             });
 
