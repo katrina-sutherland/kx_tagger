@@ -493,7 +493,7 @@
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
-                if (gate === 'SG') { detectedUpstreams.add(gate); return; }
+                if (gate === 'SG') return; // SG is a downstream gate, skip upstream detection
 
                 const action = (d.Action || "").trim().toLowerCase();
                 const isPrimaryUpstream = action.includes('up') && action !== 'up';
@@ -534,7 +534,8 @@
          * - upstreamGates: only gates that are BOTH (a) in the competition's known upstream list and
          *   (b) have upstream-style Action in this race. This prevents downstream gates (e.g. Gate 7)
          *   from being marked upstream when the CSV has carryover (e.g. "Up-Up" from a previous gate).
-         *   SG (Special) is always treated as tactical if it appears in the race.
+         *   SG (Special) is a downstream gate — it is NOT added to upstream gates.
+         *   Its L/R direction labels are handled independently in calculateTacticLogic.
          */
         function getRaceStructure(raceData, fallbackOrderedGates, competitionUpstreamGates) {
             if (!raceData || raceData.length === 0) {
@@ -554,18 +555,15 @@
             raceData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+                if (gate === 'SG') return; // SG is downstream, skip upstream detection
                 const action = (d.Action || '').toLowerCase();
-                if (gate === 'SG') {
-                    upstreamCandidates.add(gate);
-                    return;
-                }
                 if (action.includes('up')) upstreamCandidates.add(gate);
             });
 
             // Only treat as upstream if gate is in the competition's upstream list (stops carryover at downstream gates)
             const upstreamGates = new Set();
             upstreamCandidates.forEach(g => {
-                if (g === 'SG' || compUpstreamSet.has(g)) upstreamGates.add(g);
+                if (compUpstreamSet.has(g)) upstreamGates.add(g);
             });
 
             // Order: gates in this race, in fallback (competition) order
@@ -1804,3 +1802,5 @@
         });
     </script>
 </body>
+
+</html>
