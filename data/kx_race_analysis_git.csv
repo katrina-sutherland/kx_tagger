@@ -28,7 +28,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R1,Gate 7,B,3,Down-Through,3,,,,,
 2024,OLY,Paris,W,R1,Gate 8,R,1,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,W,R1,Gate 8,G,2,Left-Up,2,,FOLLOW,,,
-2024,OLY,Paris,W,R1,Gate 8,B,3,Left-Up,3,,FOLLOW,,,FLT
+2024,OLY,Paris,W,R1,Gate 8,B,3,Left-Up,3,,FOLLOW,,FLT,
 2024,OLY,Paris,W,R1,Finish,R,1,Finish,1,1,,,,
 2024,OLY,Paris,W,R1,Finish,G,2,Finish,2,2,,,,
 2024,OLY,Paris,W,R1,Finish,B,3,Finish,3,3,,,,
@@ -81,7 +81,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R3,Gate 3,B,3,Down-Right,2,,,,,
 2024,OLY,Paris,W,R3,Gate 3,G,2,Down-Right,3,,,,,
 2024,OLY,Paris,W,R3,Gate 4,R,1,Down-Left,1,,,,,
-2024,OLY,Paris,W,R3,Gate 4,B,3,Down-Left,2,,,,,FLT
+2024,OLY,Paris,W,R3,Gate 4,B,3,Down-Left,2,,,,FLT,
 2024,OLY,Paris,W,R3,Gate 4,G,2,Down-Left,3,,,,,
 2024,OLY,Paris,W,R3,Gate 5,R,1,Down-Left,1,,,,,
 2024,OLY,Paris,W,R3,Gate 5,B,3,Down-Left,2,,,,,
@@ -157,7 +157,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R5,Gate 6,B,3,Down-Right,3,,,,,
 2024,OLY,Paris,W,R5,Gate 7,G,1,Down-Through,1,,,,,
 2024,OLY,Paris,W,R5,Gate 7,B,3,Down-Through,2,,,,,
-2024,OLY,Paris,W,R5,Gate 7,R,2,Down-Through,3,,,,,FLT
+2024,OLY,Paris,W,R5,Gate 7,R,2,Down-Through,3,,,,FLT,
 2024,OLY,Paris,W,R5,Gate 8,G,1,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,W,R5,Gate 8,B,3,Left-Up,2,,SPLIT,,,
 2024,OLY,Paris,W,R5,Gate 8,R,2,Left-Up,3,,FOLLOW,,,
@@ -174,7 +174,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R6,Course,G,2,Roll,2,,,,,
 2024,OLY,Paris,W,R6,Course,B,4,Roll,3,,,,,
 2024,OLY,Paris,W,R6,Gate 2,R,1,Left-Up,1,,Left-Up,,,
-2024,OLY,Paris,W,R6,Gate 2,G,2,Right-Up,2,,SPLIT,,,FLT
+2024,OLY,Paris,W,R6,Gate 2,G,2,Right-Up,2,,SPLIT,,FLT,
 2024,OLY,Paris,W,R6,Gate 2,B,4,Left-Up,3,,SPLIT,,,
 2024,OLY,Paris,W,R6,Gate 3,R,1,Down-Right,1,,,,,
 2024,OLY,Paris,W,R6,Gate 3,G,2,Down-Right,2,,,,,
@@ -253,7 +253,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R8,Gate 4,R,1,Down-Left,1,,,,,
 2024,OLY,Paris,W,R8,Gate 4,B,3,Down-Left,2,,,,,
 2024,OLY,Paris,W,R8,Gate 4,G,2,Down-Left,3,,,,,
-2024,OLY,Paris,W,R8,Gate 4,Y,4,Down-Left,4,,,,,FLT
+2024,OLY,Paris,W,R8,Gate 4,Y,4,Down-Left,4,,,,FLT,
 2024,OLY,Paris,W,R8,Gate 5,R,1,Down-Left,1,,,,,
 2024,OLY,Paris,W,R8,Gate 5,B,3,Down-Left,2,,,,,
 2024,OLY,Paris,W,R8,Gate 5,G,2,Down-Left,3,,,,,
@@ -281,7 +281,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R9,Gate 1,G,2,Down-Left,1,,,,,
 2024,OLY,Paris,W,R9,Gate 1,R,1,Down-Left,2,,,,,
 2024,OLY,Paris,W,R9,Gate 1,B,4,Down-Left,3,,,,,
-2024,OLY,Paris,W,R9,Gate 1,Y,3,Down-Left,4,,,,,FLT
+2024,OLY,Paris,W,R9,Gate 1,Y,3,Down-Left,4,,,,FLT,
 2024,OLY,Paris,W,R9,Course,G,2,Roll,1,,,,,
 2024,OLY,Paris,W,R9,Course,R,1,Roll,2,,,,,
 2024,OLY,Paris,W,R9,Course,B,4,Roll,3,,,,,
@@ -348,8 +348,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R10,Gate 5,G,1,Down-Left,4,,,,,
 2024,OLY,Paris,W,R10,Gate 6,R,2,Down-Right,1,,,,,
 2024,OLY,Paris,W,R10,Gate 6,B,3,Down-Right,2,,,,,
-2024,OLY,Paris,W,R10,Gate 6,Y,4,Down-Right,3,,,,,FLT
-2024,OLY,Paris,W,R10,Gate 6,G,1,Down-Right,4,,,,,FLT
+2024,OLY,Paris,W,R10,Gate 6,Y,4,Down-Right,3,,,,FLT,
+2024,OLY,Paris,W,R10,Gate 6,G,1,Down-Right,4,,,,FLT,
 2024,OLY,Paris,W,R10,Gate 7,R,2,Down-Through,1,,,,,
 2024,OLY,Paris,W,R10,Gate 7,B,3,Down-Through,2,,,,,
 2024,OLY,Paris,W,R10,Gate 7,Y,4,Down-Through,3,,,,,
@@ -373,13 +373,13 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,R11,Course,R,2,Roll,1,,,,,
 2024,OLY,Paris,W,R11,Course,Y,1,Roll,2,,,,,
 2024,OLY,Paris,W,R11,Course,B,4,Roll,3,,,,,
-2024,OLY,Paris,W,R11,Course,G,3,Roll,4,,,,,FLT
+2024,OLY,Paris,W,R11,Course,G,3,Roll,4,,,,FLT,
 2024,OLY,Paris,W,R11,Gate 2,R,2,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,W,R11,Gate 2,Y,1,Right-Up,2,,FOLLOW,,,
 2024,OLY,Paris,W,R11,Gate 2,B,4,Right-Up,3,,FOLLOW,,,
-2024,OLY,Paris,W,R11,Gate 2,G,3,Right-Up,4,,FOLLOW,,,FLT
+2024,OLY,Paris,W,R11,Gate 2,G,3,Right-Up,4,,FOLLOW,,FLT,
 2024,OLY,Paris,W,R11,Gate 3,R,2,Down-Right,1,,,,,
-2024,OLY,Paris,W,R11,Gate 3,G,3,Down-Right,2,,,,,FLT
+2024,OLY,Paris,W,R11,Gate 3,G,3,Down-Right,2,,,,FLT,
 2024,OLY,Paris,W,R11,Gate 3,Y,1,Down-Right,3,,,,,
 2024,OLY,Paris,W,R11,Gate 3,B,4,Down-Right,4,,,,,
 2024,OLY,Paris,W,R11,Gate 4,R,2,Down-Left,1,,,,,
@@ -500,7 +500,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,Rep3,Gate 7,G,1,Down-Through,2,,,,,
 2024,OLY,Paris,W,Rep3,Gate 7,B,3,Down-Through,3,,,,,
 2024,OLY,Paris,W,Rep3,Gate 8,R,2,Left-Up,1,,Left-Up,,,
-2024,OLY,Paris,W,Rep3,Gate 8,G,1,Right-Up,2,,SPLIT,,,FLT
+2024,OLY,Paris,W,Rep3,Gate 8,G,1,Right-Up,2,,SPLIT,,FLT,
 2024,OLY,Paris,W,Rep3,Gate 8,B,3,Right-Up,3,,FOLLOW,,,
 2024,OLY,Paris,W,Rep3,Finish,R,2,Finish,1,1,,,,
 2024,OLY,Paris,W,Rep3,Finish,G,1,Finish,2,2,,,,
@@ -609,7 +609,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,H1,Gate 7,Y,4,Down-Through,4,,,,,
 2024,OLY,Paris,W,H1,Gate 8,R,2,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,W,H1,Gate 8,B,1,Left-Up,2,,SPLIT,,,
-2024,OLY,Paris,W,H1,Gate 8,G,3,Left-Up,3,,FOLLOW,,,FLT
+2024,OLY,Paris,W,H1,Gate 8,G,3,Left-Up,3,,FOLLOW,,FLT,
 2024,OLY,Paris,W,H1,Gate 8,Y,4,Right-Up,4,,SPLIT,,,
 2024,OLY,Paris,W,H1,Finish,R,2,Finish,1,1,,,,
 2024,OLY,Paris,W,H1,Finish,B,1,Finish,2,2,,,,
@@ -625,7 +625,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,H2,Gate 1,Y,4,Down-Left,4,,,,,
 2024,OLY,Paris,W,H2,Course,G,1,Roll,1,,,,,
 2024,OLY,Paris,W,H2,Course,B,3,Roll,2,,,,,
-2024,OLY,Paris,W,H2,Course,R,2,Roll,3,,,,,FLT
+2024,OLY,Paris,W,H2,Course,R,2,Roll,3,,,,FLT,
 2024,OLY,Paris,W,H2,Course,Y,4,Roll,4,,,,,
 2024,OLY,Paris,W,H2,Gate 2,G,1,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,W,H2,Gate 2,B,3,Left-Up,2,,SPLIT,,,
@@ -714,7 +714,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,H4,Course,R,2,Roll,1,,,,,
 2024,OLY,Paris,W,H4,Course,G,1,Roll,2,,,,,
 2024,OLY,Paris,W,H4,Course,B,3,Roll,3,,,,,
-2024,OLY,Paris,W,H4,Course,Y,4,Roll,4,,,,,FLT
+2024,OLY,Paris,W,H4,Course,Y,4,Roll,4,,,,FLT,
 2024,OLY,Paris,W,H4,Gate 2,R,2,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,W,H4,Gate 2,G,1,Left-Up,2,,SPLIT,,,
 2024,OLY,Paris,W,H4,Gate 2,B,3,Left-Up,3,,FOLLOW,,,
@@ -866,7 +866,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,H7,Gate 6,R,1,Down-Right,1,,,,,
 2024,OLY,Paris,W,H7,Gate 6,B,4,Down-Right,2,,,,,
 2024,OLY,Paris,W,H7,Gate 6,G,2,Down-Right,3,,,,,
-2024,OLY,Paris,W,H7,Gate 6,Y,3,Down-Right,4,,,,,FLT
+2024,OLY,Paris,W,H7,Gate 6,Y,3,Down-Right,4,,,,FLT,
 2024,OLY,Paris,W,H7,Gate 7,R,1,Down-Through,1,,,,,
 2024,OLY,Paris,W,H7,Gate 7,B,4,Down-Through,2,,,,,
 2024,OLY,Paris,W,H7,Gate 7,G,2,Down-Through,3,,,,,
@@ -993,7 +993,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,QF2,Gate 4,Y,4,Down-Left,4,,,,,
 2024,OLY,Paris,W,QF2,Gate 5,R,1,Down-Left,1,,,,,
 2024,OLY,Paris,W,QF2,Gate 5,G,2,Down-Left,2,,,,,
-2024,OLY,Paris,W,QF2,Gate 5,B,3,Down-Left,3,,,,,FLT
+2024,OLY,Paris,W,QF2,Gate 5,B,3,Down-Left,3,,,,FLT,
 2024,OLY,Paris,W,QF2,Gate 5,Y,4,Down-Left,4,,,,,
 2024,OLY,Paris,W,QF2,Gate 6,R,1,Down-Right,1,,,,,
 2024,OLY,Paris,W,QF2,Gate 6,G,2,Down-Right,2,,,,,
@@ -1026,7 +1026,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,QF3,Gate 2,G,2,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,W,QF3,Gate 2,Y,4,Right-Up,2,,SPLIT,,,
 2024,OLY,Paris,W,QF3,Gate 2,R,1,Left-Up,3,,SPLIT,,,
-2024,OLY,Paris,W,QF3,Gate 2,B,3,Right-Up,4,,SPLIT,,,FLT
+2024,OLY,Paris,W,QF3,Gate 2,B,3,Right-Up,4,,SPLIT,,FLT,
 2024,OLY,Paris,W,QF3,Gate 3,G,2,Down-Right,1,,,,,
 2024,OLY,Paris,W,QF3,Gate 3,Y,4,Down-Right,2,,,,,
 2024,OLY,Paris,W,QF3,Gate 3,R,1,Down-Right,3,,,,,
@@ -1065,7 +1065,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,QF4,Gate 1,Y,4,Down-Left,4,,,,,
 2024,OLY,Paris,W,QF4,Course,G,2,Roll,1,,,,,
 2024,OLY,Paris,W,QF4,Course,B,3,Roll,2,,,,,
-2024,OLY,Paris,W,QF4,Course,R,1,Roll,3,,,,,FLT
+2024,OLY,Paris,W,QF4,Course,R,1,Roll,3,,,,FLT,
 2024,OLY,Paris,W,QF4,Course,Y,4,Roll,4,,,,,
 2024,OLY,Paris,W,QF4,Gate 2,G,2,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,W,QF4,Gate 2,B,3,Left-Up,2,,SPLIT,,,
@@ -1125,11 +1125,11 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,SF1,Gate 4,G,2,Down-Left,4,,,,,
 2024,OLY,Paris,W,SF1,Gate 5,R,1,Down-Left,1,,,,,
 2024,OLY,Paris,W,SF1,Gate 5,Y,4,Down-Left,2,,,,,
-2024,OLY,Paris,W,SF1,Gate 5,B,3,Down-Left,3,,,,,FLT
+2024,OLY,Paris,W,SF1,Gate 5,B,3,Down-Left,3,,,,FLT,
 2024,OLY,Paris,W,SF1,Gate 5,G,2,Down-Left,4,,,,,
 2024,OLY,Paris,W,SF1,Gate 6,R,1,Down-Right,1,,,,,
 2024,OLY,Paris,W,SF1,Gate 6,B,3,Down-Right,2,,,,,
-2024,OLY,Paris,W,SF1,Gate 6,Y,4,Down-Right,3,,,,,FLT
+2024,OLY,Paris,W,SF1,Gate 6,Y,4,Down-Right,3,,,,FLT,
 2024,OLY,Paris,W,SF1,Gate 6,G,2,Down-Right,4,,,,,
 2024,OLY,Paris,W,SF1,Gate 7,R,1,Down-Through,1,,,,,
 2024,OLY,Paris,W,SF1,Gate 7,B,3,Down-Through,2,,,,,
@@ -1245,7 +1245,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,W,Final,Gate 2,G,2,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,W,Final,Gate 2,R,1,Right-Up,2,,SPLIT,,,
 2024,OLY,Paris,W,Final,Gate 2,B,3,Left-Up,3,,SPLIT,,,
-2024,OLY,Paris,W,Final,Gate 2,Y,4,Right-Up,4,,SPLIT,,,FLT
+2024,OLY,Paris,W,Final,Gate 2,Y,4,Right-Up,4,,SPLIT,,FLT,
 2024,OLY,Paris,W,Final,Gate 3,R,1,Down-Right,1,,,,,
 2024,OLY,Paris,W,Final,Gate 3,G,2,Down-Right,2,,,,,
 2024,OLY,Paris,W,Final,Gate 3,Y,4,Down-Right,3,,,,,
@@ -1285,7 +1285,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R1,Course,B,3,Roll,3,,,,,
 2024,OLY,Paris,M,R1,Gate 2,R,1,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,M,R1,Gate 2,G,2,Right-Up,2,,FOLLOW,,,
-2024,OLY,Paris,M,R1,Gate 2,B,3,Left-Up,3,,SPLIT,,,FLT
+2024,OLY,Paris,M,R1,Gate 2,B,3,Left-Up,3,,SPLIT,,FLT,
 2024,OLY,Paris,M,R1,Gate 3,R,1,Down-Right,1,,,,,
 2024,OLY,Paris,M,R1,Gate 3,G,2,Down-Right,2,,,,,
 2024,OLY,Paris,M,R1,Gate 3,B,3,Down-Right,3,,,,,
@@ -1309,7 +1309,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R1,Finish,B,3,Finish,3,3,,,,
 2024,OLY,Paris,M,R2,Ramp,B,1,Assigned,,,,REZANEJAD Amir,,
 2024,OLY,Paris,M,R2,Ramp,G,3,Assigned,,,,QUAN Xin,,
-2024,OLY,Paris,M,R2,Ramp,R,2,Assigned,,,,GONCALVES Pedro,,FLT
+2024,OLY,Paris,M,R2,Ramp,R,2,Assigned,,,,GONCALVES Pedro,FLT,
 2024,OLY,Paris,M,R2,Gate 1,R,2,Down-Left,1,,,,,
 2024,OLY,Paris,M,R2,Gate 1,G,3,Down-Left,2,,,,,
 2024,OLY,Paris,M,R2,Gate 1,B,1,Down-Left,3,,,,,
@@ -1330,13 +1330,13 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R2,Gate 5,B,1,Down-Left,3,,,,,
 2024,OLY,Paris,M,R2,Gate 6,R,2,Down-Right,1,,,,,
 2024,OLY,Paris,M,R2,Gate 6,G,3,Down-Right,2,,,,,
-2024,OLY,Paris,M,R2,Gate 6,B,1,Down-Right,3,,,,,FLT
+2024,OLY,Paris,M,R2,Gate 6,B,1,Down-Right,3,,,,FLT,
 2024,OLY,Paris,M,R2,Gate 7,R,2,Down-Through,1,,,,,
 2024,OLY,Paris,M,R2,Gate 7,G,3,Down-Through,2,,,,,
-2024,OLY,Paris,M,R2,Gate 7,B,1,Down-Through,3,,,,,FLT
+2024,OLY,Paris,M,R2,Gate 7,B,1,Down-Through,3,,,,FLT,
 2024,OLY,Paris,M,R2,Gate 8,R,2,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,M,R2,Gate 8,G,3,Right-Up,2,,SPLIT,,,
-2024,OLY,Paris,M,R2,Gate 8,B,1,Right-Up,3,,FOLLOW,,,FLT
+2024,OLY,Paris,M,R2,Gate 8,B,1,Right-Up,3,,FOLLOW,,FLT,
 2024,OLY,Paris,M,R2,Finish,R,2,Finish,1,1,,,,
 2024,OLY,Paris,M,R2,Finish,G,3,Finish,2,2,,,,
 2024,OLY,Paris,M,R2,Finish,B,1,Finish,3,3,,,,
@@ -1513,12 +1513,12 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R7,Course,B,4,Roll,4,,,,,
 2024,OLY,Paris,M,R7,Gate 2,R,2,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,M,R7,Gate 2,Y,3,Left-Up,2,,SPLIT,,,
-2024,OLY,Paris,M,R7,Gate 2,G,1,Right-Up,3,,SPLIT,,,FLT
+2024,OLY,Paris,M,R7,Gate 2,G,1,Right-Up,3,,SPLIT,,FLT,
 2024,OLY,Paris,M,R7,Gate 2,B,4,Left-Up,4,,SPLIT,,,
 2024,OLY,Paris,M,R7,Gate 3,R,2,Down-Right,1,,,,,
 2024,OLY,Paris,M,R7,Gate 3,Y,3,Down-Right,2,,,,,
 2024,OLY,Paris,M,R7,Gate 3,G,1,Down-Right,3,,,,,
-2024,OLY,Paris,M,R7,Gate 3,B,4,Down-Right,4,,,,,FLT
+2024,OLY,Paris,M,R7,Gate 3,B,4,Down-Right,4,,,,FLT,
 2024,OLY,Paris,M,R7,Gate 4,R,2,Down-Left,1,,,,,
 2024,OLY,Paris,M,R7,Gate 4,Y,3,Down-Left,2,,,,,
 2024,OLY,Paris,M,R7,Gate 4,G,1,Down-Left,3,,,,,
@@ -1538,7 +1538,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R7,Gate 8,R,2,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,M,R7,Gate 8,Y,3,Right-Up,2,,SPLIT,,,
 2024,OLY,Paris,M,R7,Gate 8,B,4,Left-Up,3,,SPLIT,,,
-2024,OLY,Paris,M,R7,Gate 8,G,1,Right-Up,4,,SPLIT,,,FLT
+2024,OLY,Paris,M,R7,Gate 8,G,1,Right-Up,4,,SPLIT,,FLT,
 2024,OLY,Paris,M,R7,Finish,R,2,Finish,1,1,,,,
 2024,OLY,Paris,M,R7,Finish,Y,3,Finish,2,2,,,,
 2024,OLY,Paris,M,R7,Finish,B,4,Finish,3,3,,,,
@@ -1602,7 +1602,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R9,Gate 2,G,1,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,M,R9,Gate 2,R,2,Left-Up,2,,SPLIT,,,
 2024,OLY,Paris,M,R9,Gate 2,Y,4,Right-Up,3,,SPLIT,,,
-2024,OLY,Paris,M,R9,Gate 2,B,3,Left-Up,4,,SPLIT,,,FLT
+2024,OLY,Paris,M,R9,Gate 2,B,3,Left-Up,4,,SPLIT,,FLT,
 2024,OLY,Paris,M,R9,Gate 3,G,1,Down-Right,1,,,,,
 2024,OLY,Paris,M,R9,Gate 3,R,2,Down-Right,2,,,,,
 2024,OLY,Paris,M,R9,Gate 3,Y,4,Down-Right,3,,,,,
@@ -1649,7 +1649,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R10,Gate 2,G,1,Left-Up,4,,SPLIT,,,
 2024,OLY,Paris,M,R10,Gate 3,R,2,Down-Right,1,,,,,
 2024,OLY,Paris,M,R10,Gate 3,B,3,Down-Right,2,,,,,
-2024,OLY,Paris,M,R10,Gate 3,Y,4,Down-Right,3,,,,,FLT
+2024,OLY,Paris,M,R10,Gate 3,Y,4,Down-Right,3,,,,FLT,
 2024,OLY,Paris,M,R10,Gate 3,G,1,Down-Right,4,,,,,
 2024,OLY,Paris,M,R10,Gate 4,R,2,Down-Left,1,,,,,
 2024,OLY,Paris,M,R10,Gate 4,B,3,Down-Left,2,,,,,
@@ -1670,7 +1670,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R10,Gate 8,R,2,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,M,R10,Gate 8,B,3,Left-Up,2,,SPLIT,,,
 2024,OLY,Paris,M,R10,Gate 8,Y,4,Left-Up,3,,FOLLOW,,,
-2024,OLY,Paris,M,R10,Gate 8,G,1,Right-Up,4,,SPLIT,,,FLT
+2024,OLY,Paris,M,R10,Gate 8,G,1,Right-Up,4,,SPLIT,,FLT,
 2024,OLY,Paris,M,R10,Finish,R,2,Finish,1,1,,,,
 2024,OLY,Paris,M,R10,Finish,B,3,Finish,2,2,,,,
 2024,OLY,Paris,M,R10,Finish,Y,4,Finish,3,3,,,,
@@ -1682,7 +1682,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,R11,Gate 1,R,2,Down-Left,1,,,,,
 2024,OLY,Paris,M,R11,Gate 1,B,3,Down-Left,2,,,,,
 2024,OLY,Paris,M,R11,Gate 1,Y,4,Down-Left,3,,,,,
-2024,OLY,Paris,M,R11,Gate 1,G,1,Down-Left,4,,,,,FLT
+2024,OLY,Paris,M,R11,Gate 1,G,1,Down-Left,4,,,,FLT,
 2024,OLY,Paris,M,R11,Course,R,2,Roll,1,,,,,
 2024,OLY,Paris,M,R11,Course,B,3,Roll,2,,,,,
 2024,OLY,Paris,M,R11,Course,Y,4,Roll,3,,,,,
@@ -1730,7 +1730,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,Rep1,Course,G,2,Roll,3,,,,,
 2024,OLY,Paris,M,Rep1,Gate 2,R,1,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,M,Rep1,Gate 2,B,3,Right-Up,2,,SPLIT,,,
-2024,OLY,Paris,M,Rep1,Gate 2,G,2,Right-Up,3,,FOLLOW,,,FLT
+2024,OLY,Paris,M,Rep1,Gate 2,G,2,Right-Up,3,,FOLLOW,,FLT,
 2024,OLY,Paris,M,Rep1,Gate 3,R,1,Down-Right,1,,,,,
 2024,OLY,Paris,M,Rep1,Gate 3,B,3,Down-Right,2,,,,,
 2024,OLY,Paris,M,Rep1,Gate 3,G,2,Down-Right,3,,,,,
@@ -1753,7 +1753,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,Rep1,Finish,B,3,Finish,2,2,,,,
 2024,OLY,Paris,M,Rep1,Finish,G,2,Finish,3,3,,,,
 2024,OLY,Paris,M,Rep2,Ramp,G,1,Assigned,,,,SAVSEK Benjamin,,
-2024,OLY,Paris,M,Rep2,Ramp,R,2,Assigned,,,,SOUDI Mathis,,FLT
+2024,OLY,Paris,M,Rep2,Ramp,R,2,Assigned,,,,SOUDI Mathis,FLT,
 2024,OLY,Paris,M,Rep2,Ramp,B,3,Assigned,,,,HEDWIG Grzegorz,,
 2024,OLY,Paris,M,Rep2,Gate 1,R,2,Down-Left,1,,,,,
 2024,OLY,Paris,M,Rep2,Gate 1,B,3,Down-Left,2,,,,,
@@ -1890,7 +1890,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,Rep5,Gate 8,R,2,Right-Up,1,,Right-Up,,,
 2024,OLY,Paris,M,Rep5,Gate 8,Y,4,Left-Up,2,,SPLIT,,,
 2024,OLY,Paris,M,Rep5,Gate 8,G,3,Left-Up,3,,FOLLOW,,,
-2024,OLY,Paris,M,Rep5,Gate 8,B,1,Right-Up,4,,SPLIT,,,FLT
+2024,OLY,Paris,M,Rep5,Gate 8,B,1,Right-Up,4,,SPLIT,,FLT,
 2024,OLY,Paris,M,Rep5,Finish,R,2,Finish,1,1,,,,
 2024,OLY,Paris,M,Rep5,Finish,Y,4,Finish,2,2,,,,
 2024,OLY,Paris,M,Rep5,Finish,G,3,Finish,3,3,,,,
@@ -2283,7 +2283,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,QF1,Gate 7,R,1,Down-Through,2,,,,,
 2024,OLY,Paris,M,QF1,Gate 7,Y,4,Down-Through,3,,,,,
 2024,OLY,Paris,M,QF1,Gate 7,B,3,Down-Through,4,,,,,
-2024,OLY,Paris,M,QF1,Gate 8,G,2,Right-Up,1,,Right-Up,,,FLT
+2024,OLY,Paris,M,QF1,Gate 8,G,2,Right-Up,1,,Right-Up,,FLT,
 2024,OLY,Paris,M,QF1,Gate 8,R,1,Left-Up,2,,SPLIT,,,
 2024,OLY,Paris,M,QF1,Gate 8,B,3,Right-Up,3,,SPLIT,,,
 2024,OLY,Paris,M,QF1,Gate 8,Y,4,Left-Up,4,,SPLIT,,,
@@ -2389,13 +2389,13 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,QF4,Gate 1,B,3,Down-Left,4,,,,,
 2024,OLY,Paris,M,QF4,Course,R,2,Roll,1,,,,,
 2024,OLY,Paris,M,QF4,Course,G,1,Roll,2,,,,,
-2024,OLY,Paris,M,QF4,Course,Y,4,Roll,3,,,,,FLT
+2024,OLY,Paris,M,QF4,Course,Y,4,Roll,3,,,,FLT,
 2024,OLY,Paris,M,QF4,Course,B,3,Roll,4,,,,,
 2024,OLY,Paris,M,QF4,Gate 2,R,2,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,M,QF4,Gate 2,G,1,Right-Up,2,,SPLIT,,,
 2024,OLY,Paris,M,QF4,Gate 2,B,3,Right-Up,3,,FOLLOW,,,
 2024,OLY,Paris,M,QF4,Gate 2,Y,4,Left-Up,4,,SPLIT,,,
-2024,OLY,Paris,M,QF4,Gate 3,R,2,Down-Right,1,,,,,FLT
+2024,OLY,Paris,M,QF4,Gate 3,R,2,Down-Right,1,,,,FLT,
 2024,OLY,Paris,M,QF4,Gate 3,G,1,Down-Right,2,,,,,
 2024,OLY,Paris,M,QF4,Gate 3,Y,4,Down-Right,3,,,,,
 2024,OLY,Paris,M,QF4,Gate 3,B,3,Down-Right,4,,,,,
@@ -2410,7 +2410,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,QF4,Gate 6,R,2,Down-Right,1,,,,,
 2024,OLY,Paris,M,QF4,Gate 6,G,1,Down-Right,2,,,,,
 2024,OLY,Paris,M,QF4,Gate 6,B,3,Down-Right,3,,,,,
-2024,OLY,Paris,M,QF4,Gate 6,Y,4,Down-Right,4,,,,,FLT
+2024,OLY,Paris,M,QF4,Gate 6,Y,4,Down-Right,4,,,,FLT,
 2024,OLY,Paris,M,QF4,Gate 7,R,2,Down-Through,1,,,,,
 2024,OLY,Paris,M,QF4,Gate 7,G,1,Down-Through,2,,,,,
 2024,OLY,Paris,M,QF4,Gate 7,B,3,Down-Through,3,,,,,
@@ -2418,7 +2418,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,QF4,Gate 8,R,2,Left-Up,1,,Left-Up,,,
 2024,OLY,Paris,M,QF4,Gate 8,G,1,Right-Up,2,,SPLIT,,,
 2024,OLY,Paris,M,QF4,Gate 8,B,3,Right-Up,3,,FOLLOW,,,
-2024,OLY,Paris,M,QF4,Gate 8,Y,4,Right-Up,4,,FOLLOW,,,FLT
+2024,OLY,Paris,M,QF4,Gate 8,Y,4,Right-Up,4,,FOLLOW,,FLT,
 2024,OLY,Paris,M,QF4,Finish,R,2,Finish,1,1,,,,
 2024,OLY,Paris,M,QF4,Finish,G,1,Finish,2,2,,,,
 2024,OLY,Paris,M,QF4,Finish,B,3,Finish,3,3,,,,
@@ -2497,7 +2497,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,SF2,Gate 5,B,3,Down-Left,4,,,,,
 2024,OLY,Paris,M,SF2,Gate 6,G,2,Down-Right,1,,,,,
 2024,OLY,Paris,M,SF2,Gate 6,R,1,Down-Right,2,,,,,
-2024,OLY,Paris,M,SF2,Gate 6,Y,4,Down-Right,3,,,,,FLT
+2024,OLY,Paris,M,SF2,Gate 6,Y,4,Down-Right,3,,,,FLT,
 2024,OLY,Paris,M,SF2,Gate 6,B,3,Down-Right,4,,,,,
 2024,OLY,Paris,M,SF2,Gate 7,G,2,Down-Through,1,,,,,
 2024,OLY,Paris,M,SF2,Gate 7,R,1,Down-Through,2,,,,,
@@ -2518,7 +2518,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,OLY,Paris,M,Small Final,Gate 1,Y,4,Down-Left,1,,,,,
 2024,OLY,Paris,M,Small Final,Gate 1,G,2,Down-Left,2,,,,,
 2024,OLY,Paris,M,Small Final,Gate 1,R,1,Down-Left,3,,,,,
-2024,OLY,Paris,M,Small Final,Gate 1,B,3,Down-Left,4,,,,,FLT
+2024,OLY,Paris,M,Small Final,Gate 1,B,3,Down-Left,4,,,,FLT,
 2024,OLY,Paris,M,Small Final,Course,Y,4,Roll,1,,,,,
 2024,OLY,Paris,M,Small Final,Course,R,1,Roll,2,,,,,
 2024,OLY,Paris,M,Small Final,Course,B,3,Roll,3,,,,,
@@ -2645,10 +2645,10 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,M,H2,Gate 1,G,4,Down-Left,4,,,,,
 2025,WC1,Seu,M,H2,Gate 2,Y,1,Right-Up,1,,Right-Up,,,
 2025,WC1,Seu,M,H2,Gate 2,B,2,Left-Up,2,,SPLIT,,,
-2025,WC1,Seu,M,H2,Gate 2,G,4,Left-Up,3,,FOLLOW,,,FLT
+2025,WC1,Seu,M,H2,Gate 2,G,4,Left-Up,3,,FOLLOW,,FLT,
 2025,WC1,Seu,M,H2,Gate 2,R,3,Left-Up,4,,FOLLOW,,,
 2025,WC1,Seu,M,H2,Gate 3,G,4,Down-Left,1,,,,,
-2025,WC1,Seu,M,H2,Gate 3,Y,1,Down-Left,2,,,,,FLT
+2025,WC1,Seu,M,H2,Gate 3,Y,1,Down-Left,2,,,,FLT,
 2025,WC1,Seu,M,H2,Gate 3,B,2,Down-Left,3,,,,,
 2025,WC1,Seu,M,H2,Gate 3,R,3,Down-Left,4,,,,,
 2025,WC1,Seu,M,H2,Gate 4,G,4,Down-Right,1,,,,,
@@ -2663,7 +2663,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,M,H2,Course,Y,1,Roll,2,,,,,
 2025,WC1,Seu,M,H2,Course,R,3,Roll,3,,,,,
 2025,WC1,Seu,M,H2,Course,B,2,Roll,4,,,,,
-2025,WC1,Seu,M,H2,Gate 6,R,3,Right-Up,1,,Right-Up,,,FLT
+2025,WC1,Seu,M,H2,Gate 6,R,3,Right-Up,1,,Right-Up,,FLT,
 2025,WC1,Seu,M,H2,Gate 6,G,4,Left-Up,2,,SPLIT,,,
 2025,WC1,Seu,M,H2,Gate 6,Y,1,Left-Up,3,,FOLLOW,,,
 2025,WC1,Seu,M,H2,Gate 6,B,2,Right-Up,4,,SPLIT,,,
@@ -2761,8 +2761,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,M,H5,Gate 3,Y,1,Down-Left,4,,,,,
 2025,WC1,Seu,M,H5,Gate 4,R,3,Down-Right,1,,,,,
 2025,WC1,Seu,M,H5,Gate 4,B,2,Down-Right,2,,,,,
-2025,WC1,Seu,M,H5,Gate 4,G,4,Down-Right,3,,,,,FLT
-2025,WC1,Seu,M,H5,Gate 4,Y,1,Down-Right,4,,,,,FLT
+2025,WC1,Seu,M,H5,Gate 4,G,4,Down-Right,3,,,,FLT,
+2025,WC1,Seu,M,H5,Gate 4,Y,1,Down-Right,4,,,,FLT,
 2025,WC1,Seu,M,H5,Gate 5,R,3,Down-Left,1,,,,,
 2025,WC1,Seu,M,H5,Gate 5,B,2,Down-Left,2,,,,,
 2025,WC1,Seu,M,H5,Gate 5,G,4,Down-Left,3,,,,,
@@ -2823,7 +2823,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,M,H7,Gate 1,G,4,Down-Left-Right,2,,,,,
 2025,WC1,Seu,M,H7,Gate 1,B,2,Down-Left-Right,3,,,,,
 2025,WC1,Seu,M,H7,Gate 1,Y,1,Down-Left,4,,,,,
-2025,WC1,Seu,M,H7,Gate 2,R,3,Right-Up,1,,Right-Up,,,FLT
+2025,WC1,Seu,M,H7,Gate 2,R,3,Right-Up,1,,Right-Up,,FLT,
 2025,WC1,Seu,M,H7,Gate 2,B,2,Left-Up,2,,SPLIT,,,
 2025,WC1,Seu,M,H7,Gate 2,G,4,Left-Up,3,,FOLLOW,,,
 2025,WC1,Seu,M,H7,Gate 2,Y,1,Right-Up,4,,SPLIT,,,
@@ -2866,7 +2866,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,M,H8,Gate 3,B,2,Down-Left,1,,,,,
 2025,WC1,Seu,M,H8,Gate 3,R,3,Down-Left,2,,,,,
 2025,WC1,Seu,M,H8,Gate 3,G,4,Down-Left,3,,,,,
-2025,WC1,Seu,M,H8,Gate 3,Y,1,Down-Left,4,,,,,FLT
+2025,WC1,Seu,M,H8,Gate 3,Y,1,Down-Left,4,,,,FLT,
 2025,WC1,Seu,M,H8,Gate 4,B,2,Down-Right,1,,,,,
 2025,WC1,Seu,M,H8,Gate 4,R,3,Down-Right,2,,,,,
 2025,WC1,Seu,M,H8,Gate 4,Y,1,Down-Right,3,,,,,
@@ -2897,7 +2897,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,M,QF1,Gate 1,G,3,Down,4,,,,,
 2025,WC1,Seu,M,QF1,Gate 2,B,2,Right-Up,1,,Right-Up,,,
 2025,WC1,Seu,M,QF1,Gate 2,R,4,Left-Up,2,,SPLIT,,,
-2025,WC1,Seu,M,QF1,Gate 2,G,3,Left-Up,3,,FOLLOW,,,FLT
+2025,WC1,Seu,M,QF1,Gate 2,G,3,Left-Up,3,,FOLLOW,,FLT,
 2025,WC1,Seu,M,QF1,Gate 2,Y,1,Right-Up,4,,SPLIT,,,
 2025,WC1,Seu,M,QF1,Gate 3,B,2,Down-Left,1,,,,,
 2025,WC1,Seu,M,QF1,Gate 3,R,4,Down-Left,2,,,,,
@@ -3013,7 +3013,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,M,QF4,Gate 3,G,2,Down-Left,4,,,,,
 2025,WC1,Seu,M,QF4,Gate 4,R,3,Down-Right,1,,,,,
 2025,WC1,Seu,M,QF4,Gate 4,B,4,Down-Right,2,,,,,
-2025,WC1,Seu,M,QF4,Gate 4,Y,1,Down-Right,3,,,,,FLT
+2025,WC1,Seu,M,QF4,Gate 4,Y,1,Down-Right,3,,,,FLT,
 2025,WC1,Seu,M,QF4,Gate 4,G,2,Down-Right,4,,,,,
 2025,WC1,Seu,M,QF4,Gate 5,R,3,Down-Left,1,,,,,
 2025,WC1,Seu,M,QF4,Gate 5,B,4,Down-Left,2,,,,,
@@ -3076,10 +3076,10 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,H1,Gate 1,G,2,Down-Left,3,,,,,
 2025,WC1,Seu,W,H1,Gate 1,Y,1,Down-Left,4,,,,,
 2025,WC1,Seu,W,H1,Gate 2,R,3,Left-Up,1,,Left-Up,,,
-2025,WC1,Seu,W,H1,Gate 2,B,4,Left-Up,2,,FOLLOW,,,FLT
+2025,WC1,Seu,W,H1,Gate 2,B,4,Left-Up,2,,FOLLOW,,FLT,
 2025,WC1,Seu,W,H1,Gate 2,G,2,Right-Up,3,,SPLIT,,,
 2025,WC1,Seu,W,H1,Gate 2,Y,1,Left-Up,4,,SPLIT,,,
-2025,WC1,Seu,W,H1,Gate 3,R,3,Down-Left,1,,,,,FLT
+2025,WC1,Seu,W,H1,Gate 3,R,3,Down-Left,1,,,,FLT,
 2025,WC1,Seu,W,H1,Gate 3,B,4,Down-Left,2,,,,,
 2025,WC1,Seu,W,H1,Gate 3,G,2,Down-Left,3,,,,,
 2025,WC1,Seu,W,H1,Gate 3,Y,1,Down-Left,4,,,,,
@@ -3118,7 +3118,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,H2,Gate 3,R,3,Down-Left,1,,,,,
 2025,WC1,Seu,W,H2,Gate 3,Y,1,Down-Left,2,,,,,
 2025,WC1,Seu,W,H2,Gate 3,B,2,Down-Left,3,,,,,
-2025,WC1,Seu,W,H2,Gate 3,G,4,Down-Left,4,,,,,FLT
+2025,WC1,Seu,W,H2,Gate 3,G,4,Down-Left,4,,,,FLT,
 2025,WC1,Seu,W,H2,Gate 4,R,3,Down-Right,1,,,,,
 2025,WC1,Seu,W,H2,Gate 4,Y,1,Down-Right,2,,,,,
 2025,WC1,Seu,W,H2,Gate 4,B,2,Down-Right,3,,,,,
@@ -3134,7 +3134,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,H2,Gate 6,R,3,Right-Up,1,,Right-Up,,,
 2025,WC1,Seu,W,H2,Gate 6,Y,1,Right-Up,2,,FOLLOW,,,
 2025,WC1,Seu,W,H2,Gate 6,B,2,Right-Up,3,,FOLLOW,,,
-2025,WC1,Seu,W,H2,Gate 6,G,4,Left-Up,4,,SPLIT,,,FLT
+2025,WC1,Seu,W,H2,Gate 6,G,4,Left-Up,4,,SPLIT,,FLT,
 2025,WC1,Seu,W,H2,Finish,R,3,Finish,1,1,,,,
 2025,WC1,Seu,W,H2,Finish,Y,1,Finish,2,2,,,,
 2025,WC1,Seu,W,H2,Finish,B,2,Finish,3,3,,,,
@@ -3302,7 +3302,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,H7,Gate 4,G,4,Down-Right,1,,,,,
 2025,WC1,Seu,W,H7,Gate 4,B,2,Down-Right,2,,,,,
 2025,WC1,Seu,W,H7,Gate 4,Y,1,Down-Right,3,,,,,
-2025,WC1,Seu,W,H7,Gate 4,R,3,Down-Right,4,,,,,FLT
+2025,WC1,Seu,W,H7,Gate 4,R,3,Down-Right,4,,,,FLT,
 2025,WC1,Seu,W,H7,Gate 5,G,4,Down-Left,1,,,,,
 2025,WC1,Seu,W,H7,Gate 5,B,2,Down-Left,2,,,,,
 2025,WC1,Seu,W,H7,Gate 5,Y,1,Down-Left,3,,,,,
@@ -3373,7 +3373,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,QF1,Gate 3,Y,1,Down-Left,4,,,,,
 2025,WC1,Seu,W,QF1,Gate 4,G,4,Down-Right,1,,,,,
 2025,WC1,Seu,W,QF1,Gate 4,R,3,Down-Right,2,,,,,
-2025,WC1,Seu,W,QF1,Gate 4,B,2,Down-Right,3,,,,,FLT
+2025,WC1,Seu,W,QF1,Gate 4,B,2,Down-Right,3,,,,FLT,
 2025,WC1,Seu,W,QF1,Gate 4,Y,1,Down-Right,4,,,,,
 2025,WC1,Seu,W,QF1,Gate 5,G,4,Down-Left,1,,,,,
 2025,WC1,Seu,W,QF1,Gate 5,R,3,Down-Left,2,,,,,
@@ -3402,7 +3402,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,QF2,Gate 2,Y,1,Right-Up,1,,Right-Up,,,
 2025,WC1,Seu,W,QF2,Gate 2,R,3,Right-Up,2,,FOLLOW,,,
 2025,WC1,Seu,W,QF2,Gate 2,G,4,Left-Up,3,,SPLIT,,,
-2025,WC1,Seu,W,QF2,Gate 2,B,2,Left-Up,4,,FOLLOW,,,FLT
+2025,WC1,Seu,W,QF2,Gate 2,B,2,Left-Up,4,,FOLLOW,,FLT,
 2025,WC1,Seu,W,QF2,Gate 3,Y,1,Down-Left,1,,,,,
 2025,WC1,Seu,W,QF2,Gate 3,R,3,Down-Left,2,,,,,
 2025,WC1,Seu,W,QF2,Gate 3,G,4,Down-Left,3,,,,,
@@ -3442,7 +3442,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,QF3,Gate 3,G,4,Down-Left,1,,,,,
 2025,WC1,Seu,W,QF3,Gate 3,R,3,Down-Left,2,,,,,
 2025,WC1,Seu,W,QF3,Gate 3,B,2,Down-Left,3,,,,,
-2025,WC1,Seu,W,QF3,Gate 3,Y,1,Down-Left,4,,,,,FLT
+2025,WC1,Seu,W,QF3,Gate 3,Y,1,Down-Left,4,,,,FLT,
 2025,WC1,Seu,W,QF3,Gate 4,G,4,Down-Right,1,,,,,
 2025,WC1,Seu,W,QF3,Gate 4,R,3,Down-Right,2,,,,,
 2025,WC1,Seu,W,QF3,Gate 4,B,2,Down-Right,3,,,,,
@@ -3560,7 +3560,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,SF2,Gate 5,B,2,Down-Left,4,,,,,
 2025,WC1,Seu,W,SF2,Course,R,3,Roll,1,,,,,
 2025,WC1,Seu,W,SF2,Course,G,4,Roll,2,,,,,
-2025,WC1,Seu,W,SF2,Course,Y,1,Roll,3,,,,,FLT
+2025,WC1,Seu,W,SF2,Course,Y,1,Roll,3,,,,FLT,
 2025,WC1,Seu,W,SF2,Course,B,2,Roll,4,,,,,
 2025,WC1,Seu,W,SF2,Gate 6,G,4,Left-Up,1,,Left-Up,,,
 2025,WC1,Seu,W,SF2,Gate 6,R,3,Left-Up,2,,FOLLOW,,,
@@ -3604,7 +3604,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,Seu,W,Final,Gate 6,B,2,Left-Up,4,,FOLLOW,,,
 2025,WC1,Seu,W,Final,Finish,R,3,Finish,1,1,,,,
 2025,WC1,Seu,W,Final,Finish,Y,1,Finish,2,2,,,,
-2025,WC1,Seu,W,Final,Finish,G,4,Finish,3,3,,,,RAL
+2025,WC1,Seu,W,Final,Finish,G,4,Finish,3,3,,,RAL,
 2025,WC1,Seu,W,Final,Finish,B,2,Finish,4,4,,,,
 2025,WC2,Pau,M,H1,Ramp,Y,1,Assigned,,,,SAVLI Jakob,,
 2025,WC2,Pau,M,H1,Ramp,B,2,Assigned,,,,DE COSTER Gabriel,,
@@ -3633,9 +3633,9 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H1,Gate 5,R,4,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,M,H1,Gate 5,B,2,Right-Up,2,,FOLLOW,,,
 2025,WC2,Pau,M,H1,Gate 5,Y,1,Right-Up,3,,FOLLOW,,,
-2025,WC2,Pau,M,H1,Gate 5,G,3,Right-Up,4,,FOLLOW,,,FLT
+2025,WC2,Pau,M,H1,Gate 5,G,3,Right-Up,4,,FOLLOW,,FLT,
 2025,WC2,Pau,M,H1,Gate 6,R,4,Down-Right,1,,,,,
-2025,WC2,Pau,M,H1,Gate 6,B,2,Down-Right,2,,,,,FLT
+2025,WC2,Pau,M,H1,Gate 6,B,2,Down-Right,2,,,,FLT,
 2025,WC2,Pau,M,H1,Gate 6,Y,1,Down-Right,3,,,,,
 2025,WC2,Pau,M,H1,Gate 6,G,3,Down-Right,4,,,,,
 2025,WC2,Pau,M,H1,Gate 7,R,4,Down-Left,1,,,,,
@@ -3711,7 +3711,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H3,Course,R,2,Roll,3,,,,,
 2025,WC2,Pau,M,H3,Course,Y,1,Roll,4,,,,,
 2025,WC2,Pau,M,H3,Gate 5,B,4,Right-Up,1,,Right-Up,,,
-2025,WC2,Pau,M,H3,Gate 5,G,3,Left-Up,2,,SPLIT,,,FLT
+2025,WC2,Pau,M,H3,Gate 5,G,3,Left-Up,2,,SPLIT,,FLT,
 2025,WC2,Pau,M,H3,Gate 5,Y,1,Left-Up,3,,FOLLOW,,,
 2025,WC2,Pau,M,H3,Gate 5,R,2,Left-Up,4,,FOLLOW,,,
 2025,WC2,Pau,M,H3,Gate 6,B,4,Down-Right,1,,,,,
@@ -3761,7 +3761,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H4,Gate 7,B,3,Down-Left,1,,,,,
 2025,WC2,Pau,M,H4,Gate 7,R,4,Down-Left,2,,,,,
 2025,WC2,Pau,M,H4,Gate 7,G,2,Down-Left,3,,,,,
-2025,WC2,Pau,M,H4,Gate 7,Y,1,Down-Left,4,,,,,FLT
+2025,WC2,Pau,M,H4,Gate 7,Y,1,Down-Left,4,,,,FLT,
 2025,WC2,Pau,M,H4,Finish,B,3,Finish,1,1,,,,
 2025,WC2,Pau,M,H4,Finish,R,4,Finish,2,2,,,,
 2025,WC2,Pau,M,H4,Finish,G,2,Finish,3,3,,,,
@@ -3775,7 +3775,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H5,Gate 1,B,2,Down-Right,3,,,,,
 2025,WC2,Pau,M,H5,Gate 1,Y,1,Down-Right,4,,,,,
 2025,WC2,Pau,M,H5,Gate 2,R,4,Right-Up,1,,Right-Up,,,
-2025,WC2,Pau,M,H5,Gate 2,B,2,Right-Up,2,,FOLLOW,,,FLT
+2025,WC2,Pau,M,H5,Gate 2,B,2,Right-Up,2,,FOLLOW,,FLT,
 2025,WC2,Pau,M,H5,Gate 2,Y,1,Left-Up,3,,SPLIT,,,
 2025,WC2,Pau,M,H5,Gate 2,G,3,Left-Up,4,,FOLLOW,,,
 2025,WC2,Pau,M,H5,Gate 3,R,4,Down-Left,1,,,,,
@@ -3833,10 +3833,10 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H6,Gate 5,Y,1,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,M,H6,Gate 5,B,3,Right-Up,2,,FOLLOW,,,
 2025,WC2,Pau,M,H6,Gate 5,R,2,Left-Up,3,,SPLIT,,,
-2025,WC2,Pau,M,H6,Gate 5,G,4,Left-Up,4,,FOLLOW,,,FLT
+2025,WC2,Pau,M,H6,Gate 5,G,4,Left-Up,4,,FOLLOW,,FLT,
 2025,WC2,Pau,M,H6,Gate 6,Y,1,Down-Right,1,,,,,
 2025,WC2,Pau,M,H6,Gate 6,B,3,Down-Right,2,,,,,
-2025,WC2,Pau,M,H6,Gate 6,R,2,Down-Right,3,,,,,FLT
+2025,WC2,Pau,M,H6,Gate 6,R,2,Down-Right,3,,,,FLT,
 2025,WC2,Pau,M,H6,Gate 6,G,4,Down-Right,4,,,,,
 2025,WC2,Pau,M,H6,Gate 7,Y,1,Down-Left,1,,,,,
 2025,WC2,Pau,M,H6,Gate 7,B,3,Down-Left,2,,,,,
@@ -3851,7 +3851,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H7,Ramp,G,3,Assigned,,,,BALDONI Alex,,
 2025,WC2,Pau,M,H7,Ramp,R,4,Assigned,,,,LORRENTE David,,
 2025,WC2,Pau,M,H7,Gate 1,R,4,Down-Right,1,,,,,
-2025,WC2,Pau,M,H7,Gate 1,G,3,Down-Right,2,,,,,FLT
+2025,WC2,Pau,M,H7,Gate 1,G,3,Down-Right,2,,,,FLT,
 2025,WC2,Pau,M,H7,Gate 1,B,2,Down-Right,3,,,,,
 2025,WC2,Pau,M,H7,Gate 1,Y,1,Down-Right,4,,,,,
 2025,WC2,Pau,M,H7,Gate 2,R,4,Right-Up,1,,Right-Up,,,
@@ -3873,7 +3873,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H7,Gate 5,R,4,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,M,H7,Gate 5,G,3,Left-Up,2,,SPLIT,,,
 2025,WC2,Pau,M,H7,Gate 5,B,2,Left-Up,3,,FOLLOW,,,
-2025,WC2,Pau,M,H7,Gate 5,Y,1,Left-Up,4,,FOLLOW,,,FLT
+2025,WC2,Pau,M,H7,Gate 5,Y,1,Left-Up,4,,FOLLOW,,FLT,
 2025,WC2,Pau,M,H7,Gate 6,R,4,Down-Right,1,,,,,
 2025,WC2,Pau,M,H7,Gate 6,G,3,Down-Right,2,,,,,
 2025,WC2,Pau,M,H7,Gate 6,B,2,Down-Right,3,,,,,
@@ -3904,7 +3904,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,H8,Gate 3,Y,1,Down-Left,4,,,,,
 2025,WC2,Pau,M,H8,Gate 4,R,4,Down-Right,1,,,,,
 2025,WC2,Pau,M,H8,Gate 4,G,3,Down-Right,2,,,,,
-2025,WC2,Pau,M,H8,Gate 4,B,2,Down-Right,3,,,,,FLT
+2025,WC2,Pau,M,H8,Gate 4,B,2,Down-Right,3,,,,FLT,
 2025,WC2,Pau,M,H8,Gate 4,Y,1,Down-Right,4,,,,,
 2025,WC2,Pau,M,H8,Course,R,4,Roll,1,,,,,
 2025,WC2,Pau,M,H8,Course,G,3,Roll,2,,,,,
@@ -3959,7 +3959,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,QF1,Gate 6,Y,1,Down-Right,3,,,,,
 2025,WC2,Pau,M,QF1,Gate 6,R,4,Down-Right,4,,,,,
 2025,WC2,Pau,M,QF1,Gate 7,B,2,Down-Left,1,,,,,
-2025,WC2,Pau,M,QF1,Gate 7,G,3,Down-Left,2,,,,,FLT
+2025,WC2,Pau,M,QF1,Gate 7,G,3,Down-Left,2,,,,FLT,
 2025,WC2,Pau,M,QF1,Gate 7,R,4,Down-Left,3,,,,,
 2025,WC2,Pau,M,QF1,Gate 7,Y,1,Down-Left,4,,,,,
 2025,WC2,Pau,M,QF1,Finish,B,2,Finish,1,1,,,,
@@ -3977,7 +3977,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,QF2,Gate 2,G,3,Up,1,,Up,,,
 2025,WC2,Pau,M,QF2,Gate 2,Y,1,Up,2,,FOLLOW,,,
 2025,WC2,Pau,M,QF2,Gate 2,R,4,Left-Up,3,,SPLIT,,,
-2025,WC2,Pau,M,QF2,Gate 2,B,2,Left-Up,4,,FOLLOW,,,FLT
+2025,WC2,Pau,M,QF2,Gate 2,B,2,Left-Up,4,,FOLLOW,,FLT,
 2025,WC2,Pau,M,QF2,Gate 3,G,3,Down-Left,1,,,,,
 2025,WC2,Pau,M,QF2,Gate 3,Y,1,Down-Left,2,,,,,
 2025,WC2,Pau,M,QF2,Gate 3,R,4,Down-Left,3,,,,,
@@ -4025,14 +4025,14 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,QF3,Gate 4,R,4,Down-Right,1,,,,,
 2025,WC2,Pau,M,QF3,Gate 4,B,2,Down-Right,2,,,,,
 2025,WC2,Pau,M,QF3,Gate 4,G,3,Down-Right,3,,,,,
-2025,WC2,Pau,M,QF3,Gate 4,Y,1,Down-Right,4,,,,,FLT
+2025,WC2,Pau,M,QF3,Gate 4,Y,1,Down-Right,4,,,,FLT,
 2025,WC2,Pau,M,QF3,Course,R,4,Roll,1,,,,,
 2025,WC2,Pau,M,QF3,Course,B,2,Roll,2,,,,,
 2025,WC2,Pau,M,QF3,Course,G,3,Roll,3,,,,,
 2025,WC2,Pau,M,QF3,Course,Y,1,Roll,4,,,,,
 2025,WC2,Pau,M,QF3,Gate 5,R,4,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,M,QF3,Gate 5,B,2,Left-Up,2,,SPLIT,,,
-2025,WC2,Pau,M,QF3,Gate 5,G,3,Left-Up,3,,FOLLOW,,,FLT
+2025,WC2,Pau,M,QF3,Gate 5,G,3,Left-Up,3,,FOLLOW,,FLT,
 2025,WC2,Pau,M,QF3,Gate 5,Y,1,Left-Up,4,,FOLLOW,,,
 2025,WC2,Pau,M,QF3,Gate 6,R,4,Down-Right,1,,,,,
 2025,WC2,Pau,M,QF3,Gate 6,B,2,Down-Right,2,,,,,
@@ -4040,8 +4040,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,QF3,Gate 6,Y,1,Down-Right,4,,,,,
 2025,WC2,Pau,M,QF3,Gate 7,R,4,Down-Left,1,,,,,
 2025,WC2,Pau,M,QF3,Gate 7,B,2,Down-Left,2,,,,,
-2025,WC2,Pau,M,QF3,Gate 7,G,3,Down-Left,3,,,,,FLT
-2025,WC2,Pau,M,QF3,Gate 7,Y,1,Down-Left,4,,,,,FLT
+2025,WC2,Pau,M,QF3,Gate 7,G,3,Down-Left,3,,,,FLT,
+2025,WC2,Pau,M,QF3,Gate 7,Y,1,Down-Left,4,,,,FLT,
 2025,WC2,Pau,M,QF3,Finish,R,4,Finish,1,1,,,,
 2025,WC2,Pau,M,QF3,Finish,B,2,Finish,2,2,,,,
 2025,WC2,Pau,M,QF3,Finish,G,3,Finish,3,3,,,,
@@ -4050,7 +4050,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,QF4,Ramp,G,2,Assigned,,,,LLORENTE David,,
 2025,WC2,Pau,M,QF4,Ramp,B,3,Assigned,,,,RENIA Benjamin,,
 2025,WC2,Pau,M,QF4,Ramp,R,4,Assigned,,,,LEAVER Sam,,
-2025,WC2,Pau,M,QF4,Gate 1,R,4,Down-Right,1,,,,,FLT
+2025,WC2,Pau,M,QF4,Gate 1,R,4,Down-Right,1,,,,FLT,
 2025,WC2,Pau,M,QF4,Gate 1,G,2,Down-Right,2,,,,,
 2025,WC2,Pau,M,QF4,Gate 1,B,3,Down-Right,3,,,,,
 2025,WC2,Pau,M,QF4,Gate 1,Y,1,Down-Right,4,,,,,
@@ -4072,7 +4072,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,QF4,Course,G,2,Roll,4,,,,,
 2025,WC2,Pau,M,QF4,Gate 5,R,4,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,M,QF4,Gate 5,B,3,Left-Up,2,,SPLIT,,,
-2025,WC2,Pau,M,QF4,Gate 5,Y,1,Right-Up,3,,SPLIT,,,FLT
+2025,WC2,Pau,M,QF4,Gate 5,Y,1,Right-Up,3,,SPLIT,,FLT,
 2025,WC2,Pau,M,QF4,Gate 5,G,2,Left-Up,4,,SPLIT,,,
 2025,WC2,Pau,M,QF4,Gate 6,R,4,Down-Right,1,,,,,
 2025,WC2,Pau,M,QF4,Gate 6,B,3,Down-Right,2,,,,,
@@ -4278,7 +4278,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,H2,Gate 6,R,4,Down-Right,3,,,,,
 2025,WC2,Pau,W,H2,Gate 6,B,2,Down-Right,4,,,,,
 2025,WC2,Pau,W,H2,Gate 7,Y,1,Down-Left,1,,,,,
-2025,WC2,Pau,W,H2,Gate 7,G,3,Down-Left,2,,,,,FLT
+2025,WC2,Pau,W,H2,Gate 7,G,3,Down-Left,2,,,,FLT,
 2025,WC2,Pau,W,H2,Gate 7,R,4,Down-Left,3,,,,,
 2025,WC2,Pau,W,H2,Gate 7,B,2,Down-Left,4,,,,,
 2025,WC2,Pau,W,H2,Finish,Y,1,Finish,1,1,,,,
@@ -4312,7 +4312,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,H3,Gate 5,R,2,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,W,H3,Gate 5,B,1,Right-Up,2,,FOLLOW,,,
 2025,WC2,Pau,W,H3,Gate 5,Y,4,Left-Up,3,,SPLIT,,,
-2025,WC2,Pau,W,H3,Gate 5,G,3,Left-Up,4,,FOLLOW,,,FLT
+2025,WC2,Pau,W,H3,Gate 5,G,3,Left-Up,4,,FOLLOW,,FLT,
 2025,WC2,Pau,W,H3,Gate 6,B,1,Down-Right,1,,,,,
 2025,WC2,Pau,W,H3,Gate 6,R,2,Down-Right,2,,,,,
 2025,WC2,Pau,W,H3,Gate 6,Y,4,Down-Right,3,,,,,
@@ -4354,12 +4354,12 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,H4,Gate 5,Y,4,Right-Up,3,,FOLLOW,,,
 2025,WC2,Pau,W,H4,Gate 5,R,2,Right-Up,4,,FOLLOW,,,
 2025,WC2,Pau,W,H4,Gate 6,G,3,Down-Left,1,,,,,
-2025,WC2,Pau,W,H4,Gate 6,B,1,Down-Left,2,,,,,RAL
+2025,WC2,Pau,W,H4,Gate 6,B,1,Down-Left,2,,,,RAL,
 2025,WC2,Pau,W,H4,Gate 6,R,2,Down-Left,3,,,,,
 2025,WC2,Pau,W,H4,Gate 6,Y,4,Down-Left,4,,,,,
 2025,WC2,Pau,W,H4,Gate 7,B,1,Down-Left,1,,,,,
 2025,WC2,Pau,W,H4,Gate 7,G,3,Down-Left,2,,,,,
-2025,WC2,Pau,W,H4,Gate 7,R,2,Down-Left,3,,,,,RAL
+2025,WC2,Pau,W,H4,Gate 7,R,2,Down-Left,3,,,,RAL,
 2025,WC2,Pau,W,H4,Gate 7,Y,4,Down-Left,4,,,,,
 2025,WC2,Pau,W,H4,Finish,B,1,Finish,1,1,,,,
 2025,WC2,Pau,W,H4,Finish,G,3,Finish,2,2,,,,
@@ -4380,7 +4380,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,H5,Gate 3,B,4,Down-Left,1,,,,,
 2025,WC2,Pau,W,H5,Gate 3,R,2,Down-Left,2,,,,,
 2025,WC2,Pau,W,H5,Gate 3,Y,1,Down-Left,3,,,,,
-2025,WC2,Pau,W,H5,Gate 3,G,3,Down-Left,4,,,,,FLT
+2025,WC2,Pau,W,H5,Gate 3,G,3,Down-Left,4,,,,FLT,
 2025,WC2,Pau,W,H5,Gate 4,B,4,Down-Right,1,,,,,
 2025,WC2,Pau,W,H5,Gate 4,R,2,Down-Right,2,,,,,
 2025,WC2,Pau,W,H5,Gate 4,Y,1,Down-Right,3,,,,,
@@ -4411,7 +4411,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,H6,Ramp,Y,1,Assigned,,,,HOCEVAR Eva Alina,,
 2025,WC2,Pau,W,H6,Gate 1,G,3,Down-Left,1,,,,,
 2025,WC2,Pau,W,H6,Gate 1,R,2,Down-Left,2,,,,,
-2025,WC2,Pau,W,H6,Gate 1,B,4,Down-Left,3,,,,,FLT
+2025,WC2,Pau,W,H6,Gate 1,B,4,Down-Left,3,,,,FLT,
 2025,WC2,Pau,W,H6,Gate 1,Y,1,Down-Left,4,,,,,
 2025,WC2,Pau,W,H6,Gate 2,G,3,Left-Up,1,,Left-Up,,,
 2025,WC2,Pau,W,H6,Gate 2,Y,1,Left-Up,2,,FOLLOW,,,
@@ -4551,7 +4551,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,QF1,Course,R,2,Roll,4,,,,,
 2025,WC2,Pau,W,QF1,Gate 5,G,4,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,W,QF1,Gate 5,B,3,Left-Up,2,,SPLIT,,,
-2025,WC2,Pau,W,QF1,Gate 5,Y,1,Left-Up,3,,FOLLOW,,,FLT
+2025,WC2,Pau,W,QF1,Gate 5,Y,1,Left-Up,3,,FOLLOW,,FLT,
 2025,WC2,Pau,W,QF1,Gate 5,R,2,Right-Up,4,,SPLIT,,,
 2025,WC2,Pau,W,QF1,Gate 6,G,4,Down-Right,1,,,,,
 2025,WC2,Pau,W,QF1,Gate 6,R,2,Down-Right,2,,,,,
@@ -4626,9 +4626,9 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,QF3,Gate 4,R,3,Down-Right,3,,,,,
 2025,WC2,Pau,W,QF3,Gate 4,G,4,Down-Right,4,,,,,
 2025,WC2,Pau,W,QF3,Course,B,2,Roll,1,,,,,
-2025,WC2,Pau,W,QF3,Course,Y,1,Roll,2,,,,,FLT
+2025,WC2,Pau,W,QF3,Course,Y,1,Roll,2,,,,FLT,
 2025,WC2,Pau,W,QF3,Course,G,4,Roll,3,,,,,
-2025,WC2,Pau,W,QF3,Course,R,3,Roll,4,,,,,FLT
+2025,WC2,Pau,W,QF3,Course,R,3,Roll,4,,,,FLT,
 2025,WC2,Pau,W,QF3,Gate 5,B,2,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,W,QF3,Gate 5,G,4,Left-Up,2,,SPLIT,,,
 2025,WC2,Pau,W,QF3,Gate 5,Y,1,Right-Up,3,,SPLIT,,,
@@ -4695,7 +4695,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,SF1,Gate 1,Y,1,Down-Left,4,,,,,
 2025,WC2,Pau,W,SF1,Gate 2,R,3,Right-Up,1,,Right-Up,,,
 2025,WC2,Pau,W,SF1,Gate 2,G,4,Left-Up,2,,SPLIT,,,
-2025,WC2,Pau,W,SF1,Gate 2,B,2,Right-Up,3,,SPLIT,,,FLT
+2025,WC2,Pau,W,SF1,Gate 2,B,2,Right-Up,3,,SPLIT,,FLT,
 2025,WC2,Pau,W,SF1,Gate 2,Y,1,Left-Up,4,,SPLIT,,,
 2025,WC2,Pau,W,SF1,Gate 3,Y,1,Down-Left,1,,,,,
 2025,WC2,Pau,W,SF1,Gate 3,G,4,Down-Left,2,,,,,
@@ -4703,11 +4703,11 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,SF1,Gate 3,B,2,Down-Left,4,,,,,
 2025,WC2,Pau,W,SF1,Gate 4,Y,1,Down-Right,1,,,,,
 2025,WC2,Pau,W,SF1,Gate 4,G,4,Down-Right,2,,,,,
-2025,WC2,Pau,W,SF1,Gate 4,R,3,Down-Right,3,,,,,FLT
-2025,WC2,Pau,W,SF1,Gate 4,B,2,Down-Right,4,,,,,FLT
-2025,WC2,Pau,W,SF1,Course,Y,1,Roll,1,,,,,FLT
+2025,WC2,Pau,W,SF1,Gate 4,R,3,Down-Right,3,,,,FLT,
+2025,WC2,Pau,W,SF1,Gate 4,B,2,Down-Right,4,,,,FLT,
+2025,WC2,Pau,W,SF1,Course,Y,1,Roll,1,,,,FLT,
 2025,WC2,Pau,W,SF1,Course,G,4,Roll,2,,,,,
-2025,WC2,Pau,W,SF1,Course,R,3,Roll,3,,,,,FLT
+2025,WC2,Pau,W,SF1,Course,R,3,Roll,3,,,,FLT,
 2025,WC2,Pau,W,SF1,Course,B,2,Roll,4,,,,,
 2025,WC2,Pau,W,SF1,Gate 5,Y,1,Left-Up,1,,Left-Up,,,
 2025,WC2,Pau,W,SF1,Gate 5,G,4,Right-Up,2,,SPLIT,,,
@@ -4733,7 +4733,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,SF2,Gate 1,B,2,Down-Left,2,,,,,
 2025,WC2,Pau,W,SF2,Gate 1,G,4,Down-Left,3,,,,,
 2025,WC2,Pau,W,SF2,Gate 1,Y,1,Down-Left,4,,,,,
-2025,WC2,Pau,W,SF2,Gate 2,R,3,Right-Up,1,,Right-Up,,,FLT
+2025,WC2,Pau,W,SF2,Gate 2,R,3,Right-Up,1,,Right-Up,,FLT,
 2025,WC2,Pau,W,SF2,Gate 2,B,2,Right-Up,2,,FOLLOW,,,
 2025,WC2,Pau,W,SF2,Gate 2,G,4,Left-Up,3,,SPLIT,,,
 2025,WC2,Pau,W,SF2,Gate 2,Y,1,Left-Up,4,,FOLLOW,,,
@@ -4763,7 +4763,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,SF2,Gate 7,R,3,Down-Left,4,,,,,
 2025,WC2,Pau,W,SF2,Finish,G,4,Finish,1,1,,,,
 2025,WC2,Pau,W,SF2,Finish,Y,1,Finish,2,2,,,,
-2025,WC2,Pau,W,SF2,Finish,B,2,Finish,3,3,,,,RAL
+2025,WC2,Pau,W,SF2,Finish,B,2,Finish,3,3,,,RAL,
 2025,WC2,Pau,W,SF2,Finish,R,3,Finish,4,4,,,,
 2025,WC2,Pau,W,Final,Ramp,R,4,Assigned,,,,LAZKANO Miren,,
 2025,WC2,Pau,W,Final,Ramp,G,3,Assigned,,,,CHOURRAUT Maialen,,
@@ -4773,7 +4773,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,Final,Gate 1,R,4,Down-Left,2,,,,,
 2025,WC2,Pau,W,Final,Gate 1,Y,1,Down-Left,3,,,,,
 2025,WC2,Pau,W,Final,Gate 1,B,2,Down-Left,4,,,,,
-2025,WC2,Pau,W,Final,Gate 2,G,3,Right-Up,1,,Right-Up,,,FLT
+2025,WC2,Pau,W,Final,Gate 2,G,3,Right-Up,1,,Right-Up,,FLT,
 2025,WC2,Pau,W,Final,Gate 2,R,4,Left-Up,2,,SPLIT,,,
 2025,WC2,Pau,W,Final,Gate 2,B,2,Right-Up,3,,SPLIT,,,
 2025,WC2,Pau,W,Final,Gate 2,Y,1,Left-Up,4,,SPLIT,,,
@@ -4802,7 +4802,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,Final,Gate 7,G,3,Down-Left,3,,,,,
 2025,WC2,Pau,W,Final,Gate 7,Y,1,Down-Left,4,,,,,
 2025,WC2,Pau,W,Final,Finish,R,4,Finish,1,1,,,,
-2025,WC2,Pau,W,Final,Finish,B,2,Finish,2,2,,,,RAL
+2025,WC2,Pau,W,Final,Finish,B,2,Finish,2,2,,,RAL,
 2025,WC2,Pau,W,Final,Finish,G,3,Finish,3,3,,,,
 2025,WC2,Pau,W,Final,Finish,Y,1,Finish,4,4,,,,
 2025,WC3,Prague,W,H1,Ramp,G,3,Assigned,,,,BOUZIDI Carole,,
@@ -5453,7 +5453,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC4,Tacen,M,H2,Gate 5,G,1,Down-Left,3,,,,,
 2025,WC4,Tacen,M,H2,Gate 5,Y,3,Down-Left,4,,,,,
 2025,WC4,Tacen,M,H2,Gate 6,B,4,Left-Up,1,,Left-Up,,,
-2025,WC4,Tacen,M,H2,Gate 6,R,2,Left-Up,2,,FOLLOW,,,FLT
+2025,WC4,Tacen,M,H2,Gate 6,R,2,Left-Up,2,,FOLLOW,,FLT,
 2025,WC4,Tacen,M,H2,Gate 6,G,1,Left-Up,3,,FOLLOW,,,
 2025,WC4,Tacen,M,H2,Gate 6,Y,3,Right-Up,4,,SPLIT,,,
 2025,WC4,Tacen,M,H2,Course,B,4,Roll,1,,,,,
@@ -5479,7 +5479,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC4,Tacen,M,H3,Gate 2,R,2,Left-Up,1,,Left-Up,,,
 2025,WC4,Tacen,M,H3,Gate 2,Y,4,Left-Up,2,,FOLLOW,,,
 2025,WC4,Tacen,M,H3,Gate 2,B,1,Right-Up,3,,SPLIT,,,
-2025,WC4,Tacen,M,H3,Gate 2,G,3,Left-Up,4,,SPLIT,,,FLT
+2025,WC4,Tacen,M,H3,Gate 2,G,3,Left-Up,4,,SPLIT,,FLT,
 2025,WC4,Tacen,M,H3,Gate 3,R,2,Down-Left,1,,,,,
 2025,WC4,Tacen,M,H3,Gate 3,B,1,Down-Left,2,,,,,
 2025,WC4,Tacen,M,H3,Gate 3,Y,4,Down-Left,3,,,,,
@@ -5557,7 +5557,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC4,Tacen,M,H5,Gate 1,Y,3,Down-Left,3,,,,,
 2025,WC4,Tacen,M,H5,Gate 1,B,1,Down-Left,4,,,,,
 2025,WC4,Tacen,M,H5,Gate 2,R,4,Left-Up,1,,Left-Up,,,
-2025,WC4,Tacen,M,H5,Gate 2,Y,3,Left-Up,2,,FOLLOW,,,FLT
+2025,WC4,Tacen,M,H5,Gate 2,Y,3,Left-Up,2,,FOLLOW,,FLT,
 2025,WC4,Tacen,M,H5,Gate 2,G,2,Left-Up,3,,FOLLOW,,,
 2025,WC4,Tacen,M,H5,Gate 2,B,1,Right-Up,4,,SPLIT,,,
 2025,WC4,Tacen,M,H5,Gate 3,R,4,Down-Left,1,,,,,
@@ -9797,7 +9797,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WCh,Penrith,W,H1,Gate 1,G,3,Down-Through,2,,,,,
 2025,WCh,Penrith,W,H1,Gate 1,Y,2,Down-Through,3,,,,,
 2025,WCh,Penrith,W,H1,Gate 1,B,1,Down-Through,4,,,,,
-2025,WCh,Penrith,W,H1,Gate 2,R,4,Left-Up,1,,Left-Up,,,FLT
+2025,WCh,Penrith,W,H1,Gate 2,R,4,Left-Up,1,,Left-Up,,FLT,
 2025,WCh,Penrith,W,H1,Gate 2,G,3,Left-Up,2,,FOLLOW,,,
 2025,WCh,Penrith,W,H1,Gate 2,Y,2,Right-Up,3,,SPLIT,,,
 2025,WCh,Penrith,W,H1,Gate 2,B,1,Right-Up,4,,FOLLOW,,,
@@ -11089,7 +11089,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WRR,Penrith,M,R1,Gate 4,R,4,Down-Right,1,,,,,
 2026,WRR,Penrith,M,R1,Gate 4,B,2,Down-Right,2,,,,,
 2026,WRR,Penrith,M,R1,Gate 4,G,3,Down-Right,3,,,,,
-2026,WRR,Penrith,M,R1,Gate 4,Y,1,Down-Right,4,4,,,,FLT 4
+2026,WRR,Penrith,M,R1,Gate 4,Y,1,Down-Right,4,4,,,,FLT
 2026,WRR,Penrith,M,R1,Gate 5,R,4,Down-Left,1,,,,,
 2026,WRR,Penrith,M,R1,Gate 5,B,2,Down-Left,2,,,,,
 2026,WRR,Penrith,M,R1,Gate 5,G,3,Down-Left,3,,,,,
@@ -12022,7 +12022,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,AO,Penrith,W,QF2,Finish,Y,2,Finish,2,2,,,,
 2026,AO,Penrith,W,QF2,Finish,B,3,Finish,3,3,,,,
 2026,AO,Penrith,W,QF2,Finish,G,1,Finish,4,4,,,,
-2026,AO,Penrith,W,QF3,Ramp,R,1,Assigned,,,,FOZ Noemie,,
+2026,AO,Penrith,W,QF3,Ramp,R,1,Assigned,,,,FOX Noemie,,
 2026,AO,Penrith,W,QF3,Ramp,Y,2,Assigned,,,,O'CALLAGHAN Georgie,,
 2026,AO,Penrith,W,QF3,Ramp,B,3,Assigned,,,,BEKOVA Katerina,,
 2026,AO,Penrith,W,QF3,Ramp,G,4,Assigned,,,,SRIBAR Ria,,
