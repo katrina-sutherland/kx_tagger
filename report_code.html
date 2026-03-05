@@ -530,10 +530,10 @@
 
         /**
          * Derives gate order and upstream gates from a single race's data.
-         * - orderedGates: gates that appear in this race, in the order given by fallbackOrderedGates.
+         * - orderedGates: gates in the order they were actually tagged in this race (so SG can be
+         *   followed by any gate number, e.g. 4, 5, Roll, SG, 7, not forced to go straight to Finish).
          * - upstreamGates: only gates that are BOTH (a) in the competition's known upstream list and
-         *   (b) have upstream-style Action in this race. This prevents downstream gates (e.g. Gate 7)
-         *   from being marked upstream when the CSV has carryover (e.g. "Up-Up" from a previous gate).
+         *   (b) have upstream-style Action in this race.
          *   SG (Special) is a downstream gate — it is NOT added to upstream gates.
          *   Its L/R direction labels are handled independently in calculateTacticLogic.
          */
@@ -550,7 +550,7 @@
 
             const compUpstreamSet = new Set(competitionUpstreamGates || []);
 
-            // Candidates: gates where this race has upstream-style Action or SG
+            // Candidates: gates where this race has upstream-style Action
             const upstreamCandidates = new Set();
             raceData.forEach(d => {
                 const gate = d.Gate;
@@ -560,17 +560,38 @@
                 if (action.includes('up')) upstreamCandidates.add(gate);
             });
 
-            // Only treat as upstream if gate is in the competition's upstream list (stops carryover at downstream gates)
             const upstreamGates = new Set();
             upstreamCandidates.forEach(g => {
                 if (compUpstreamSet.has(g)) upstreamGates.add(g);
             });
 
-            // Order: gates in this race, in fallback (competition) order
-            let orderedGates = (fallbackOrderedGates && fallbackOrderedGates.length > 0)
-                ? fallbackOrderedGates.filter(g => gatesInRace.has(g))
-                : [];
+            // Build gate order from this race's actual tag order (per-BIB sequence), so SG can be
+            // followed by any gate (e.g. 4, 5, Roll, SG, 7) instead of forcing SG -> Finish.
+            const bibsInRace = [...new Set(raceData.map(d => d.BIB))];
+            const sequencesByBib = [];
+            bibsInRace.forEach(bib => {
+                const rows = raceData.filter(d => d.BIB === bib);
+                const gateSeq = [];
+                rows.forEach(d => {
+                    const g = d.Gate;
+                    if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish') gateSeq.push(g);
+                });
+                sequencesByBib.push(gateSeq);
+            });
+            let orderedGates = [];
+            if (sequencesByBib.length > 0) {
+                const longest = sequencesByBib.reduce((a, b) => a.length >= b.length ? a : b);
+                orderedGates = [...longest];
+            }
 
+            // If we couldn't derive order from data, use fallback filtered by gates in race, then append any missing
+            if (orderedGates.length === 0 && fallbackOrderedGates && fallbackOrderedGates.length > 0) {
+                orderedGates = fallbackOrderedGates.filter(g => gatesInRace.has(g));
+            }
+            const orderedSet = new Set(orderedGates);
+            gatesInRace.forEach(g => {
+                if (!orderedSet.has(g)) orderedGates.push(g);
+            });
             if (orderedGates.length === 0) {
                 orderedGates = [...gatesInRace];
                 orderedGates.sort((a, b) => {
