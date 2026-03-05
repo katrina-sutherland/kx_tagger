@@ -565,29 +565,26 @@
                 if (compUpstreamSet.has(g)) upstreamGates.add(g);
             });
 
-            // Build gate order from this race's actual tag order (per-BIB sequence), so SG can be
-            // followed by any gate (e.g. 4, 5, Roll, SG, 7) instead of forcing SG -> Finish.
-            const bibsInRace = [...new Set(raceData.map(d => d.BIB))];
-            const sequencesByBib = [];
-            bibsInRace.forEach(bib => {
-                const rows = raceData.filter(d => d.BIB === bib);
-                const gateSeq = [];
-                rows.forEach(d => {
-                    const g = d.Gate;
-                    if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish') gateSeq.push(g);
-                });
-                sequencesByBib.push(gateSeq);
+            // Build gate order from this race's actual tag order (CSV row order = tag order).
+            // First occurrence of each gate across the whole race gives the course order, so SG
+            // can be followed by any gate (e.g. 4, 5, Roll, SG, 7) instead of forcing SG -> Finish.
+            const orderedGates = [];
+            const seen = new Set();
+            raceData.forEach(d => {
+                const g = d.Gate;
+                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish' && !seen.has(g)) {
+                    seen.add(g);
+                    orderedGates.push(g);
+                }
             });
-            let orderedGates = [];
-            if (sequencesByBib.length > 0) {
-                const longest = sequencesByBib.reduce((a, b) => a.length >= b.length ? a : b);
-                orderedGates = [...longest];
-            }
 
-            // If we couldn't derive order from data, use fallback filtered by gates in race, then append any missing
+            // If we got no order from data (e.g. empty race), use fallback filtered by gates in race
             if (orderedGates.length === 0 && fallbackOrderedGates && fallbackOrderedGates.length > 0) {
-                orderedGates = fallbackOrderedGates.filter(g => gatesInRace.has(g));
+                fallbackOrderedGates.forEach(g => {
+                    if (gatesInRace.has(g)) orderedGates.push(g);
+                });
             }
+            // Append any gate that appeared in the race but wasn't in the order (safety)
             const orderedSet = new Set(orderedGates);
             gatesInRace.forEach(g => {
                 if (!orderedSet.has(g)) orderedGates.push(g);
