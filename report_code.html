@@ -739,10 +739,19 @@
             svg.append("text").attr("x", width / 2).attr("y", height / 2).attr("text-anchor", "middle").attr("class", "text-slate-500 text-lg select-none").text(message);
         }
 
+        /** Updates the competition dropdown to only show competitions that have data for the selected year. */
+        function updateCompetitionOptionsForYear(data, selectorGroup) {
+            const selectedYear = +selectorGroup.year.property("value");
+            const compsInYear = [...new Set(data.filter(d => d.Year === selectedYear).map(d => d.Competition))].sort();
+            const options = compsInYear.length > 0 ? ['All', ...compsInYear] : ['All'];
+            const currentComp = selectorGroup.competition.property("value");
+            selectorGroup.competition.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
+            if (!options.includes(currentComp)) selectorGroup.competition.property("value", options[0]);
+        }
+
         function populateFilters(data, selectorGroup) {
             const uniqueValues = {
                 year: [...new Set(data.map(d => d.Year))].sort((a, b) => b - a),
-                competition: [...new Set(data.map(d => d.Competition))].sort(),
                 gender: [...new Set(data.map(d => d.Gender))].sort(),
                 phase: [...new Set(data.map(d => d.Phase))]
             };
@@ -757,13 +766,27 @@
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
             for (const key in selectorGroup) {
-                const options = key === 'year' ? uniqueValues[key] : ['All', ...uniqueValues[key]];
+                let options;
+                if (key === 'year') {
+                    options = uniqueValues.year;
+                } else if (key === 'competition') {
+                    const initialYear = uniqueValues.year[0];
+                    const compsInYear = [...new Set(data.filter(d => d.Year === initialYear).map(d => d.Competition))].sort();
+                    options = compsInYear.length > 0 ? ['All', ...compsInYear] : ['All'];
+                } else {
+                    options = ['All', ...uniqueValues[key]];
+                }
                 selectorGroup[key].selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
 
-                if (key === 'year' && selectorGroup === selectorsFull) selectorGroup[key].on("change", updateAllChartsFull);
-                else if (key === 'year' && selectorGroup === selectorsCompact) selectorGroup[key].on("change", updateAllChartsCompact);
-                else if (selectorGroup === selectorsFull) selectorGroup[key].on("change", updateAllChartsFull);
-                else selectorGroup[key].on("change", updateAllChartsCompact);
+                if (key === 'year' && selectorGroup === selectorsFull) {
+                    selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataFull, selectorsFull); updateAllChartsFull(); });
+                } else if (key === 'year' && selectorGroup === selectorsCompact) {
+                    selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
+                } else if (selectorGroup === selectorsFull) {
+                    selectorGroup[key].on("change", updateAllChartsFull);
+                } else {
+                    selectorGroup[key].on("change", updateAllChartsCompact);
+                }
             }
         }
 
@@ -784,30 +807,46 @@
         }
 
         // --- ATHLETE PROFILE ---
+        function updateAthleteCompetitionOptions() {
+            const selectedYear = selectorsAthlete.year.property("value");
+            const compsInYear = selectedYear === 'All'
+                ? [...new Set(masterDataCompact.map(d => d.Competition))].sort()
+                : [...new Set(masterDataCompact.filter(d => d.Year === +selectedYear).map(d => d.Competition))].sort();
+            const options = ['All', ...compsInYear];
+            const currentComp = selectorsAthlete.competition.property("value");
+            selectorsAthlete.competition.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
+            if (!options.includes(currentComp)) selectorsAthlete.competition.property("value", "All");
+        }
+
         function setupAthleteProfileTab() {
             // NOTE: This explicitly uses masterDataCompact (In-Competition Data)
+            const years = [...new Set(masterDataCompact.map(d => d.Year))].sort((a, b) => b - a);
+            const latestYear = years[0];
             const currentFilters = {
-                year: selectorsAthlete.year.property("value"),
+                year: selectorsAthlete.year.property("value") || latestYear,
                 competition: selectorsAthlete.competition.property("value"),
                 gender: selectorsAthlete.gender.property("value")
             };
 
-            const uniqueValues = {
-                year: [...new Set(masterDataCompact.map(d => d.Year))].sort((a, b) => b - a),
-                competition: [...new Set(masterDataCompact.map(d => d.Competition))].sort(),
-                gender: [...new Set(masterDataCompact.map(d => d.Gender))].sort(),
-            };
+            selectorsAthlete.year.selectAll("option").data(['All', ...years]).join("option").attr("value", d => d).text(d => d);
+            if (currentFilters.year && (currentFilters.year === 'All' || years.includes(+currentFilters.year))) {
+                selectorsAthlete.year.property("value", currentFilters.year);
+            } else if (latestYear) selectorsAthlete.year.property("value", latestYear);
 
-            for (const key in selectorsAthlete) {
-                selectorsAthlete[key].selectAll("option")
-                    .data(['All', ...uniqueValues[key]])
-                    .join("option")
-                    .attr("value", d => d)
-                    .text(d => d);
+            const compsInYear = currentFilters.year === 'All' || !currentFilters.year
+                ? [...new Set(masterDataCompact.map(d => d.Competition))].sort()
+                : [...new Set(masterDataCompact.filter(d => d.Year === +currentFilters.year).map(d => d.Competition))].sort();
+            selectorsAthlete.competition.selectAll("option").data(['All', ...compsInYear]).join("option").attr("value", d => d).text(d => d);
+            if (currentFilters.competition && (currentFilters.competition === 'All' || compsInYear.includes(currentFilters.competition))) {
+                selectorsAthlete.competition.property("value", currentFilters.competition);
+            } else {
+                selectorsAthlete.competition.property("value", "All");
+            }
 
-                if (currentFilters[key] && (currentFilters[key] === 'All' || uniqueValues[key].includes(key === 'year' ? +currentFilters[key] : currentFilters[key]))) {
-                    selectorsAthlete[key].property("value", currentFilters[key]);
-                }
+            const genders = [...new Set(masterDataCompact.map(d => d.Gender))].sort();
+            selectorsAthlete.gender.selectAll("option").data(['All', ...genders]).join("option").attr("value", d => d).text(d => d);
+            if (currentFilters.gender && (currentFilters.gender === 'All' || genders.includes(currentFilters.gender))) {
+                selectorsAthlete.gender.property("value", currentFilters.gender);
             }
 
             Object.values(selectorsAthlete).forEach(sel => sel.on("change", updateAthleteSelectors));
@@ -817,6 +856,8 @@
         }
 
         function updateAthleteSelectors() {
+            updateAthleteCompetitionOptions();
+
             const currentSelections = {};
             d3.selectAll(".athlete-select").each(function () {
                 const id = d3.select(this).attr("id");
