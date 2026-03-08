@@ -144,6 +144,12 @@
                             <select id="gender-select-full"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
+                        <div id="location-wrapper-full" class="hidden">
+                            <label for="location-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Location</label>
+                            <select id="location-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
                         <div>
                             <label for="phase-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
@@ -222,6 +228,12 @@
                             <label for="gender-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
                             <select id="gender-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div id="location-wrapper-compact" class="hidden">
+                            <label for="location-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Location</label>
+                            <select id="location-select-compact"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
@@ -460,10 +472,12 @@
                 const action = d.Action || d.action || d.Notes || d.notes || '';
                 const faultVal = d.Fault || d.fault || '';
                 const finishRank = d['Finish Rank'] || d['FinishRank'] || d.Rank || d.rank || d['Overall Rank'] || d['OverallRank'] || '';
+                const location = (d.Location || '').trim();
 
                 return {
                     Year: year,
                     Competition: competition,
+                    Location: location,
                     Gender: gender,
                     Phase: phase,
                     Gate: gate,
@@ -623,6 +637,8 @@
             selectorsFull = {
                 year: d3.select("#year-select-full"),
                 competition: d3.select("#competition-select-full"),
+                location: d3.select("#location-select-full"),
+                locationWrapper: d3.select("#location-wrapper-full"),
                 gender: d3.select("#gender-select-full"),
                 phase: d3.select("#phase-select-full")
             };
@@ -631,6 +647,8 @@
             selectorsCompact = {
                 year: d3.select("#year-select-compact"),
                 competition: d3.select("#competition-select-compact"),
+                location: d3.select("#location-select-compact"),
+                locationWrapper: d3.select("#location-wrapper-compact"),
                 gender: d3.select("#gender-select-compact"),
                 phase: d3.select("#phase-select-compact")
             };
@@ -747,6 +765,25 @@
             const currentComp = selectorGroup.competition.property("value");
             selectorGroup.competition.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
             if (!options.includes(currentComp)) selectorGroup.competition.property("value", options[0]);
+            updateLocationForWRR(data, selectorGroup);
+        }
+
+        /** Show Location dropdown only for WRR; populate with locations for selected year + WRR. */
+        function updateLocationForWRR(data, selectorGroup) {
+            const comp = selectorGroup.competition.property("value");
+            const isWRR = comp === 'WRR';
+            if (!selectorGroup.locationWrapper) return;
+            if (isWRR) {
+                const selectedYear = +selectorGroup.year.property("value");
+                const locations = [...new Set(data.filter(d => d.Year === selectedYear && d.Competition === 'WRR' && d.Location).map(d => d.Location))].sort();
+                const options = locations.length > 0 ? locations : ['All'];
+                const currentLoc = selectorGroup.location.property("value");
+                selectorGroup.location.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
+                if (!options.includes(currentLoc)) selectorGroup.location.property("value", options[0]);
+                selectorGroup.locationWrapper.classed("hidden", false);
+            } else {
+                selectorGroup.locationWrapper.classed("hidden", true);
+            }
         }
 
         function populateFilters(data, selectorGroup) {
@@ -766,6 +803,11 @@
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
             for (const key in selectorGroup) {
+                if (key === 'locationWrapper') continue;
+                if (key === 'location') {
+                    selectorGroup[key].on("change", () => { if (selectorGroup === selectorsFull) updateAllChartsFull(); else updateAllChartsCompact(); });
+                    continue;
+                }
                 let options;
                 if (key === 'year') {
                     options = uniqueValues.year;
@@ -782,12 +824,17 @@
                     selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataFull, selectorsFull); updateAllChartsFull(); });
                 } else if (key === 'year' && selectorGroup === selectorsCompact) {
                     selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
+                } else if (key === 'competition' && selectorGroup === selectorsFull) {
+                    selectorGroup[key].on("change", () => { updateLocationForWRR(masterDataFull, selectorsFull); updateAllChartsFull(); });
+                } else if (key === 'competition' && selectorGroup === selectorsCompact) {
+                    selectorGroup[key].on("change", () => { updateLocationForWRR(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
                 } else if (selectorGroup === selectorsFull) {
                     selectorGroup[key].on("change", updateAllChartsFull);
                 } else {
                     selectorGroup[key].on("change", updateAllChartsCompact);
                 }
             }
+            updateLocationForWRR(data, selectorGroup);
         }
 
         function forceDefaults(selectorGroup, data) {
@@ -1656,11 +1703,13 @@
             const selected = {
                 year: +selectorsFull.year.property("value"),
                 competition: selectorsFull.competition.property("value"),
+                location: selectorsFull.competition.property("value") === 'WRR' ? selectorsFull.location.property("value") : null,
                 gender: selectorsFull.gender.property("value"),
                 phase: selectorsFull.phase.property("value")
             };
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
-            const currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            let currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            if (selected.location && selected.location !== 'All') currentRaceData = currentRaceData.filter(d => d.Location === selected.location);
 
             // Gate order and upstream from race; upstream only where competition says upstream (stops carryover e.g. Gate 7)
             const raceStructure = getRaceStructure(currentRaceData, structure.orderedGates, structure.upstreamGates);
@@ -1698,7 +1747,8 @@
 
             updateFaultAnalysis("#fault-analysis-full", currentRaceData, courseDisplayOrder, bibToNameMap);
 
-            const pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
+            let pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
+            if (selected.location && selected.location !== 'All') pieChartAggregateData = pieChartAggregateData.filter(d => d.Location === selected.location);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
             pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
@@ -1741,12 +1791,14 @@
             const selected = {
                 year: +selectorsCompact.year.property("value"),
                 competition: selectorsCompact.competition.property("value"),
+                location: selectorsCompact.competition.property("value") === 'WRR' ? selectorsCompact.location.property("value") : null,
                 gender: selectorsCompact.gender.property("value"),
                 phase: selectorsCompact.phase.property("value")
             };
 
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataCompact);
-            const currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            let currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
+            if (selected.location && selected.location !== 'All') currentRaceData = currentRaceData.filter(d => d.Location === selected.location);
 
             // --- BUILD GATE ORDER DIRECTLY FROM RACE DATA ---
             // In-competition tagger saves display-ready gate names ("1", "1st Up", etc.)
@@ -1821,7 +1873,8 @@
             // Fault Analysis — use race-specific ordered gates
             updateFaultAnalysis("#fault-analysis-compact", currentRaceData, courseDisplayOrder, bibToNameMap);
 
-            const pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
+            let pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
+            if (selected.location && selected.location !== 'All') pieChartAggregateData = pieChartAggregateData.filter(d => d.Location === selected.location);
             const uniqueFinalPositions = [];
             const seenEntries = new Set();
             pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
