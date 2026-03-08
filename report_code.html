@@ -138,7 +138,7 @@
                             <select id="competition-select-full"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
-                        <div id="location-wrapper-full" class="hidden">
+                        <div id="location-wrapper-full">
                             <label for="location-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
                             <select id="location-select-full"
@@ -224,7 +224,7 @@
                             <select id="competition-select-compact"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
-                        <div id="location-wrapper-compact" class="hidden">
+                        <div id="location-wrapper-compact">
                             <label for="location-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
                             <select id="location-select-compact"
@@ -697,6 +697,7 @@
                     filterControlsFull.classed("hidden", false);
                     populateFilters(masterDataFull, selectorsFull);
                     forceDefaults(selectorsFull, masterDataFull);
+                    updateCompetitionOptionsForYear(masterDataFull, selectorsFull);
                     updateAllChartsFull();
 
                     // Setup Season Summary (using full data)
@@ -710,6 +711,7 @@
                     filterControlsCompact.classed("hidden", false);
                     populateFilters(masterDataCompact, selectorsCompact);
                     forceDefaults(selectorsCompact, masterDataCompact);
+                    updateCompetitionOptionsForYear(masterDataCompact, selectorsCompact);
                     updateAllChartsCompact();
 
                     // Setup Athlete Profile (Using Compact/In-Comp Data)
@@ -765,24 +767,21 @@
             const currentComp = selectorGroup.competition.property("value");
             selectorGroup.competition.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
             if (!options.includes(currentComp)) selectorGroup.competition.property("value", options[0]);
-            updateLocationForWRR(data, selectorGroup);
+            updateLocationOptions(data, selectorGroup);
         }
 
-        /** Show Location dropdown only for WRR; populate with locations for selected year + WRR. */
-        function updateLocationForWRR(data, selectorGroup) {
+        /** Always show Location dropdown; populate with locations for selected year + competition. For non-WRR (single location) auto-select it. */
+        function updateLocationOptions(data, selectorGroup) {
+            const selectedYear = +selectorGroup.year.property("value");
             const comp = selectorGroup.competition.property("value");
-            const isWRR = comp === 'WRR';
-            if (!selectorGroup.locationWrapper) return;
-            if (isWRR) {
-                const selectedYear = +selectorGroup.year.property("value");
-                const locations = [...new Set(data.filter(d => d.Year === selectedYear && d.Competition === 'WRR' && d.Location).map(d => d.Location))].sort();
-                const options = locations.length > 0 ? locations : ['All'];
-                const currentLoc = selectorGroup.location.property("value");
-                selectorGroup.location.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
-                if (!options.includes(currentLoc)) selectorGroup.location.property("value", options[0]);
-                selectorGroup.locationWrapper.classed("hidden", false);
-            } else {
-                selectorGroup.locationWrapper.classed("hidden", true);
+            const locations = [...new Set(data.filter(d => d.Year === selectedYear && (comp === 'All' || d.Competition === comp) && d.Location).map(d => d.Location))].sort();
+            const options = locations.length > 0 ? ['All', ...locations] : ['All'];
+            const currentLoc = selectorGroup.location.property("value");
+            selectorGroup.location.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
+            if (locations.length === 1) {
+                selectorGroup.location.property("value", locations[0]);
+            } else if (!options.includes(currentLoc)) {
+                selectorGroup.location.property("value", options[0]);
             }
         }
 
@@ -825,16 +824,16 @@
                 } else if (key === 'year' && selectorGroup === selectorsCompact) {
                     selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
                 } else if (key === 'competition' && selectorGroup === selectorsFull) {
-                    selectorGroup[key].on("change", () => { updateLocationForWRR(masterDataFull, selectorsFull); updateAllChartsFull(); });
+                    selectorGroup[key].on("change", () => { updateLocationOptions(masterDataFull, selectorsFull); updateAllChartsFull(); });
                 } else if (key === 'competition' && selectorGroup === selectorsCompact) {
-                    selectorGroup[key].on("change", () => { updateLocationForWRR(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
+                    selectorGroup[key].on("change", () => { updateLocationOptions(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
                 } else if (selectorGroup === selectorsFull) {
                     selectorGroup[key].on("change", updateAllChartsFull);
                 } else {
                     selectorGroup[key].on("change", updateAllChartsCompact);
                 }
             }
-            updateLocationForWRR(data, selectorGroup);
+            updateLocationOptions(data, selectorGroup);
         }
 
         function forceDefaults(selectorGroup, data) {
@@ -1703,7 +1702,7 @@
             const selected = {
                 year: +selectorsFull.year.property("value"),
                 competition: selectorsFull.competition.property("value"),
-                location: selectorsFull.competition.property("value") === 'WRR' ? selectorsFull.location.property("value") : null,
+                location: selectorsFull.location.property("value"),
                 gender: selectorsFull.gender.property("value"),
                 phase: selectorsFull.phase.property("value")
             };
@@ -1791,7 +1790,7 @@
             const selected = {
                 year: +selectorsCompact.year.property("value"),
                 competition: selectorsCompact.competition.property("value"),
-                location: selectorsCompact.competition.property("value") === 'WRR' ? selectorsCompact.location.property("value") : null,
+                location: selectorsCompact.location.property("value"),
                 gender: selectorsCompact.gender.property("value"),
                 phase: selectorsCompact.phase.property("value")
             };
