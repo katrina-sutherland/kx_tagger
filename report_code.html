@@ -125,7 +125,7 @@
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-full"
                     class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                         <div>
                             <label for="year-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
@@ -138,16 +138,16 @@
                             <select id="competition-select-full"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
-                        <div>
-                            <label for="gender-select-full"
-                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                            <select id="gender-select-full"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                        </div>
                         <div id="location-wrapper-full" class="hidden">
                             <label for="location-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
                             <select id="location-select-full"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div class="max-w-[6.5rem]">
+                            <label for="gender-select-full"
+                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                            <select id="gender-select-full"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
@@ -211,7 +211,7 @@
             <div class="max-w-7xl mx-auto space-y-8">
                 <div id="filter-controls-compact"
                     class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
                         <div>
                             <label for="year-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
@@ -224,16 +224,16 @@
                             <select id="competition-select-compact"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
-                        <div>
-                            <label for="gender-select-compact"
-                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                            <select id="gender-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
-                        </div>
                         <div id="location-wrapper-compact" class="hidden">
                             <label for="location-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
                             <select id="location-select-compact"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div class="max-w-[6.5rem]">
+                            <label for="gender-select-compact"
+                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                            <select id="gender-select-compact"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
@@ -670,7 +670,7 @@
             const cacheBuster = now.getTime();
 
             try {
-                // EXPLICIT FETCHING (GitHub)
+                // Full Report: kx_race_analysis_git.csv (columns: Year, Competition, Location, Gender, Phase, Gate, BIB, ...)
                 const urlFull = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
                 const urlCompact = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
 
