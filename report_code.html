@@ -354,11 +354,17 @@
         <div id="report-summary" class="hidden">
             <div class="max-w-7xl mx-auto space-y-8">
                 <div class="bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
                             <label for="year-select-summary"
                                 class="block text-sm font-medium text-slate-300 mb-2">Year</label>
                             <select id="year-select-summary"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="gender-select-summary"
+                                class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
+                            <select id="gender-select-summary"
                                 class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
                         </div>
                         <div>
@@ -662,6 +668,7 @@
 
             selectorsSummary = {
                 year: d3.select("#year-select-summary"),
+                gender: d3.select("#gender-select-summary"),
                 athlete: d3.select("#athlete-select-summary")
             };
 
@@ -772,6 +779,7 @@
 
         /** Always show Location dropdown; populate with locations for selected year + competition. For non-WRR (single location) auto-select it. */
         function updateLocationOptions(data, selectorGroup) {
+            if (selectorGroup.locationWrapper) selectorGroup.locationWrapper.classed("hidden", false);
             const selectedYear = +selectorGroup.year.property("value");
             const comp = selectorGroup.competition.property("value");
             const locations = [...new Set(data.filter(d => d.Year === selectedYear && (comp === 'All' || d.Competition === comp) && d.Location).map(d => d.Location))].sort();
@@ -1329,8 +1337,20 @@
                 .attr("value", d => d)
                 .text(d => d);
 
+            // Populate Gender (All, Men, Women from data)
+            const uniqueGenders = [...new Set(masterDataFull.map(d => d.Gender))].filter(g => g).sort();
+            const genderOptions = uniqueGenders.length > 0 ? ['All', ...uniqueGenders] : ['All'];
+            selectorsSummary.gender.selectAll("option")
+                .data(genderOptions)
+                .join("option")
+                .attr("value", d => d)
+                .text(d => d);
+            if (uniqueGenders.includes("Men")) selectorsSummary.gender.property("value", "Men");
+            else if (genderOptions.length > 0) selectorsSummary.gender.property("value", genderOptions[0]);
+
             // Listeners
             selectorsSummary.year.on("change", updateSeasonSummaryAthletes);
+            selectorsSummary.gender.on("change", updateSeasonSummaryAthletes);
             selectorsSummary.athlete.on("change", generateSeasonSummary);
 
             // Init Athlete Dropdown
@@ -1339,7 +1359,11 @@
 
         function updateSeasonSummaryAthletes() {
             const selectedYear = +selectorsSummary.year.property("value");
-            const yearData = masterDataFull.filter(d => d.Year === selectedYear);
+            const selectedGender = selectorsSummary.gender.property("value");
+            let yearData = masterDataFull.filter(d => d.Year === selectedYear);
+            if (selectedGender && selectedGender !== 'All') {
+                yearData = yearData.filter(d => d.Gender === selectedGender);
+            }
 
             const uniqueAthleteNames = [...new Set(yearData.map(d => formatAthleteName(d.AthleteName)))].filter(n => n).sort();
 
