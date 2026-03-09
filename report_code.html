@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -1410,7 +1410,7 @@
                 const key = `${d.Competition}|${d.Phase}|${d.Gender}`;
                 if (!processedKeys.has(key)) {
                     processedKeys.add(key);
-                    races.push({ competition: d.Competition, phase: d.Phase, gender: d.Gender });
+                    races.push({ competition: d.Competition, location: d.Location || '', phase: d.Phase, gender: d.Gender });
                 }
             });
 
@@ -1465,7 +1465,7 @@
 
             const thead = table.append("thead").attr("class", "bg-slate-700/50 uppercase text-xs font-semibold text-slate-400");
             const headerRow = thead.append("tr");
-            ["Competition", "Phase", "Bib", "Ramp", "Phase Rank", "Finish Rank", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
+            ["Competition", "Location", "Phase", "Bib", "Ramp", "Phase Rank", "Finish Rank", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
 
             const tbody = table.append("tbody");
 
@@ -1490,6 +1490,7 @@
                 if (athleteResult) {
                     const tr = tbody.append("tr").attr("class", "border-t border-slate-700 hover:bg-slate-700/30");
                     tr.append("td").attr("class", "p-3 font-medium text-white").text(race.competition);
+                    tr.append("td").attr("class", "p-3").text(race.location || '-');
                     tr.append("td").attr("class", "p-3").text(race.phase);
 
                     // Bib
