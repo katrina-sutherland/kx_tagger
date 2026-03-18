@@ -360,9 +360,15 @@
                                 <div class="absolute inset-0 bg-slate-900/50" aria-hidden="true"></div>
                                 <svg id="tt-course-overlay" class="absolute inset-0 w-full h-full" style="pointer-events: none;"></svg>
                             </div>
-                            <div id="tt-course-legend" class="flex justify-center gap-6 mt-4 text-sm">
-                                <span class="text-[#9B59B6] font-medium">—— <span id="tt-course-legend-athlete">Athlete</span></span>
-                                <span class="text-[#E8C020] font-medium">—— <span id="tt-course-legend-first">Rank 1</span></span>
+                            <div id="tt-course-legend" class="flex justify-center gap-6 mt-4 text-sm items-center">
+                                <span class="font-medium inline-flex items-center gap-1.5">
+                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0" aria-hidden="true"><path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#9B59B6" stroke="rgba(0,0,0,0.35)" stroke-width="0.6"/></svg>
+                                    <span id="tt-course-legend-athlete" class="text-[#9B59B6]">Athlete</span>
+                                </span>
+                                <span class="font-medium inline-flex items-center gap-1.5">
+                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0" aria-hidden="true"><path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#E8C020" stroke="rgba(0,0,0,0.35)" stroke-width="0.6"/></svg>
+                                    <span id="tt-course-legend-first" class="text-[#E8C020]">Rank 1</span>
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -588,11 +594,15 @@
         /** Parse time trial CSV: same as parseCsvData but preserves Split 1, Split 2, ... as numbers (seconds). */
         function parseTimeToSeconds(val) {
             if (val == null || val === '') return NaN;
-            const s = String(val).trim();
+            const s = String(val).trim().toLowerCase();
+            if (s === 'n/a' || s === 'na' || s === '-') return NaN;
             const n = parseFloat(s);
-            if (!isNaN(n)) return n;
-            const mm = s.match(/^(\d+):(\d+(?:\.\d+)?)$/);
-            if (mm) return parseInt(mm[1], 10) * 60 + parseFloat(mm[2]);
+            if (!isNaN(n)) return n === 0 ? NaN : n;
+            const mm = String(val).trim().match(/^(\d+):(\d+(?:\.\d+)?)$/);
+            if (mm) {
+                const secs = parseInt(mm[1], 10) * 60 + parseFloat(mm[2]);
+                return secs === 0 ? NaN : secs;
+            }
             return NaN;
         }
 
@@ -636,7 +646,7 @@
                     const m = k.match(/^Split\s*(\d+)$/i);
                     if (m) {
                         const t = parseTimeToSeconds(d[k]);
-                        if (!isNaN(t)) out[k] = t;
+                        if (typeof t === 'number' && !isNaN(t) && t > 0) out[k] = t;
                     }
                 });
                 return out;
@@ -1146,6 +1156,17 @@
 
         // Centre of channel path: follows course down and around (split sections 1–7: bottom-left → along bottom → up right). No visible line drawn.
         const ttCourseCentrePath = "M 16 74 Q 28 76 42 75 T 68 74 T 76 68 Q 76 52 76 38 T 76 22";
+        // Fixed split anchor points (0–100 overlay coords) so placement is consistent across competitions.
+        // Keys are split numbers (from "Split N" columns).
+        const ttSplitAnchors = {
+            1: { pt: [18, 70], tan: [1, 0] },
+            2: { pt: [26, 76], tan: [1, 0] },
+            3: { pt: [44, 76], tan: [1, 0] },
+            4: { pt: [64, 78], tan: [1, 0] },
+            5: { pt: [82, 76], tan: [0.8, -0.45] },
+            6: { pt: [94, 66], tan: [0.4, -0.9] },
+            7: { pt: [96, 52], tan: [0.4, -0.9] }
+        };
 
         function drawTTCourseView(splitNames, athleteTimes, firstPlaceTimes) {
             const svg = d3.select("#tt-course-overlay");
@@ -1179,30 +1200,15 @@
                 const ty = i < n - 1 ? ptAdj.y - pt.y : pt.y - ptAdj.y;
                 tangents.push([tx, ty]);
             }
-            // When we have 7 splits, place each split at a fixed, hand-tuned point on the course image
-            // matching the annotated X positions (1–7) you provided.
-            if (n === 7) {
-                const customPts = [
-                    [18, 70], // Split 1 (slightly down and right)
-                    [26, 76], // Split 2
-                    [44, 76], // Split 3 (up and right)
-                    [64, 78], // Split 4
-                    [82, 76], // Split 5
-                    [94, 66], // Split 6
-                    [96, 52]  // Split 7
-                ];
-                const customTan = [
-                    [1, 0],    // 1 – along bottom
-                    [1, 0],    // 2
-                    [1, 0],    // 3
-                    [1, 0],    // 4
-                    [0.8, -0.45], // 5 – entering right side
-                    [0.4, -0.9],  // 6 – up right wall
-                    [0.4, -0.9]   // 7 – further up
-                ];
-                for (let i = 0; i < 7; i++) {
-                    pts[i] = customPts[i].slice();
-                    tangents[i] = customTan[i].slice();
+            // Override sampled points with fixed anchors by split number (consistent across competitions).
+            // Example: if this competition only has Split 1..5, we place those 5 at anchors 1..5.
+            for (let i = 0; i < n; i++) {
+                const m = String(splitNames[i] || '').match(/(\d+)/);
+                const splitNum = m ? parseInt(m[1], 10) : NaN;
+                const anchor = ttSplitAnchors[splitNum];
+                if (anchor) {
+                    pts[i] = anchor.pt.slice();
+                    tangents[i] = anchor.tan.slice();
                 }
             }
 
@@ -1355,7 +1361,14 @@
             );
 
             const firstRowWithSplits = dataForVB.find(r => getSplitColumns(r).length > 0);
-            const splitNames = firstRowWithSplits ? getSplitColumns(firstRowWithSplits) : [];
+            const allSplitNames = firstRowWithSplits ? getSplitColumns(firstRowWithSplits) : [];
+            // Only include splits that this course has: at least one valid (> 0, non-NaN) value in the data
+            const splitNames = allSplitNames.filter(col =>
+                dataForVB.some(d => {
+                    const v = d[col];
+                    return typeof v === 'number' && !isNaN(v) && v > 0;
+                })
+            );
             const hasSplits = splitNames.length > 0;
 
             if (hasSplits) {
