@@ -596,13 +596,16 @@
             if (val == null || val === '') return NaN;
             const s = String(val).trim().toLowerCase();
             if (s === 'n/a' || s === 'na' || s === '-') return NaN;
-            const n = parseFloat(s);
-            if (!isNaN(n)) return n === 0 ? NaN : n;
+            // Prefer mm:ss(.ss) parsing when a colon is present (avoid parseFloat("0:30") === 0).
             const mm = String(val).trim().match(/^(\d+):(\d+(?:\.\d+)?)$/);
             if (mm) {
                 const secs = parseInt(mm[1], 10) * 60 + parseFloat(mm[2]);
                 return secs === 0 ? NaN : secs;
             }
+            // Treat "0" (and "0.0", "00") as missing split info, but do NOT affect values like "2026".
+            if (/^0+(\.0+)?$/.test(s)) return NaN;
+            const n = parseFloat(s);
+            if (!isNaN(n)) return n;
             return NaN;
         }
 
