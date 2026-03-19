@@ -340,7 +340,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-slate-400 text-sm mb-4">View individual time trial runs from <strong>kx_tagger/data/kayak_timetrial.csv</strong> on GitHub (this report fetches the CSV directly from the repository). Use filters to narrow by year, competition, location, gender, and athlete. Select an athlete to see their split line vs 1st place (gold).</p>
+                <p class="text-slate-400 text-sm mb-4">View individual time trial runs. Use filters to narrow by year, competition, location, gender, and athlete. Select an athlete to see their split line vs 1st place (gold).</p>
                 <div id="tt-chart-container" class="space-y-8 hidden">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                         <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Time Trial Sector Comparison v 1st:</h3>
@@ -857,14 +857,19 @@
                 // Full Report: kx_race_analysis_git.csv (columns: Year, Competition, Location, Gender, Phase, Gate, BIB, ...)
                 const urlFull = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
                 const urlCompact = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
-                // Individual Time Trial: load from data/ next to report (run: python3 -m http.server 8888 from kx_tagger folder)
-                const urlTT = `data/kayak_timetrial.csv?t=${cacheBuster}`;
+                // Individual Time Trial: prefer GitHub raw (contains 2025+), fallback to local `data/` next to report.
+                const urlTTLocal = `data/kayak_timetrial.csv?t=${cacheBuster}`;
+                const urlTTGitHub = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kayak_timetrial.csv?t=${cacheBuster}`;
 
-                const [responseFull, responseCompact, responseTT] = await Promise.all([
+                const [responseFull, responseCompact] = await Promise.all([
                     fetch(urlFull),
-                    fetch(urlCompact),
-                    fetch(urlTT).catch(() => ({ ok: false }))
+                    fetch(urlCompact)
                 ]);
+
+                let responseTT = await fetch(urlTTGitHub).catch(() => ({ ok: false }));
+                if (!responseTT.ok) {
+                    responseTT = await fetch(urlTTLocal).catch(() => ({ ok: false }));
+                }
 
                 if (!responseFull.ok) throw new Error(`Failed to load Full Report CSV`);
                 if (!responseCompact.ok) throw new Error(`Failed to load In-Competition CSV`);
@@ -1285,7 +1290,7 @@
             }
         }
 
-        function drawTTSplitsTable(splitNames, rowData) {
+        function drawTTSplitsTable(splitNames, rowData, showSectorDescriptions) {
             d3.select("#tt-splits-table-wrapper").classed("hidden", false);
             const container = d3.select("#tt-splits-table-container");
             container.selectAll("*").remove();
@@ -1305,6 +1310,28 @@
             thead.append("tr").selectAll("th").data(['', ...splitNames, 'Total']).join("th")
                 .attr("class", "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300")
                 .text((d, i) => i === 0 ? '' : d);
+
+            if (showSectorDescriptions) {
+                const sectorDescriptionsBySplit = {
+                    1: "Green Light to Drop In:",
+                    2: "Drop In to Exit Gate 2",
+                    3: "Exit Gate 2 to Gate 4 Gate Line",
+                    4: "Gate 4 to Gate 7 Gate Line",
+                    5: "Gate 7 to Upside down Roll",
+                    6: "Roll to Gate 8 Gate Line",
+                    7: "Gate 8 to Finish"
+                };
+
+                const splitDescriptionColumns = splitNames.map(col => {
+                    const m = String(col).match(/(\d+)/);
+                    const n = m ? parseInt(m[1], 10) : NaN;
+                    return sectorDescriptionsBySplit[n] || '';
+                });
+
+                thead.append("tr").selectAll("th").data(['', ...splitDescriptionColumns, '']).join("th")
+                    .attr("class", "px-4 py-2 text-left text-[11px] font-medium text-slate-400 whitespace-normal leading-tight")
+                    .text(d => d);
+            }
             const tbody = table.append("tbody").attr("class", "divide-y divide-slate-700 bg-slate-800/50");
             const rows = tbody.selectAll("tr").data(rowData).join("tr").attr("class", "hover:bg-slate-700/50");
             rows.selectAll("td").data((d, rowIdx) => {
@@ -1428,7 +1455,8 @@
                     if (athleteIsDistinctFrom5) {
                         rows.push({ label: athleteName, color: ttTableColors.athlete, times: athleteTimes, total: athleteTotal });
                     }
-                    drawTTSplitsTable(splitNames, rows);
+                    const showSectorDescriptions = selected.year === 2025;
+                    drawTTSplitsTable(splitNames, rows, showSectorDescriptions);
                     setTTViewMode(ttViewMode);
                     const diff = (athleteTotal != null && rank1Total != null) ? athleteTotal - rank1Total : null;
                     if (diff != null) {
