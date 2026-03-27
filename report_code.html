@@ -1160,6 +1160,41 @@
             rank5: '#a3e635' // sage green
         };
 
+        // Default course background; custom maps only when CSV Location matches a file stem (see data/course_maps/README.md).
+        const TT_DEFAULT_COURSE_IMAGE = 'whitewater_course.png';
+        // Exact filenames in data/course_maps/ — keep in sync with disk (case matters on some servers).
+        const TT_COURSE_MAP_FILENAMES = [
+            'la_seu.png',
+            'tacen.png',
+            'ausburg.png',
+            'paris.png',
+        ];
+
+        function normalizeCourseLocationKey(s) {
+            return String(s).trim().toLowerCase()
+                .replace(/'/g, '')
+                .replace(/[\s_\-]+/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '');
+        }
+
+        const TT_COURSE_IMAGE_BY_LOCATION = {};
+        for (const fname of TT_COURSE_MAP_FILENAMES) {
+            const stem = fname.replace(/\.(png|jpe?g|webp)$/i, '');
+            TT_COURSE_IMAGE_BY_LOCATION[normalizeCourseLocationKey(stem)] = `data/course_maps/${fname}`;
+        }
+
+        function getTTCourseBackgroundImageUrl(location) {
+            if (!location || location === SELECT_PLACEHOLDER || location === 'All') return TT_DEFAULT_COURSE_IMAGE;
+            const key = normalizeCourseLocationKey(location);
+            return TT_COURSE_IMAGE_BY_LOCATION[key] || TT_DEFAULT_COURSE_IMAGE;
+        }
+
+        function applyTTCourseBackgroundImage(location) {
+            const url = getTTCourseBackgroundImageUrl(location);
+            d3.select('#tt-course-view').style('background-image', `url('${url}')`);
+        }
+
         let ttViewMode = 'line';
         let lastTTChartData = null;
 
@@ -1377,6 +1412,7 @@
                 d3.select("#tt-chart-container").classed("hidden", true);
                 return;
             }
+            applyTTCourseBackgroundImage(selected.location);
             const dataForVB = masterDataTT.filter(d =>
                 d.Year === selected.year &&
                 (selected.competition === 'All' || d.Competition === selected.competition) &&
