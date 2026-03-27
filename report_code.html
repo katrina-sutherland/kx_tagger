@@ -1160,9 +1160,9 @@
             rank5: '#a3e635' // sage green
         };
 
-        // Default course background; custom maps only when CSV Location matches a file stem (see data/course_maps/README.md).
+        // Default course background; custom maps only when CSV Location matches a file stem (see course_maps/README.md).
         const TT_DEFAULT_COURSE_IMAGE = 'whitewater_course.png';
-        // Exact filenames in data/course_maps/ — keep in sync with disk (case matters on some servers).
+        // Exact filenames in course_maps/ — keep in sync with disk (case matters on some servers).
         const TT_COURSE_MAP_FILENAMES = [
             'la_seu.png',
             'tacen.png',
@@ -1181,7 +1181,7 @@
         const TT_COURSE_IMAGE_BY_LOCATION = {};
         for (const fname of TT_COURSE_MAP_FILENAMES) {
             const stem = fname.replace(/\.(png|jpe?g|webp)$/i, '');
-            TT_COURSE_IMAGE_BY_LOCATION[normalizeCourseLocationKey(stem)] = `data/course_maps/${fname}`;
+            TT_COURSE_IMAGE_BY_LOCATION[normalizeCourseLocationKey(stem)] = `course_maps/${fname}`;
         }
 
         function getTTCourseBackgroundImageUrl(location) {
