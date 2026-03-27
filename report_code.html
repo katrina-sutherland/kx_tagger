@@ -1178,6 +1178,10 @@
                 .replace(/^_|_$/g, '');
         }
 
+        function isParisCourseLocation(location) {
+            return normalizeCourseLocationKey(location) === 'paris';
+        }
+
         const TT_COURSE_IMAGE_BY_LOCATION = {};
         for (const fname of TT_COURSE_MAP_FILENAMES) {
             const stem = fname.replace(/\.(png|jpe?g|webp)$/i, '');
@@ -1197,6 +1201,7 @@
 
         let ttViewMode = 'line';
         let lastTTChartData = null;
+        let ttCourseDirectionSign = 1;
 
         // Centre of channel path: follows course down and around (split sections 1–7: bottom-left → along bottom → up right). No visible line drawn.
         const ttCourseCentrePath = "M 16 74 Q 28 76 42 75 T 68 74 T 76 68 Q 76 52 76 38 T 76 22";
@@ -1272,7 +1277,9 @@
                 const ax = athleteTimes[i], vx = firstPlaceTimes[i];
                 const aNum = typeof ax === 'number' && !isNaN(ax);
                 const vNum = typeof vx === 'number' && !isNaN(vx);
-                const [dx, dy] = norm(tangents[i]);
+                const [tx, ty] = norm(tangents[i]);
+                const dx = tx * ttCourseDirectionSign;
+                const dy = ty * ttCourseDirectionSign;
                 const perpX = -dy;
                 const perpY = dx;
                 const xMid = pts[i][0];
@@ -1413,6 +1420,7 @@
                 return;
             }
             applyTTCourseBackgroundImage(selected.location);
+            ttCourseDirectionSign = isParisCourseLocation(selected.location) ? -1 : 1;
             const dataForVB = masterDataTT.filter(d =>
                 d.Year === selected.year &&
                 (selected.competition === 'All' || d.Competition === selected.competition) &&
