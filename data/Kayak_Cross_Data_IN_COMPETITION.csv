@@ -4354,3 +4354,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,W,H5,Finish,Y,4,Finish,3,3,,,
 2024,WC3,Krakow,W,H5,Finish,B,3,Finish,4,4,,,
 2024,WC3,Krakow,W,H5,Gate 6,Y,4,FLT,,4,,,FLT 6
+2024,WC3,Krakow,W,H6,Ramp,R,1,Assigned,,,,MINTALOVA Eliska,
+2024,WC3,Krakow,W,H6,Ramp,G,2,Assigned,,,,PLOCHMANN Annkatrin,
+2024,WC3,Krakow,W,H6,Ramp,B,3,Assigned,,,,FISEROVA Tereza,
