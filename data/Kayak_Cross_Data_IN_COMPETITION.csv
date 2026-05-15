@@ -4353,10 +4353,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,W,H5,Finish,G,2,Finish,2,2,,,
 2024,WC3,Krakow,W,H5,Finish,Y,4,Finish,3,3,,,
 2024,WC3,Krakow,W,H5,Finish,B,3,Finish,4,4,,,
-2024,WC3,Krakow,W,H5,Gate 6,Y,4,FLT,,4,,,FLT 6
-2024,WC3,Krakow,W,H6,Ramp,R,1,Assigned,,,,MINTALOVA Eliska,
-2024,WC3,Krakow,W,H6,Ramp,G,2,Assigned,,,,PLOCHMANN Annkatrin,
-2024,WC3,Krakow,W,H6,Ramp,B,3,Assigned,,,,FISEROVA Tereza,
 2024,WC3,Krakow,W,H6,Ramp,R,1,Assigned,,,,MINTALOVA Eliska,
 2024,WC3,Krakow,W,H6,Ramp,G,2,Assigned,,,,PLOCHMANN Annkatrin,
 2024,WC3,Krakow,W,H6,Ramp,B,3,Assigned,,,,FISEROVA Tereza,
@@ -4405,10 +4401,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,W,H7,Finish,G,4,Finish,2,2,,,
 2024,WC3,Krakow,W,H7,Finish,B,2,Finish,3,3,,,
 2024,WC3,Krakow,W,H7,Finish,Y,3,Finish,4,4,,,
-2024,WC3,Krakow,W,H7,Gate 7,B,2,FLT,,4,,,FLT 7
-2024,WC3,Krakow,W,H8,Ramp,R,1,Assigned,,,,MARX Alena,
-2024,WC3,Krakow,W,H8,Ramp,G,2,Assigned,,,,PINTERIC Naja,
-2024,WC3,Krakow,W,H8,Ramp,Y,4,Assigned,,,,SOMMERNES Iris,
 2024,WC3,Krakow,W,H8,Ramp,R,1,Assigned,,,,MARX Alena,
 2024,WC3,Krakow,W,H8,Ramp,G,2,Assigned,,,,PINTERIC Naja,
 2024,WC3,Krakow,W,H8,Ramp,B,3,Assigned,,,,NOVAK Ajda,
@@ -4433,10 +4425,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,W,H8,Finish,G,2,Finish,2,2,,,
 2024,WC3,Krakow,W,H8,Finish,B,3,Finish,3,3,,,
 2024,WC3,Krakow,W,H8,Finish,Y,4,Finish,4,4,,,
-2024,WC3,Krakow,W,H8,Gate 7,Y,4,FLT,,4,,,FLT 7
-2024,WC3,Krakow,W,H8,Gate 7,B,3,FLT,,3,,,FLT 7
-2024,WC3,Krakow,W,QF1,Ramp,R,1,Assigned,,,,FRANKLIN Mallory,
-2024,WC3,Krakow,W,QF1,Ramp,G,2,Assigned,,,,KNEBLOVA Tereza,
 2024,WC3,Krakow,W,QF1,Ramp,R,1,Assigned,,,,FRANKLIN Mallory,
 2024,WC3,Krakow,W,QF1,Ramp,G,2,Assigned,,,,KNEBLOVA tereza,
 2024,WC3,Krakow,W,QF1,Ramp,B,3,Assigned,,,,BETTERIDGE Lois,
@@ -4461,7 +4449,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,W,QF1,Finish,B,3,Finish,2,2,,,
 2024,WC3,Krakow,W,QF1,Finish,Y,4,Finish,3,3,,,
 2024,WC3,Krakow,W,QF1,Finish,R,1,Finish,4,4,,,
-2024,WC3,Krakow,W,QF1,Gate 1,Y,4,FLT,,4,,,FLT 1
 2024,WC3,Krakow,W,QF2,Ramp,R,1,Assigned,,,,WOODS Kimberley,
 2024,WC3,Krakow,W,QF2,Ramp,G,2,Assigned,,,,FOX Noemie,
 2024,WC3,Krakow,W,QF2,Ramp,B,3,Assigned,,,,STANOVSKA Sona,
@@ -4486,7 +4473,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,W,QF2,Finish,B,3,Finish,2,2,,,
 2024,WC3,Krakow,W,QF2,Finish,G,2,Finish,3,3,,,
 2024,WC3,Krakow,W,QF2,Finish,Y,4,Finish,4,4,,,
-2024,WC3,Krakow,W,QF2,Gate 6,G,2,FLT,,4,,,FLT 6
 2024,WC3,Krakow,W,QF3,Ramp,R,1,Assigned,,,,BEKOVA Katerina,
 2024,WC3,Krakow,W,QF3,Ramp,G,2,Assigned,,,,MINTALOVA Eliska,
 2024,WC3,Krakow,W,QF3,Ramp,Y,3,Assigned,,,,ESTACIA NETA Omira,
@@ -4535,7 +4521,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,W,QF4,Finish,B,4,Finish,2,2,,,
 2024,WC3,Krakow,W,QF4,Finish,R,1,Finish,3,3,,,
 2024,WC3,Krakow,W,QF4,Finish,Y,3,Finish,4,4,,,
-2024,WC3,Krakow,W,SF1,Ramp,G,2,Assigned,,,,KNEBLOVA Teresza,
+2024,WC3,Krakow,W,SF1,Ramp,G,2,Assigned,,,,KNEBLOVA Tereza,
 2024,WC3,Krakow,W,SF1,Ramp,B,3,Assigned,,,,STANOVSKA Sona,
 2024,WC3,Krakow,W,SF1,Ramp,Y,4,Assigned,,,,BETTERIDGE Lois,
 2024,WC3,Krakow,W,SF1,Ramp,R,1,Assigned,,,,WOODS Kimberley,
