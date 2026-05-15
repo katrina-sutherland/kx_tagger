@@ -4701,3 +4701,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC3,Krakow,M,H4,2nd Up,R,2,Right-Up,1,,Right-Up,,
 2024,WC3,Krakow,M,H4,2nd Up,B,4,Right-Up,2,,FOLLOW,,
 2024,WC3,Krakow,M,H4,2nd Up,G,1,Right-Up,3,,FOLLOW,,
+2024,WC3,Krakow,M,H4,2nd Up,Y,3,Left-Up,4,,SPLIT,,
+2024,WC3,Krakow,M,H4,Finish,R,2,Finish,1,1,,,
+2024,WC3,Krakow,M,H4,Finish,B,4,Finish,2,2,,,
+2024,WC3,Krakow,M,H4,Finish,G,1,Finish,3,3,,,
+2024,WC3,Krakow,M,H4,Finish,Y,3,Finish,4,4,,,
