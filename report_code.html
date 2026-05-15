@@ -1160,13 +1160,13 @@
             rank5: '#a3e635' // sage green
         };
 
-        // Default course background; custom maps only when CSV Location matches a file stem (see course_maps/README.md).
+        // Default course background; custom maps only when CSV Location matches a file stem (see data/course_maps/README.md).
         const TT_DEFAULT_COURSE_IMAGE = 'whitewater_course.png';
-        // Exact filenames in course_maps/ — keep in sync with disk (case matters on some servers).
+        // Exact filenames in data/course_maps/ — keep in sync with disk (case matters on some servers).
         const TT_COURSE_MAP_FILENAMES = [
-            'la_seu.png',
+            'la seu d\'urgell.png',
             'tacen.png',
-            'ausburg.png',
+            'augsburg.png',
             'paris.png',
         ];
 
@@ -1182,10 +1182,36 @@
             return normalizeCourseLocationKey(location) === 'paris';
         }
 
+        function getParisSplitOffset(i, n) {
+            if (i < 0 || n <= 0) return { x: 0, y: 0 };
+            let x = 0;
+            let y = 0;
+            // Move first split a little left.
+            if (i === 0) x -= 3;
+            // Lift the last 4 splits higher.
+            if (i >= n - 4) y -= 3;
+            // Lift the 3rd-last a little more.
+            if (i === n - 3) y -= 3;
+            // Lift the final 2 splits higher again.
+            if (i >= n - 2) y -= 9;
+            // Lift the very final split a little more.
+            if (i === n - 1) y -= 3;
+            return { x, y };
+        }
+
+        function getParisSplitRotationDelta(i, n) {
+            if (i < 0 || n <= 0) return 0;
+            // Angle the very final split a touch further right.
+            if (i === n - 1) return 24;
+            // Angle the final 2 splits a bit more to the right.
+            if (i >= n - 2) return 18;
+            return 0;
+        }
+
         const TT_COURSE_IMAGE_BY_LOCATION = {};
         for (const fname of TT_COURSE_MAP_FILENAMES) {
             const stem = fname.replace(/\.(png|jpe?g|webp)$/i, '');
-            TT_COURSE_IMAGE_BY_LOCATION[normalizeCourseLocationKey(stem)] = `course_maps/${fname}`;
+            TT_COURSE_IMAGE_BY_LOCATION[normalizeCourseLocationKey(stem)] = `data/course_maps/${fname}`;
         }
 
         function getTTCourseBackgroundImageUrl(location) {
@@ -1202,6 +1228,9 @@
         let ttViewMode = 'line';
         let lastTTChartData = null;
         let ttCourseDirectionSign = 1;
+        let ttCourseReverseSplitOrder = false;
+        let ttCourseYOffset = 0;
+        let ttParisFirstSplitRotationDelta = 0;
 
         // Centre of channel path: follows course down and around (split sections 1–7: bottom-left → along bottom → up right). No visible line drawn.
         const ttCourseCentrePath = "M 16 74 Q 28 76 42 75 T 68 74 T 76 68 Q 76 52 76 38 T 76 22";
@@ -1277,16 +1306,21 @@
                 const ax = athleteTimes[i], vx = firstPlaceTimes[i];
                 const aNum = typeof ax === 'number' && !isNaN(ax);
                 const vNum = typeof vx === 'number' && !isNaN(vx);
-                const [tx, ty] = norm(tangents[i]);
+                const posIdx = ttCourseReverseSplitOrder ? (n - 1 - i) : i;
+                const [tx, ty] = norm(tangents[posIdx]);
                 const dx = tx * ttCourseDirectionSign;
                 const dy = ty * ttCourseDirectionSign;
                 const perpX = -dy;
                 const perpY = dx;
-                const xMid = pts[i][0];
-                const yMid = pts[i][1];
+                const parisOffset = (ttCourseReverseSplitOrder || ttCourseDirectionSign < 0) ? getParisSplitOffset(i, n) : { x: 0, y: 0 };
+                const xMid = pts[posIdx][0] + parisOffset.x;
+                const yMid = pts[posIdx][1] + ttCourseYOffset + parisOffset.y;
                 const boatRotationOffset = (i === 0 ? 48 : 12);
                 const placeCanoe = (x, y, color) => {
-                    const deg = (Math.atan2(dy, dx) * 180 / Math.PI) + boatRotationOffset;
+                    const splitRotationDelta =
+                        (i === 0 ? ttParisFirstSplitRotationDelta : 0) +
+                        ((ttCourseReverseSplitOrder || ttCourseDirectionSign < 0) ? getParisSplitRotationDelta(i, n) : 0);
+                    const deg = (Math.atan2(dy, dx) * 180 / Math.PI) + boatRotationOffset + splitRotationDelta;
                     g.append("path")
                         .attr("d", canoePath)
                         .attr("fill", color)
@@ -1301,8 +1335,10 @@
                     const along = athleteAhead ? 1 : -1;
                     const xA = xMid + dx * along * alongOff + perpX * perpOff;
                     const yA = yMid + dy * along * alongOff + perpY * perpOff;
-                    const xV = xMid - dx * along * alongOff - perpX * perpOff;
-                    const yV = yMid - dy * along * alongOff - perpY * perpOff;
+                    // Keep athlete (purple) fixed; bring rank-1 (yellow) a bit closer.
+                    const rank1SeparationScale = 0.56;
+                    const xV = xMid - dx * along * alongOff * rank1SeparationScale - perpX * perpOff * rank1SeparationScale;
+                    const yV = yMid - dy * along * alongOff * rank1SeparationScale - perpY * perpOff * rank1SeparationScale;
                     placeCanoe(xA, yA, '#9B59B6');
                     placeCanoe(xV, yV, '#E8C020');
                 } else {
@@ -1420,7 +1456,11 @@
                 return;
             }
             applyTTCourseBackgroundImage(selected.location);
-            ttCourseDirectionSign = isParisCourseLocation(selected.location) ? -1 : 1;
+            const isParis = isParisCourseLocation(selected.location);
+            ttCourseDirectionSign = isParis ? -1 : 1;
+            ttCourseReverseSplitOrder = isParis;
+            ttCourseYOffset = isParis ? -6 : 0;
+            ttParisFirstSplitRotationDelta = isParis ? -90 : 0;
             const dataForVB = masterDataTT.filter(d =>
                 d.Year === selected.year &&
                 (selected.competition === 'All' || d.Competition === selected.competition) &&
@@ -2017,6 +2057,7 @@
                 .attr("value", d => d)
                 .text(d => d);
             if (uniqueGenders.includes("Men")) selectorsSummary.gender.property("value", "Men");
+            else if (uniqueGenders.includes("M")) selectorsSummary.gender.property("value", "M");
             else if (genderOptions.length > 0) selectorsSummary.gender.property("value", genderOptions[0]);
 
             // Listeners
@@ -2121,7 +2162,14 @@
                     );
                     const structure = scanCompetitionStructure(selectedYear, compName, masterDataFull);
                     const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
-                    const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
+                    const finalContext = athleteYearData.find(d =>
+                        d.Competition === compName &&
+                        d.Phase === 'Final' &&
+                        d.Gender === finalRace.gender
+                    );
+                    const athleteResult = finalContext
+                        ? rankedResults.find(r => r.bib === finalContext.BIB)
+                        : rankedResults.find(r => r.name === selectedAthleteName);
 
                     if (athleteResult) {
                         // Use Calculated Phase Rank as Finish Rank for Final
@@ -2140,6 +2188,7 @@
 
             const tbody = table.append("tbody");
 
+            let rowsRendered = 0;
             races.forEach(race => {
                 // 1. Get Full Race Data context (all athletes in that race)
                 const fullRaceData = masterDataFull.filter(d =>
@@ -2149,16 +2198,28 @@
                     d.Gender === race.gender
                 );
 
+                // Bib for this athlete in this race (from any row we have with their name — avoids
+                // mismatch when getCalculatedRaceResults falls back to "RED"/"GREEN" etc. if gate rows lack names)
+                const athleteContextRow = athleteYearData.find(d =>
+                    d.Competition === race.competition &&
+                    d.Phase === race.phase &&
+                    d.Gender === race.gender
+                );
+                const targetBib = athleteContextRow ? athleteContextRow.BIB : null;
+
                 // 2. Get Ordered Gates for ranking logic
                 const structure = scanCompetitionStructure(selectedYear, race.competition, masterDataFull);
 
                 // 3. Calculate Results
                 const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
 
-                // 4. Find Selected Athlete in results
-                const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
+                // 4. Find Selected Athlete in results (prefer BIB — matches ranking helper when names are sparse)
+                const athleteResult = targetBib
+                    ? rankedResults.find(r => r.bib === targetBib)
+                    : rankedResults.find(r => r.name === selectedAthleteName);
 
                 if (athleteResult) {
+                    rowsRendered++;
                     const tr = tbody.append("tr").attr("class", "border-t border-slate-700 hover:bg-slate-700/30");
                     tr.append("td").attr("class", "p-3 font-medium text-white").text(race.competition);
                     tr.append("td").attr("class", "p-3").text(race.location || '-');
@@ -2212,6 +2273,10 @@
                     tr.append("td").attr("class", "p-3 text-slate-500 italic").text(note);
                 }
             });
+
+            if (rowsRendered === 0 && races.length > 0) {
+                container.html("<p class='text-center text-slate-400'>Found race list for this athlete but could not resolve phase rows (check BIB / name tagging in the source CSV).</p>");
+            }
         }
 
         function drawLineChartFull(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
