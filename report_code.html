@@ -516,6 +516,7 @@
                 const hashValue = tabHashMap[tabId] || 'full-report';
                 history.replaceState(null, null, '#' + hashValue);
             }
+            schedulePersistReportUiState();
         }
 
         function getTabFromHash() {
@@ -528,6 +529,162 @@
                 'season-summary': tabSummary
             };
             return hashToTab[hash] || null;
+        }
+
+        /** Persist filter + tab state across refresh (localStorage). */
+        const REPORT_UI_STORAGE_KEY = 'kx_kayak_cross_report_ui_v1';
+        let reportUiPersistTimer = null;
+
+        function readReportUiState() {
+            try {
+                const raw = localStorage.getItem(REPORT_UI_STORAGE_KEY);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function writeReportUiState(obj) {
+            try {
+                localStorage.setItem(REPORT_UI_STORAGE_KEY, JSON.stringify(obj));
+            } catch (e) { /* quota / private mode */ }
+        }
+
+        function getActiveTabHashFromDom() {
+            const pairs = [
+                [reportFull, 'full-report'],
+                [reportCompact, 'in-competition'],
+                [reportTT, 'time-trial'],
+                [reportAthlete, 'athlete-profile'],
+                [reportSummary, 'season-summary']
+            ];
+            for (const [rep, hash] of pairs) {
+                if (rep && !rep.classed('hidden')) return hash;
+            }
+            return 'full-report';
+        }
+
+        function gatherReportUiState() {
+            const slotIds = ['athlete-select-1', 'athlete-select-2', 'athlete-select-3'];
+            const slots = {};
+            slotIds.forEach(id => {
+                const n = document.getElementById(id);
+                if (n) slots[id] = n.value || '';
+            });
+            return {
+                activeTab: getActiveTabHashFromDom(),
+                full: selectorsFull ? {
+                    year: selectorsFull.year.property("value"),
+                    competition: selectorsFull.competition.property("value"),
+                    location: selectorsFull.location.property("value"),
+                    gender: selectorsFull.gender.property("value"),
+                    phase: selectorsFull.phase.property("value")
+                } : {},
+                compact: selectorsCompact ? {
+                    year: selectorsCompact.year.property("value"),
+                    competition: selectorsCompact.competition.property("value"),
+                    location: selectorsCompact.location.property("value"),
+                    gender: selectorsCompact.gender.property("value"),
+                    phase: selectorsCompact.phase.property("value")
+                } : {},
+                tt: selectorsTT ? {
+                    year: selectorsTT.year.property("value"),
+                    competition: selectorsTT.competition.property("value"),
+                    location: selectorsTT.location.property("value"),
+                    gender: selectorsTT.gender.property("value"),
+                    athlete: selectorsTT.athlete.property("value")
+                } : {},
+                ttView: typeof ttViewMode !== 'undefined' ? ttViewMode : 'line',
+                athlete: selectorsAthlete ? {
+                    year: selectorsAthlete.year.property("value"),
+                    competition: selectorsAthlete.competition.property("value"),
+                    gender: selectorsAthlete.gender.property("value"),
+                    slots
+                } : { slots },
+                summary: selectorsSummary ? {
+                    year: selectorsSummary.year.property("value"),
+                    gender: selectorsSummary.gender.property("value"),
+                    athlete: selectorsSummary.athlete.property("value")
+                } : {}
+            };
+        }
+
+        function schedulePersistReportUiState() {
+            clearTimeout(reportUiPersistTimer);
+            reportUiPersistTimer = setTimeout(() => {
+                writeReportUiState(gatherReportUiState());
+                reportUiPersistTimer = null;
+            }, 120);
+        }
+
+        function flushPersistReportUiState() {
+            clearTimeout(reportUiPersistTimer);
+            reportUiPersistTimer = null;
+            writeReportUiState(gatherReportUiState());
+        }
+
+        function selectOptionExists(sel, val) {
+            if (!sel || !sel.node() || val === undefined || val === null) return false;
+            const s = String(val);
+            return [...sel.node().querySelectorAll('option')].some(o => o.value === s);
+        }
+
+        /** Restore year → competition → location → gender → phase (or TT athlete) when options allow. */
+        function applyPersistedReportFilters(selectorGroup, data, frag, isTT) {
+            if (!selectorGroup || !frag || !data || !data.length) return;
+            if (frag.year != null && frag.year !== '' && selectOptionExists(selectorGroup.year, frag.year)) {
+                selectorGroup.year.property("value", String(frag.year));
+            }
+            updateCompetitionOptionsForYear(data, selectorGroup);
+            if (frag.competition != null && frag.competition !== '' && selectOptionExists(selectorGroup.competition, frag.competition)) {
+                selectorGroup.competition.property("value", String(frag.competition));
+            }
+            updateLocationOptions(data, selectorGroup);
+            if (frag.location != null && frag.location !== '' && selectorGroup.location && selectOptionExists(selectorGroup.location, frag.location)) {
+                selectorGroup.location.property("value", String(frag.location));
+            }
+            if (frag.gender != null && frag.gender !== '' && selectOptionExists(selectorGroup.gender, frag.gender)) {
+                selectorGroup.gender.property("value", String(frag.gender));
+            }
+            if (!isTT && frag.phase != null && frag.phase !== '' && selectorGroup.phase && selectOptionExists(selectorGroup.phase, frag.phase)) {
+                selectorGroup.phase.property("value", String(frag.phase));
+            }
+            if (isTT && selectorGroup.athlete) {
+                updateTTAthleteOptions();
+                if (frag.athlete != null && frag.athlete !== '' && selectOptionExists(selectorGroup.athlete, frag.athlete)) {
+                    selectorGroup.athlete.property("value", String(frag.athlete));
+                }
+            }
+        }
+
+        function attachReportUiPersistence() {
+            const ns = 'persistReportUi';
+            const bind = (sel) => {
+                if (!sel || !sel.on) return;
+                sel.on(`change.${ns}`, schedulePersistReportUiState);
+            };
+            if (selectorsFull) {
+                Object.keys(selectorsFull).forEach(k => {
+                    if (k === 'locationWrapper') return;
+                    bind(selectorsFull[k]);
+                });
+            }
+            if (selectorsCompact) {
+                Object.keys(selectorsCompact).forEach(k => {
+                    if (k === 'locationWrapper') return;
+                    bind(selectorsCompact[k]);
+                });
+            }
+            if (selectorsTT) {
+                Object.keys(selectorsTT).forEach(k => {
+                    if (k === 'locationWrapper') return;
+                    bind(selectorsTT[k]);
+                });
+            }
+            if (selectorsAthlete) Object.values(selectorsAthlete).forEach(bind);
+            if (selectorsSummary) Object.values(selectorsSummary).forEach(bind);
+            d3.selectAll('#athlete-select-1, #athlete-select-2, #athlete-select-3').on(`change.${ns}`, schedulePersistReportUiState);
         }
 
         // --- DATA PARSING ---
@@ -854,6 +1011,7 @@
             const cacheBuster = now.getTime();
 
             try {
+                const persistedUi = readReportUiState();
                 // Full Report: kx_race_analysis_git.csv (columns: Year, Competition, Location, Gender, Phase, Gate, BIB, ...)
                 const urlFull = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
                 const urlCompact = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
@@ -899,13 +1057,14 @@
                     populateFilters(masterDataFull, selectorsFull);
                     forceDefaults(selectorsFull, masterDataFull);
                     updateCompetitionOptionsForYear(masterDataFull, selectorsFull);
+                    applyPersistedReportFilters(selectorsFull, masterDataFull, persistedUi && persistedUi.full, false);
                     updateAllChartsFull();
 
                     // Setup Individual Time Trial (using kayak_timetrial.csv)
-                    if (masterDataTT.length > 0) setupTimeTrialTab();
+                    if (masterDataTT.length > 0) setupTimeTrialTab(persistedUi);
 
                     // Setup Season Summary (using full data)
-                    setupSeasonSummaryTab();
+                    setupSeasonSummaryTab(persistedUi && persistedUi.summary);
                 } else {
                     console.warn("Full Report data is empty.");
                 }
@@ -916,10 +1075,11 @@
                     populateFilters(masterDataCompact, selectorsCompact);
                     forceDefaults(selectorsCompact, masterDataCompact);
                     updateCompetitionOptionsForYear(masterDataCompact, selectorsCompact);
+                    applyPersistedReportFilters(selectorsCompact, masterDataCompact, persistedUi && persistedUi.compact, false);
                     updateAllChartsCompact();
 
                     // Setup Athlete Profile (Using Compact/In-Comp Data)
-                    setupAthleteProfileTab();
+                    setupAthleteProfileTab(persistedUi && persistedUi.athlete);
                 } else {
                     console.warn("In-Competition Report data is empty.");
                 }
@@ -936,13 +1096,29 @@
                     tabSummary.on("click", () => { setActiveTab(tabSummary); });
                 }
 
-                // Restore active tab from URL hash (so refresh stays on the same tab)
-                const savedTab = getTabFromHash();
-                if (savedTab && savedTab.node() !== tabFull.node()) {
-                    setActiveTab(savedTab, false);
-                    // Trigger chart rendering for the restored tab
+                // Restore active tab: URL hash wins when set; otherwise last tab from localStorage
+                let savedTab = getTabFromHash();
+                if (!savedTab && persistedUi && persistedUi.activeTab) {
+                    const idToTab = {
+                        'full-report': tabFull,
+                        'in-competition': tabCompact,
+                        'time-trial': tabTT,
+                        'athlete-profile': tabAthlete,
+                        'season-summary': tabSummary
+                    };
+                    savedTab = idToTab[persistedUi.activeTab] || null;
+                }
+                if (savedTab && savedTab.node()) {
+                    setActiveTab(savedTab, true);
                     if (savedTab.node() === tabCompact.node() && masterDataCompact.length > 0) updateAllChartsCompact();
                     if (savedTab.node() === tabTT.node()) updateTimeTrialReport();
+                    if (savedTab.node() === tabAthlete.node()) updateAthleteProfiles();
+                }
+
+                attachReportUiPersistence();
+                if (!window.__kxReportUiPagehide) {
+                    window.__kxReportUiPagehide = true;
+                    window.addEventListener('pagehide', flushPersistReportUiState);
                 }
 
                 window.addEventListener('resize', () => {
@@ -1105,13 +1281,16 @@
             if (!athletes.includes(current)) selectorsTT.athlete.property("value", SELECT_PLACEHOLDER);
         }
 
-        function setupTimeTrialTab() {
+        function setupTimeTrialTab(persistedUi) {
             if (masterDataTT.length === 0) return;
             filterControlsTT.classed("hidden", false);
             populateFilters(masterDataTT, selectorsTT);
             forceDefaults(selectorsTT, masterDataTT);
             updateCompetitionOptionsForYear(masterDataTT, selectorsTT);
-            updateTTAthleteOptions();
+            applyPersistedReportFilters(selectorsTT, masterDataTT, persistedUi && persistedUi.tt, true);
+            if (persistedUi && (persistedUi.ttView === 'line' || persistedUi.ttView === 'course')) {
+                setTTViewMode(persistedUi.ttView);
+            }
             updateTimeTrialReport();
             d3.select("#tt-view-line").on("click", () => setTTViewMode('line'));
             d3.select("#tt-view-course").on("click", () => setTTViewMode('course'));
@@ -1366,6 +1545,7 @@
                 btnCourse.classed("bg-slate-600 text-slate-200 border-slate-500", true).classed("text-slate-400 border-slate-600", false);
                 if (lastTTChartData) drawTTCourseView(lastTTChartData.splitNames, lastTTChartData.athleteTimes, lastTTChartData.firstPlaceTimes);
             }
+            schedulePersistReportUiState();
         }
 
         function drawTTSplitsTable(splitNames, rowData, showSectorDescriptions) {
@@ -1583,19 +1763,26 @@
             if (!options.includes(currentComp)) selectorsAthlete.competition.property("value", "All");
         }
 
-        function setupAthleteProfileTab() {
+        function setupAthleteProfileTab(persistedAthlete) {
             // NOTE: This explicitly uses masterDataCompact (In-Competition Data)
             const years = [...new Set(masterDataCompact.map(d => d.Year))].sort((a, b) => b - a);
             const latestYear = years[0];
+            const ap = persistedAthlete || {};
             const currentFilters = {
-                year: selectorsAthlete.year.property("value") || latestYear,
-                competition: selectorsAthlete.competition.property("value"),
-                gender: selectorsAthlete.gender.property("value")
+                year: (ap.year !== undefined && ap.year !== null && ap.year !== '')
+                    ? ap.year
+                    : (selectorsAthlete.year.property("value") || latestYear),
+                competition: ap.competition != null && ap.competition !== ''
+                    ? ap.competition
+                    : selectorsAthlete.competition.property("value"),
+                gender: ap.gender != null && ap.gender !== ''
+                    ? ap.gender
+                    : selectorsAthlete.gender.property("value")
             };
 
             selectorsAthlete.year.selectAll("option").data(['All', ...years]).join("option").attr("value", d => d).text(d => d);
             if (currentFilters.year && (currentFilters.year === 'All' || years.includes(+currentFilters.year))) {
-                selectorsAthlete.year.property("value", currentFilters.year);
+                selectorsAthlete.year.property("value", String(currentFilters.year));
             } else if (latestYear) selectorsAthlete.year.property("value", latestYear);
 
             const compsInYear = currentFilters.year === 'All' || !currentFilters.year
@@ -1618,6 +1805,17 @@
             d3.selectAll(".athlete-select").on("change", updateAthleteProfiles);
 
             updateAthleteSelectors();
+
+            const slots = ap.slots || {};
+            ['athlete-select-1', 'athlete-select-2', 'athlete-select-3'].forEach((id) => {
+                const v = slots[id];
+                if (!v) return;
+                const sel = d3.select(`#${id}`);
+                if (sel.empty()) return;
+                const opts = [...sel.node().querySelectorAll('option')].map(o => o.value);
+                if (opts.includes(v)) sel.property("value", v);
+            });
+            updateAthleteProfiles();
         }
 
         function updateAthleteSelectors() {
@@ -2039,7 +2237,8 @@
         }
 
         // --- SEASON SUMMARY LOGIC ---
-        function setupSeasonSummaryTab() {
+        function setupSeasonSummaryTab(persistedSummary) {
+            const ps = persistedSummary || {};
             // Populate Year
             const uniqueYears = [...new Set(masterDataFull.map(d => d.Year))].sort((a, b) => b - a);
             selectorsSummary.year.selectAll("option")
@@ -2060,6 +2259,13 @@
             else if (uniqueGenders.includes("M")) selectorsSummary.gender.property("value", "M");
             else if (genderOptions.length > 0) selectorsSummary.gender.property("value", genderOptions[0]);
 
+            if (ps.year != null && ps.year !== '' && uniqueYears.map(String).includes(String(ps.year))) {
+                selectorsSummary.year.property("value", String(ps.year));
+            }
+            if (ps.gender != null && ps.gender !== '' && genderOptions.includes(String(ps.gender))) {
+                selectorsSummary.gender.property("value", String(ps.gender));
+            }
+
             // Listeners
             selectorsSummary.year.on("change", updateSeasonSummaryAthletes);
             selectorsSummary.gender.on("change", updateSeasonSummaryAthletes);
@@ -2067,6 +2273,11 @@
 
             // Init Athlete Dropdown
             updateSeasonSummaryAthletes();
+
+            if (ps.athlete != null && ps.athlete !== '' && selectOptionExists(selectorsSummary.athlete, ps.athlete)) {
+                selectorsSummary.athlete.property("value", String(ps.athlete));
+                generateSeasonSummary();
+            }
         }
 
         function updateSeasonSummaryAthletes() {
