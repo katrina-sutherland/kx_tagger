@@ -5352,3 +5352,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,La Seu,M,H2,Finish,G,4,Finish,2,2,,,
 2025,WC1,La Seu,M,H2,Finish,Y,1,Finish,3,3,,,
 2025,WC1,La Seu,M,H2,Finish,B,2,Finish,4,4,,,
+2025,WC1,La Seu,M,H3,Ramp,Y,1,Assigned,,,,GONCALVES Pedro,
+2025,WC1,La Seu,M,H3,Ramp,B,2,Assigned,,,,HUANG Liman,
+2025,WC1,La Seu,M,H3,Ramp,R,3,Assigned,,,,LEAVER Sam,
+2025,WC1,La Seu,M,H3,Ramp,G,4,Assigned,,,,DELFOUR Lucien,
+2025,WC1,La Seu,M,H3,SG,G,4,Down,1,,Down,,
