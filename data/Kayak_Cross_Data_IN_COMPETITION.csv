@@ -5308,3 +5308,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,La Seu,M,H1,Ramp,B,2,Assigned,,,,HAYLETT Ben,
 2025,WC1,La Seu,M,H1,Ramp,G,3,Assigned,,,,POPE Benjamin,
 2025,WC1,La Seu,M,H1,Ramp,R,4,Assigned,,,,DICKSON Jonny,
+2025,WC1,La Seu,M,H1,SG,R,4,Down-Left,1,,Down-Left,,
+2025,WC1,La Seu,M,H1,SG,B,2,Down-Right,2,,SPLIT,,
+2025,WC1,La Seu,M,H1,SG,Y,1,Down-Right,3,,FOLLOW,,
+2025,WC1,La Seu,M,H1,SG,G,3,Down-Left,4,,SPLIT,,
+2025,WC1,La Seu,M,H1,1st Up,B,2,Right-Up,1,,Right-Up,,
