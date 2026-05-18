@@ -5304,3 +5304,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC1,La Seu,W,Final,Finish,Y,1,Finish,2,2,,,
 2025,WC1,La Seu,W,Final,Finish,G,4,Finish,3,3,,,
 2025,WC1,La Seu,W,Final,Finish,B,2,Finish,4,4,,,
+2025,WC1,La Seu,M,H1,Ramp,Y,1,Assigned,,,,OHRSTROM Isak,
+2025,WC1,La Seu,M,H1,Ramp,B,2,Assigned,,,,HAYLETT Ben,
+2025,WC1,La Seu,M,H1,Ramp,G,3,Assigned,,,,POPE Benjamin,
+2025,WC1,La Seu,M,H1,Ramp,R,4,Assigned,,,,DICKSON Jonny,
