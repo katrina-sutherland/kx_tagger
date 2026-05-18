@@ -5931,3 +5931,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,W,SF2,Ramp,B,2,Assigned,,,,MARX Alena,
 2025,WC2,Pau,W,SF2,Ramp,R,3,Assigned,,,,FOX Jessica,
 2025,WC2,Pau,W,SF2,Ramp,G,4,Assigned,,,,LAZKANO Miren,
+2025,WC2,Pau,W,SF2,1,R,3,Down-Right,1,,,,
+2025,WC2,Pau,W,SF2,1,B,2,Down-Right,2,,,,
+2025,WC2,Pau,W,SF2,1,G,4,Down-Right,3,,,,
+2025,WC2,Pau,W,SF2,1,Y,1,Down-Right,4,,,,
