@@ -480,6 +480,30 @@
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
         const SELECT_PLACEHOLDER = 'Select...';
+        const SPECIAL_GATE_ID = 'SG';
+        const GATE_COLOR_DOWNSTREAM = '#22c55e';
+        const GATE_COLOR_UPSTREAM_FULL = '#DC143C';
+        const GATE_COLOR_UPSTREAM_COMPACT = '#ef4444';
+        const GATE_COLOR_ROLL = '#eab308';
+        const GATE_COLOR_NEUTRAL = '#94a3b8';
+
+        function isSpecialGate(gate) {
+            return gate === SPECIAL_GATE_ID || gate === 'Special';
+        }
+
+        /** SG is always a downstream gate — never treat it as upstream for labels or colours. */
+        function withoutSpecialGateFromUpstreamList(upstreamGates) {
+            return (upstreamGates || []).filter(g => !isSpecialGate(g));
+        }
+
+        function gateAxisLabelColor(gate, upstreamGates, options = {}) {
+            const { rollGates = [], upstreamColor = GATE_COLOR_UPSTREAM_COMPACT } = options;
+            if (gate === 'Finish' || gate === 'Start') return GATE_COLOR_NEUTRAL;
+            if (gate === 'Roll' || rollGates.includes(gate)) return GATE_COLOR_ROLL;
+            if (isSpecialGate(gate)) return GATE_COLOR_DOWNSTREAM;
+            if (upstreamGates.includes(gate)) return upstreamColor;
+            return GATE_COLOR_DOWNSTREAM;
+        }
 
         // Declare DOM variables
         let tooltip, tabFull, tabCompact, tabTT, tabAthlete, tabSummary;
@@ -697,6 +721,76 @@
                 return `${lastName} ${firstName}`;
             }
             return name.toUpperCase();
+        }
+
+        function isDnsRow(d) {
+            if (!d) return false;
+            const action = String(d.Action || '').trim().toUpperCase();
+            const finalPos = String(d.FinalPosition ?? '').trim().toUpperCase();
+            return action === 'DNS' || finalPos === 'DNS';
+        }
+
+        function athleteNameFromRaceRows(rows, bib) {
+            const named = rows.filter(r => r.BIB === bib && r.AthleteName && String(r.AthleteName).trim());
+            if (!named.length) return '';
+            return formatAthleteName(named[0].AthleteName);
+        }
+
+        /** Names + ramp lane numbers (or 'DNS') for every BIB in a single race/phase. */
+        function buildRaceBibMeta(currentRaceData) {
+            const bibToNameMap = new Map();
+            const rampPositions = new Map();
+            const dnsBibs = new Set();
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB).filter(Boolean))];
+
+            bibsInRace.forEach(bib => {
+                const rows = currentRaceData.filter(d => d.BIB === bib);
+                const name = athleteNameFromRaceRows(rows, bib);
+                if (name) bibToNameMap.set(bib, name);
+
+                if (rows.some(isDnsRow)) {
+                    dnsBibs.add(bib);
+                    rampPositions.set(bib, 'DNS');
+                    return;
+                }
+                const rampRow = rows.find(d => d.Gate === 'Ramp' && d.RampPosition > 0)
+                    || rows.find(d => d.RampPosition > 0);
+                if (rampRow) rampPositions.set(bib, rampRow.RampPosition);
+            });
+
+            return { bibToNameMap, rampPositions, dnsBibs };
+        }
+
+        function sortRampPositionEntries(rampPositions) {
+            const bibOrder = ['R', 'G', 'B', 'Y'];
+            return Array.from(rampPositions).sort((a, b) => {
+                const [bibA, posA] = a;
+                const [bibB, posB] = b;
+                const dnsA = posA === 'DNS';
+                const dnsB = posB === 'DNS';
+                if (dnsA && dnsB) return bibOrder.indexOf(bibA) - bibOrder.indexOf(bibB);
+                if (dnsA) return 1;
+                if (dnsB) return -1;
+                if (posA !== posB) return posA - posB;
+                return bibOrder.indexOf(bibA) - bibOrder.indexOf(bibB);
+            });
+        }
+
+        function appendRampPosChartLabel(chart, x, y, bib, pos, bibToNameMap) {
+            const fullName = bibToNameMap.get(bib);
+            const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+            const textNode = chart.append("text")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("text-anchor", "end")
+                .style("fill", bibColors[bib])
+                .style("font-size", "10px");
+            textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
+            if (pos === 'DNS') {
+                textNode.append("tspan").style("font-weight", "normal").style("font-size", "8px").text("DNS");
+            } else {
+                textNode.append("tspan").style("font-weight", "normal").text(pos);
+            }
         }
 
         function parseCsvData(csvString) {
@@ -944,7 +1038,10 @@
                 });
             }
 
-            return { orderedGates, upstreamGates: Array.from(upstreamGates) };
+            return {
+                orderedGates,
+                upstreamGates: withoutSpecialGateFromUpstreamList(Array.from(upstreamGates))
+            };
         }
 
         // --- INITIALIZATION ---
@@ -1845,7 +1942,7 @@
                 filteredData = filteredData.filter(d => d.Gender === selectedFilters.gender);
             }
 
-            const athleteRampData = filteredData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            const athleteRampData = filteredData.filter(d => d.AthleteName && (d.Gate === 'Ramp' || isDnsRow(d)));
             const uniqueAthleteNames = ['', ...[...new Set(athleteRampData.map(d => formatAthleteName(d.AthleteName)))].sort()];
 
             const selects = d3.selectAll(".athlete-select");
@@ -1916,8 +2013,10 @@
 
             const originalName = originalAthleteEntry.AthleteName;
 
-            // 4. Get Ramp entries (runs) for this athlete IN THIS CONTEXT ONLY
-            const athleteRampEntries = contextData.filter(d => d.AthleteName === originalName && d.Gate === 'Ramp');
+            // 4. Get Ramp / DNS (Start) entries (runs) for this athlete IN THIS CONTEXT ONLY
+            const athleteRampEntries = contextData.filter(d =>
+                d.AthleteName === originalName && (d.Gate === 'Ramp' || (d.Gate === 'Start' && isDnsRow(d)))
+            );
 
             const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
             athleteRampEntries.sort((a, b) => {
@@ -1931,7 +2030,8 @@
             });
 
             const profileData = athleteRampEntries.map(rampEntry => {
-                const { Phase: phase, BIB: bib, RampPosition: rampPos } = rampEntry;
+                const { Phase: phase, BIB: bib } = rampEntry;
+                const rampPos = isDnsRow(rampEntry) ? 'DNS' : rampEntry.RampPosition;
 
                 // 5. Get full race data from CONTEXT DATA
                 const fullRaceDataForAthlete = contextData.filter(d => d.Phase === phase && d.BIB === bib);
@@ -1992,8 +2092,13 @@
                 // Centered Bib Cell
                 row.append("td").attr("class", `${cellClass} text-center`).html(`<div class="w-2 h-2 md:w-4 md:h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
 
-                // Centered Ramp Cell
-                row.append("td").attr("class", `${cellClass} text-center`).text(d.rampPos);
+                // Centered Ramp Cell (DNS shown smaller)
+                const rampCell = row.append("td").attr("class", `${cellClass} text-center`);
+                if (d.rampPos === 'DNS') {
+                    rampCell.append("span").attr("class", "text-[9px] lg:text-[10px] text-slate-400").text("DNS");
+                } else {
+                    rampCell.text(d.rampPos);
+                }
 
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.direction);
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.tactic);
@@ -2029,6 +2134,7 @@
         }
 
         function calculateTacticLogic(raceData, upstreamGates) {
+            upstreamGates = withoutSpecialGateFromUpstreamList(upstreamGates);
             upstreamGates.forEach(gate => {
                 const gateEvents = raceData.filter(d => d.Gate === gate).sort((a, b) => a.Position - b.Position);
                 if (gateEvents.length === 0) return;
@@ -2055,9 +2161,9 @@
                 }
             });
 
-            // --- SPECIAL GATE: Set displayTactic to L or R based on Action ---
+            // --- SPECIAL GATE (downstream): L / R labels from action ---
             raceData.forEach(d => {
-                if (d.Gate === 'SG') {
+                if (isSpecialGate(d.Gate)) {
                     const action = (d.Action || '').toLowerCase();
                     if (action.includes('left')) {
                         d.displayTactic = 'L';
@@ -2086,9 +2192,7 @@
             const athleteStats = bibsInRace.map(bib => {
                 const myFaults = faultData.filter(d => d.BIB === bib);
 
-                // Name lookup (grab from first valid entry)
-                const nameEntry = raceData.find(d => d.BIB === bib && d.AthleteName);
-                const name = nameEntry ? formatAthleteName(nameEntry.AthleteName) : (bibFullNames[bib] || bib);
+                const name = athleteNameFromRaceRows(raceData, bib) || (bibFullNames[bib] || bib);
 
                 let isRAL = false;
                 let deepestFaultIndex = -1;
@@ -2117,9 +2221,13 @@
                     return f.FaultVal || f.Action || "Fault";
                 });
 
-                const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0);
-                const originalRank = finishEntry ? finishEntry.FinalPosition : 99;
+                const dnsRow = raceData.find(d => d.BIB === bib && isDnsRow(d));
+                const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0 && !isDnsRow(d));
+                const originalRank = dnsRow ? 99 : (finishEntry ? finishEntry.FinalPosition : 99);
                 const rampEntry = raceData.find(d => d.BIB === bib && d.Gate === 'Ramp');
+                let rampPosition = '-';
+                if (dnsRow) rampPosition = 'DNS';
+                else if (rampEntry && rampEntry.RampPosition > 0) rampPosition = rampEntry.RampPosition;
 
                 // Capture finish rank from any entry for this athlete in this race
                 const finishRankEntry = raceData.find(d => d.BIB === bib && d.FinishRank);
@@ -2128,7 +2236,8 @@
                 return {
                     bib: bib,
                     name: name,
-                    rampPosition: rampEntry ? rampEntry.RampPosition : '-',
+                    rampPosition: rampPosition,
+                    isDNS: !!dnsRow,
                     faults: faultStrings,
                     faultCount: faultStrings.length,
                     deepestFaultIndex: deepestFaultIndex,
@@ -2227,7 +2336,8 @@
                 row.append("span").attr("class", "text-slate-200 truncate").text(athlete.name);
 
                 let reason = "Clean";
-                if (athlete.isRAL) reason = "RAL";
+                if (athlete.isDNS) reason = "DNS";
+                else if (athlete.isRAL) reason = "RAL";
                 else if (athlete.faultCount > 0) {
                     const gateName = orderedGates[athlete.deepestFaultIndex] || "Start";
                     reason = athlete.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athlete.faultCount} Faults`;
@@ -2441,7 +2551,12 @@
                     bibCell.append("div").attr("class", "w-4 h-4 rounded-sm inline-block align-middle mr-2").style("background-color", bibColors[athleteResult.bib]);
                     bibCell.append("span").text(athleteResult.bib);
 
-                    tr.append("td").attr("class", "p-3").text(athleteResult.rampPosition);
+                    const rampTd = tr.append("td").attr("class", "p-3");
+                    if (athleteResult.rampPosition === 'DNS') {
+                        rampTd.append("span").attr("class", "text-xs text-slate-400").text("DNS");
+                    } else {
+                        rampTd.text(athleteResult.rampPosition);
+                    }
 
                     // Phase Rank (Result)
                     const phaseRank = athleteResult.calculatedRank;
@@ -2476,7 +2591,8 @@
 
                     // Notes
                     let note = "-";
-                    if (athleteResult.isRAL) note = "RAL";
+                    if (athleteResult.isDNS) note = "DNS";
+                    else if (athleteResult.isRAL) note = "RAL";
                     else if (athleteResult.faultCount > 0) {
                         const gateName = structure.orderedGates[athleteResult.deepestFaultIndex] || "Start";
                         note = athleteResult.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athleteResult.faultCount} Faults`;
@@ -2509,12 +2625,9 @@
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => {
-                if (d === 'Finish' || d === 'Start') return '#94a3b8';
-                if (d === 'Roll') return '#eab308';
-                if (upstreamGates.includes(d)) return '#DC143C';
-                return '#22c55e';
-            });
+            xAxis.selectAll(".tick text").style("fill", d => gateAxisLabelColor(d, upstreamGates, {
+                upstreamColor: GATE_COLOR_UPSTREAM_FULL
+            }));
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const finishTextNode = finishTick.select('text').node();
@@ -2527,14 +2640,10 @@
             svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
             svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
-                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                const sortedRamps = sortRampPositionEntries(rampPositions);
                 chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 10) - 4).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
                 sortedRamps.forEach(([bib, pos], i) => {
-                    const fullName = bibToNameMap.get(bib);
-                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
-                    const textNode = chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
-                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
-                    textNode.append("tspan").style("font-weight", "normal").text(pos);
+                    appendRampPosChartLabel(chart, -10, yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12), bib, pos, bibToNameMap);
                 });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
@@ -2546,7 +2655,7 @@
                 const pointsData = values.filter(d => d.Gate !== 'Start');
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    const showLabel = (upstreamGates.includes(d.Gate) || d.Gate === 'SG') && d.displayTactic;
+                    const showLabel = (upstreamGates.includes(d.Gate) || isSpecialGate(d.Gate)) && d.displayTactic;
                     if (showLabel) {
                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
@@ -2569,11 +2678,10 @@
             legendContainer.selectAll("*").remove();
 
             // Legend Sorting Logic
+            const bibOrderLegendFull = ['R', 'G', 'B', 'Y'];
+            const legendBibsFull = [...new Set([...groupedData.keys(), ...rampPositions.keys()])].sort((a, b) => bibOrderLegendFull.indexOf(a) - bibOrderLegendFull.indexOf(b));
             const legendItems = legendContainer.selectAll("div")
-                .data(Array.from(groupedData.keys()).sort((a, b) => {
-                    const order = ['R', 'G', 'B', 'Y'];
-                    return order.indexOf(a) - order.indexOf(b);
-                }))
+                .data(legendBibsFull)
                 .join("div")
                 .attr("class", "flex items-center");
 
@@ -2600,12 +2708,7 @@
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => {
-                if (d === 'Finish' || d === 'Start') return '#94a3b8';
-                if (d === 'Roll' || rollGates.includes(d)) return '#eab308'; // Yellow for Rolls
-                if (upstreamGates.includes(d)) return '#ef4444'; // Red for Upstreams
-                return '#22c55e'; // Green for Downstreams
-            });
+            xAxis.selectAll(".tick text").style("fill", d => gateAxisLabelColor(d, upstreamGates, { rollGates }));
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const bbox = finishTick.select('text').node().getBBox();
@@ -2615,14 +2718,10 @@
             svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
             svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
-                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                const sortedRamps = sortRampPositionEntries(rampPositions);
                 chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
                 sortedRamps.forEach(([bib, pos], i) => {
-                    const fullName = bibToNameMap.get(bib);
-                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
-                    const textNode = chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
-                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
-                    textNode.append("tspan").style("font-weight", "normal").text(pos);
+                    appendRampPosChartLabel(chart, -10, yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12), bib, pos, bibToNameMap);
                 });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
@@ -2634,7 +2733,7 @@
                 const pointsData = values.filter(d => d.Gate !== 'Start');
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    const showLabel = (upstreamGates.includes(d.Gate) || d.Gate === 'SG') && d.displayTactic;
+                    const showLabel = (upstreamGates.includes(d.Gate) || isSpecialGate(d.Gate)) && d.displayTactic;
                     if (showLabel) {
                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
@@ -2656,12 +2755,10 @@
             const legendContainer = d3.select("#legend-compact");
             legendContainer.selectAll("*").remove();
 
-            // Legend Sorting Logic (Updated)
+            const bibOrderLegendCompact = ['R', 'G', 'B', 'Y'];
+            const legendBibsCompact = [...new Set([...groupedData.keys(), ...rampPositions.keys()])].sort((a, b) => bibOrderLegendCompact.indexOf(a) - bibOrderLegendCompact.indexOf(b));
             const legendItems = legendContainer.selectAll("div")
-                .data(Array.from(groupedData.keys()).sort((a, b) => {
-                    const order = ['R', 'G', 'B', 'Y'];
-                    return order.indexOf(a) - order.indexOf(b);
-                }))
+                .data(legendBibsCompact)
                 .join("div")
                 .attr("class", "flex items-center");
 
@@ -2695,29 +2792,22 @@
             // Gate order and upstream from race; upstream only where competition says upstream (stops carryover e.g. Gate 7)
             const raceStructure = getRaceStructure(currentRaceData, structure.orderedGates, structure.upstreamGates);
             const courseDisplayOrder = raceStructure.orderedGates.length > 0 ? raceStructure.orderedGates : structure.orderedGates;
-            const upstreamGatesFull = raceStructure.upstreamGates;
+            const upstreamGatesFull = withoutSpecialGateFromUpstreamList(raceStructure.upstreamGates);
 
             calculateTacticLogic(currentRaceData, upstreamGatesFull);
 
-            const bibToNameMap = new Map();
-            const rampPositions = new Map();
-            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
-            rampEntriesForCurrentRace.forEach(d => {
-                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
-            });
-            currentRaceData.forEach(d => {
-                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
-            });
+            const { bibToNameMap, rampPositions, dnsBibs } = buildRaceBibMeta(currentRaceData);
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
             const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataFull = [];
             bibsInRace.forEach(bib => {
+                if (dnsBibs.has(bib)) return;
                 const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0 && !isDnsRow(d));
                 const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
                 lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
                 const gateData = athleteRaceData.filter(d =>
-                    d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0 && courseDisplayOrder.includes(d.Gate)
+                    d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Position > 0 && courseDisplayOrder.includes(d.Gate)
                 );
                 lineChartReadyDataFull.push(...gateData);
                 if (finalPosition) {
@@ -2800,44 +2890,39 @@
             });
             const courseDisplayOrder = [...orderedGatesSet];
 
-            // Detect upstream gates from the competition-wide scan AND current race data
-            const upstreamGates = [...structure.upstreamGates.filter(g => courseDisplayOrder.includes(g))];
+            // Detect upstream gates from the competition-wide scan AND current race data (SG is always downstream)
+            const upstreamGates = withoutSpecialGateFromUpstreamList(
+                structure.upstreamGates.filter(g => courseDisplayOrder.includes(g))
+            );
             currentRaceData.forEach(d => {
+                const gate = d.Gate;
+                if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish' || isSpecialGate(gate)) return;
                 const action = d.Action || "";
                 const tactic = d.UpstreamTactic || "";
                 if ((action.includes('Up') || (tactic.trim().length > 0 && tactic !== 'N/A')) &&
-                    d.Gate && d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish') {
-                    if (!upstreamGates.includes(d.Gate)) upstreamGates.push(d.Gate);
+                    !upstreamGates.includes(gate)) {
+                    upstreamGates.push(gate);
                 }
             });
 
             calculateTacticLogic(currentRaceData, upstreamGates);
 
-            // Population of map variables
-            const bibToNameMap = new Map();
-            const rampPositions = new Map();
-            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
-            rampEntriesForCurrentRace.forEach(d => {
-                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
-            });
-            currentRaceData.forEach(d => {
-                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
-            });
+            const { bibToNameMap, rampPositions, dnsBibs } = buildRaceBibMeta(currentRaceData);
 
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
 
             const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
             let lineChartReadyDataCompact = [];
             bibsInRace.forEach(bib => {
+                if (dnsBibs.has(bib)) return;
                 const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
+                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0 && !isDnsRow(d));
                 const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
 
                 lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
 
-                // No mapping needed — gate names are already display-ready
                 const gateData = athleteRaceData.filter(d =>
-                    d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0 &&
+                    d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Position > 0 &&
                     courseDisplayOrder.includes(d.Gate)
                 );
                 lineChartReadyDataCompact.push(...gateData);
