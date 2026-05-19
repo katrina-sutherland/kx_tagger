@@ -6179,3 +6179,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC2,Pau,M,QF1,1st Up,G,3,Up,2,,FOLLOW,,
 2025,WC2,Pau,M,QF1,1st Up,B,2,Left-Up,3,,SPLIT,,
 2025,WC2,Pau,M,QF1,1st Up,Y,1,Left-Up,4,,FOLLOW,,
+2025,WC2,Pau,M,QF1,Next Gate,G,3,Down-Left,1,,,,
+2025,WC2,Pau,M,QF1,Next Gate,R,4,Down-Left,2,,,,
+2025,WC2,Pau,M,QF1,Next Gate,B,2,Down-Left,3,,,,
+2025,WC2,Pau,M,QF1,Next Gate,Y,1,Down-Left,4,,,,
