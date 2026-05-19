@@ -730,6 +730,32 @@
             return action === 'DNS' || finalPos === 'DNS';
         }
 
+        /** Standalone fault rows (FLT action, no live tag order) — exclude from line chart / gate order. */
+        function isFaultOnlyRow(d) {
+            if (!d) return false;
+            const action = String(d.Action || '').trim().toUpperCase();
+            if (action === 'FLT' || action === 'RAL') return true;
+            const order = +(d.Order ?? d.Position ?? 0);
+            if (order > 0) return false;
+            const faultVal = String(d.FaultVal || '').trim();
+            if (faultVal && /FLT|FAULT|RAL|DSQ|DNF/i.test(faultVal)) return true;
+            const gate = String(d.Gate || '').trim().toUpperCase();
+            if (gate === 'COURSE' && order === 0) return true;
+            return false;
+        }
+
+        /** Rows from live tagging (gate sequence + finish); ignores fault-only rows and backfilled final ranks. */
+        function isLiveRaceTagRow(d) {
+            if (!d || !d.BIB) return false;
+            if (d.Gate === 'Ramp' || d.Gate === 'Start') return false;
+            if (isDnsRow(d) || isFaultOnlyRow(d)) return false;
+            return +(d.Order ?? d.Position ?? 0) > 0;
+        }
+
+        function liveTagOrder(d) {
+            return +(d.Order ?? d.Position ?? 0);
+        }
+
         function athleteNameFromRaceRows(rows, bib) {
             const named = rows.filter(r => r.BIB === bib && r.AthleteName && String(r.AthleteName).trim());
             if (!named.length) return '';
@@ -759,6 +785,66 @@
             });
 
             return { bibToNameMap, rampPositions, dnsBibs };
+        }
+
+        /** Line chart points from live tags only (Order at each gate; finish uses Finish row Order, not fault-adjusted Final Position). */
+        function buildLineChartSeriesForRace(currentRaceData, courseDisplayOrder, options = {}) {
+            const { startPosition = 4.5, dnsBibs = new Set() } = options;
+            const series = [];
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB).filter(Boolean))];
+            bibsInRace.forEach(bib => {
+                if (dnsBibs.has(bib)) return;
+                const athleteRows = currentRaceData.filter(d => d.BIB === bib);
+                series.push({ BIB: bib, Gate: 'Start', Position: startPosition });
+                athleteRows
+                    .filter(d => isLiveRaceTagRow(d) && d.Gate !== 'Finish' && courseDisplayOrder.includes(d.Gate))
+                    .forEach(d => {
+                        series.push({
+                            BIB: bib,
+                            Gate: d.Gate,
+                            Position: liveTagOrder(d),
+                            Action: d.Action,
+                            UpstreamTactic: d.UpstreamTactic,
+                            displayTactic: d.displayTactic
+                        });
+                    });
+                const finishRow = athleteRows.find(d => d.Gate === 'Finish' && isLiveRaceTagRow(d));
+                if (finishRow) {
+                    const finishPos = liveTagOrder(finishRow);
+                    series.push({ BIB: bib, Gate: 'Finish', Position: finishPos, FinalPosition: finishPos });
+                }
+            });
+            return series;
+        }
+
+        /**
+         * Per-phase results after faults (for pie charts). Line chart uses live tags only.
+         */
+        function buildFaultAdjustedPhaseOutcomes(aggregateData, compStructure) {
+            const phases = [...new Set(aggregateData.map(d => d.Phase).filter(Boolean))];
+            const outcomes = [];
+            phases.forEach(phase => {
+                const raceData = aggregateData.filter(d => d.Phase === phase);
+                const liveForStructure = raceData.filter(d => isLiveRaceTagRow(d));
+                const rs = getRaceStructure(
+                    liveForStructure,
+                    compStructure.orderedGates,
+                    compStructure.upstreamGates
+                );
+                const orderedGates = rs.orderedGates.length ? rs.orderedGates : compStructure.orderedGates;
+                getCalculatedRaceResults(raceData, orderedGates).forEach(r => {
+                    if (r.isDNS) return;
+                    const rampPos = r.rampPosition;
+                    if (rampPos === 'DNS' || rampPos === '-') return;
+                    outcomes.push({
+                        Phase: phase,
+                        BIB: r.bib,
+                        FinalPosition: r.calculatedRank,
+                        RampPosition: typeof rampPos === 'number' ? rampPos : parseInt(rampPos, 10) || 0
+                    });
+                });
+            });
+            return outcomes;
         }
 
         function sortRampPositionEntries(rampPositions) {
@@ -929,6 +1015,7 @@
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+                if (isFaultOnlyRow(d)) return;
                 if (gate === 'SG') return; // SG is a downstream gate, skip upstream detection
 
                 const action = (d.Action || "").trim().toLowerCase();
@@ -940,7 +1027,7 @@
             compData.forEach(d => {
                 const runId = `${d.Phase}-${d.Gender}-${d.BIB}`;
                 if (!runs[runId]) runs[runId] = [];
-                if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp') {
+                if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp' && isLiveRaceTagRow(d)) {
                     runs[runId].push(d.Gate);
                 }
             });
@@ -981,7 +1068,7 @@
             const gatesInRace = new Set();
             raceData.forEach(d => {
                 const g = d.Gate;
-                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish') gatesInRace.add(g);
+                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish' && !isFaultOnlyRow(d)) gatesInRace.add(g);
             });
 
             const compUpstreamSet = new Set(competitionUpstreamGates || []);
@@ -991,6 +1078,7 @@
             raceData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+                if (isFaultOnlyRow(d)) return;
                 if (gate === 'SG') return; // SG is downstream, skip upstream detection
                 const action = (d.Action || '').toLowerCase();
                 if (action.includes('up')) upstreamCandidates.add(gate);
@@ -1008,7 +1096,7 @@
             const seen = new Set();
             raceData.forEach(d => {
                 const g = d.Gate;
-                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish' && !seen.has(g)) {
+                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish' && !isFaultOnlyRow(d) && !seen.has(g)) {
                     seen.add(g);
                     orderedGates.push(g);
                 }
@@ -2135,8 +2223,9 @@
 
         function calculateTacticLogic(raceData, upstreamGates) {
             upstreamGates = withoutSpecialGateFromUpstreamList(upstreamGates);
+            const liveRows = raceData.filter(isLiveRaceTagRow);
             upstreamGates.forEach(gate => {
-                const gateEvents = raceData.filter(d => d.Gate === gate).sort((a, b) => a.Position - b.Position);
+                const gateEvents = liveRows.filter(d => d.Gate === gate).sort((a, b) => liveTagOrder(a) - liveTagOrder(b));
                 if (gateEvents.length === 0) return;
                 const leader = gateEvents[0];
                 leader.displayTactic = leader.UpstreamTactic;
@@ -2155,14 +2244,14 @@
                 }
             });
             // Non-upstream gates: clear displayTactic so no carryover from previous upstream is shown
-            raceData.forEach(d => {
+            liveRows.forEach(d => {
                 if (!upstreamGates.includes(d.Gate)) {
                     d.displayTactic = '';
                 }
             });
 
             // --- SPECIAL GATE (downstream): L / R labels from action ---
-            raceData.forEach(d => {
+            liveRows.forEach(d => {
                 if (isSpecialGate(d.Gate)) {
                     const action = (d.Action || '').toLowerCase();
                     if (action.includes('left')) {
@@ -2222,8 +2311,8 @@
                 });
 
                 const dnsRow = raceData.find(d => d.BIB === bib && isDnsRow(d));
-                const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0 && !isDnsRow(d));
-                const originalRank = dnsRow ? 99 : (finishEntry ? finishEntry.FinalPosition : 99);
+                const finishRow = raceData.find(d => d.BIB === bib && d.Gate === 'Finish' && isLiveRaceTagRow(d));
+                const originalRank = dnsRow ? 99 : (finishRow ? liveTagOrder(finishRow) : 99);
                 const rampEntry = raceData.find(d => d.BIB === bib && d.Gate === 'Ramp');
                 let rampPosition = '-';
                 if (dnsRow) rampPosition = 'DNS';
@@ -2789,8 +2878,9 @@
             let currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             if (selected.location && selected.location !== 'All') currentRaceData = currentRaceData.filter(d => d.Location === selected.location);
 
-            // Gate order and upstream from race; upstream only where competition says upstream (stops carryover e.g. Gate 7)
-            const raceStructure = getRaceStructure(currentRaceData, structure.orderedGates, structure.upstreamGates);
+            // Gate order from live tags only; faults do not change the line chart
+            const liveForStructure = currentRaceData.filter(isLiveRaceTagRow);
+            const raceStructure = getRaceStructure(liveForStructure, structure.orderedGates, structure.upstreamGates);
             const courseDisplayOrder = raceStructure.orderedGates.length > 0 ? raceStructure.orderedGates : structure.orderedGates;
             const upstreamGatesFull = withoutSpecialGateFromUpstreamList(raceStructure.upstreamGates);
 
@@ -2798,21 +2888,9 @@
 
             const { bibToNameMap, rampPositions, dnsBibs } = buildRaceBibMeta(currentRaceData);
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
-            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
-            let lineChartReadyDataFull = [];
-            bibsInRace.forEach(bib => {
-                if (dnsBibs.has(bib)) return;
-                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0 && !isDnsRow(d));
-                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
-                lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                const gateData = athleteRaceData.filter(d =>
-                    d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Position > 0 && courseDisplayOrder.includes(d.Gate)
-                );
-                lineChartReadyDataFull.push(...gateData);
-                if (finalPosition) {
-                    lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
-                }
+            const lineChartReadyDataFull = buildLineChartSeriesForRace(currentRaceData, courseDisplayOrder, {
+                startPosition: 5,
+                dnsBibs
             });
             drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGatesFull);
 
@@ -2820,12 +2898,7 @@
 
             let pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             if (selected.location && selected.location !== 'All') pieChartAggregateData = pieChartAggregateData.filter(d => d.Location === selected.location);
-            const uniqueFinalPositions = [];
-            const seenEntries = new Set();
-            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
-                const key = `${d.Phase}-${d.BIB}`;
-                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
-            });
+            const uniqueFinalPositions = buildFaultAdjustedPhaseOutcomes(pieChartAggregateData, structure);
             const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
             const allBibLabels = Object.values(bibFullNames).sort();
             const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => bibColors[Object.keys(bibFullNames).find(key => bibFullNames[key] === label)]));
@@ -2836,7 +2909,7 @@
             const bibSecondPlaceCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
             const bibSecondPlacePieData = allBibLabels.map(label => ({ label: label, value: bibSecondPlaceCounts.get(label) || 0 }));
             drawPieChartAndLegend("#pie-chart-bib-second-full", "#pie-legend-bib-second-full", bibSecondPlacePieData, bibColorScale);
-            const gate2Leaders = pieChartAggregateData.filter(d => d.Gate === '2' && d.Position === 1);
+            const gate2Leaders = pieChartAggregateData.filter(d => d.Gate === '2' && d.Position === 1 && isLiveRaceTagRow(d));
             const finishPositionsOfLeaders = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
             gate2Leaders.forEach(leader => {
                 const finalResult = uniqueFinalPositions.find(d => d.Phase === leader.Phase && d.BIB === leader.BIB);
@@ -2879,24 +2952,17 @@
             let currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             if (selected.location && selected.location !== 'All') currentRaceData = currentRaceData.filter(d => d.Location === selected.location);
 
-            // --- BUILD GATE ORDER DIRECTLY FROM RACE DATA ---
-            // In-competition tagger saves display-ready gate names ("1", "1st Up", etc.)
-            // so no mapping is needed. We build the order from the data itself.
-            const orderedGatesSet = new Set();
-            currentRaceData.forEach(d => {
-                if (d.Gate && d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish') {
-                    orderedGatesSet.add(d.Gate);
-                }
-            });
-            const courseDisplayOrder = [...orderedGatesSet];
+            // Gate order from live tags only (same as full report — faults do not reorder gates)
+            const liveForStructure = currentRaceData.filter(isLiveRaceTagRow);
+            const raceStructure = getRaceStructure(liveForStructure, structure.orderedGates, structure.upstreamGates);
+            const courseDisplayOrder = raceStructure.orderedGates.length > 0 ? raceStructure.orderedGates : structure.orderedGates;
 
-            // Detect upstream gates from the competition-wide scan AND current race data (SG is always downstream)
             const upstreamGates = withoutSpecialGateFromUpstreamList(
                 structure.upstreamGates.filter(g => courseDisplayOrder.includes(g))
             );
-            currentRaceData.forEach(d => {
+            liveForStructure.forEach(d => {
                 const gate = d.Gate;
-                if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish' || isSpecialGate(gate)) return;
+                if (!gate || gate === 'Finish' || isSpecialGate(gate)) return;
                 const action = d.Action || "";
                 const tactic = d.UpstreamTactic || "";
                 if ((action.includes('Up') || (tactic.trim().length > 0 && tactic !== 'N/A')) &&
@@ -2911,30 +2977,13 @@
 
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
 
-            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
-            let lineChartReadyDataCompact = [];
-            bibsInRace.forEach(bib => {
-                if (dnsBibs.has(bib)) return;
-                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0 && !isDnsRow(d));
-                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
-
-                lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-
-                const gateData = athleteRaceData.filter(d =>
-                    d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Position > 0 &&
-                    courseDisplayOrder.includes(d.Gate)
-                );
-                lineChartReadyDataCompact.push(...gateData);
-
-                if (finalPosition) {
-                    lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
-                }
+            const lineChartReadyDataCompact = buildLineChartSeriesForRace(currentRaceData, courseDisplayOrder, {
+                startPosition: 4.5,
+                dnsBibs
             });
 
-            // --- ROLL DETECTION (no mapping needed) ---
             const rollGates = [];
-            currentRaceData.forEach(d => {
+            liveForStructure.forEach(d => {
                 const actionStr = (d.Action || "").toLowerCase();
                 const gateStr = (d.Gate || "").toLowerCase();
                 if (gateStr === 'roll' || gateStr.includes('roll') || actionStr.includes('roll')) {
@@ -2944,17 +2993,11 @@
 
             drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates, rollGates);
 
-            // Fault Analysis — use race-specific ordered gates
             updateFaultAnalysis("#fault-analysis-compact", currentRaceData, courseDisplayOrder, bibToNameMap);
 
             let pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             if (selected.location && selected.location !== 'All') pieChartAggregateData = pieChartAggregateData.filter(d => d.Location === selected.location);
-            const uniqueFinalPositions = [];
-            const seenEntries = new Set();
-            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
-                const key = `${d.Phase}-${d.BIB}`;
-                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
-            });
+            const uniqueFinalPositions = buildFaultAdjustedPhaseOutcomes(pieChartAggregateData, structure);
             const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
             const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
             const allBibLabels = Object.values(bibFullNames).sort();
