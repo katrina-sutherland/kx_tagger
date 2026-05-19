@@ -496,6 +496,26 @@
             return (upstreamGates || []).filter(g => !isSpecialGate(g));
         }
 
+        /** First upstream gate on the course for a competition (by tagged gate order). */
+        function getFirstUpstreamGate(compStructure) {
+            if (!compStructure) return null;
+            const upstreamSet = new Set(withoutSpecialGateFromUpstreamList(compStructure.upstreamGates || []));
+            if (!upstreamSet.size) return null;
+            for (const gate of compStructure.orderedGates || []) {
+                if (upstreamSet.has(gate)) return gate;
+            }
+            let fallback = null;
+            let bestIdx = Infinity;
+            upstreamSet.forEach(g => {
+                const idx = (compStructure.orderedGates || []).indexOf(g);
+                if (idx >= 0 && idx < bestIdx) {
+                    bestIdx = idx;
+                    fallback = g;
+                }
+            });
+            return fallback || [...upstreamSet][0];
+        }
+
         function gateAxisLabelColor(gate, upstreamGates, options = {}) {
             const { rollGates = [], upstreamColor = GATE_COLOR_UPSTREAM_COMPACT } = options;
             if (gate === 'Finish' || gate === 'Start') return GATE_COLOR_NEUTRAL;
@@ -2117,26 +2137,42 @@
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
 
+            const compStructureCache = new Map();
+            const getCompStructure = (year, competition) => {
+                const key = `${year}|${competition}`;
+                if (!compStructureCache.has(key)) {
+                    compStructureCache.set(key, scanCompetitionStructure(year, competition, contextData));
+                }
+                return compStructureCache.get(key);
+            };
+
             const profileData = athleteRampEntries.map(rampEntry => {
-                const { Phase: phase, BIB: bib } = rampEntry;
+                const { Phase: phase, BIB: bib, Year: raceYear, Competition: raceComp } = rampEntry;
                 const rampPos = isDnsRow(rampEntry) ? 'DNS' : rampEntry.RampPosition;
 
-                // 5. Get full race data from CONTEXT DATA
                 const fullRaceDataForAthlete = contextData.filter(d => d.Phase === phase && d.BIB === bib);
 
-                const upstreamData = fullRaceDataForAthlete.find(d =>
-                    d.Gate !== 'Ramp' &&
-                    d.Gate !== 'Start' &&
-                    d.Gate !== 'Finish' &&
-                    d.UpstreamTactic &&
-                    d.UpstreamTactic.trim() !== ''
-                );
+                let tactic = 'N/A';
+                let direction = 'N/A';
 
-                let tactic = upstreamData?.UpstreamTactic || 'N/A';
-                let direction = upstreamData?.Action || 'N/A';
+                if (!isDnsRow(rampEntry)) {
+                    const compStructure = getCompStructure(raceYear, raceComp);
+                    const firstUpstreamGate = getFirstUpstreamGate(compStructure);
 
-                if (tactic === 'Left-Up' || tactic === 'Right-Up') {
-                    tactic = 'in 1st Place';
+                    if (firstUpstreamGate) {
+                        const upstreamData = fullRaceDataForAthlete.find(d =>
+                            d.Gate === firstUpstreamGate && isLiveRaceTagRow(d)
+                        ) || fullRaceDataForAthlete.find(d =>
+                            d.Gate === firstUpstreamGate && !isFaultOnlyRow(d)
+                        );
+
+                        tactic = upstreamData?.UpstreamTactic || 'N/A';
+                        direction = upstreamData?.Action || 'N/A';
+
+                        if (tactic === 'Left-Up' || tactic === 'Right-Up') {
+                            tactic = 'in 1st Place';
+                        }
+                    }
                 }
 
                 return { phase, bib, rampPos, direction, tactic };
