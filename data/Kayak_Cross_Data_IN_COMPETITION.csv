@@ -7953,3 +7953,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,H8,Finish,B,2,Finish,2,2,,,
 2025,WC5,Augsburg,W,H8,Finish,Y,1,Finish,3,3,,,
 2025,WC5,Augsburg,W,H8,Finish,G,4,Finish,4,4,,,
+2025,WC5,Augsburg,W,QF1,Ramp,R,1,Assigned,,,,LEAVER Lois,
+2025,WC5,Augsburg,W,QF1,Ramp,Y,2,Assigned,,,,PINTERIC Naja,
+2025,WC5,Augsburg,W,QF1,Ramp,G,3,Assigned,,,,DORIA Monica,
+2025,WC5,Augsburg,W,QF1,Ramp,B,4,Assigned,,,,SAMKOVA Olga,
