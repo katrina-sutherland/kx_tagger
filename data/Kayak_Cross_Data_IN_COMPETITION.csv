@@ -6740,3 +6740,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC3,Prague,M,H2,2nd Up,R,1,Left-Up,2,,SPLIT,,
 2025,WC3,Prague,M,H2,2nd Up,G,4,Left-Up,3,,FOLLOW,,
 2025,WC3,Prague,M,H2,2nd Up,B,2,Left-Up,4,,FOLLOW,,
+2025,WC3,Prague,M,H2,Finish,Y,3,Finish,1,1,,,
+2025,WC3,Prague,M,H2,Finish,G,4,Finish,2,2,,,
+2025,WC3,Prague,M,H2,Finish,R,1,Finish,3,3,,,
+2025,WC3,Prague,M,H2,Finish,B,2,Finish,4,4,,,
