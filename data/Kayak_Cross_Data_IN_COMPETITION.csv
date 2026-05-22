@@ -6597,3 +6597,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC3,Prague,W,QF3,2nd Up,B,2,Right-Up,2,,SPLIT,,
 2025,WC3,Prague,W,QF3,2nd Up,R,4,Right-Up,3,,FOLLOW,,
 2025,WC3,Prague,W,QF3,2nd Up,Y,3,Left-Up,4,,SPLIT,,
+2025,WC3,Prague,W,QF3,Finish,G,1,Finish,1,1,,,
+2025,WC3,Prague,W,QF3,Finish,R,4,Finish,2,2,,,
+2025,WC3,Prague,W,QF3,Finish,B,2,Finish,3,3,,,
+2025,WC3,Prague,W,QF3,Finish,Y,3,Finish,4,4,,,
+2025,WC3,Prague,W,QF4,Ramp,R,1,Assigned,,,,PRIGENT Camille,
