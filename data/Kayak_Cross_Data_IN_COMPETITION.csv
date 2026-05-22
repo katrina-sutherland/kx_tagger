@@ -6653,3 +6653,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC3,Prague,W,SF2,Ramp,B,2,Assigned,,,,PRIGENT Camille,
 2025,WC3,Prague,W,SF2,Ramp,Y,3,Assigned,,,,LEIBFARTH Evy,
 2025,WC3,Prague,W,SF2,Ramp,R,4,Assigned,,,,FUNK Ricarda,
+2025,WC3,Prague,W,SF2,SG,R,4,Down-Left,1,,Down-Left,,
+2025,WC3,Prague,W,SF2,SG,Y,3,Down-Left,2,,FOLLOW,,
+2025,WC3,Prague,W,SF2,SG,B,2,Down-Right,3,,SPLIT,,
+2025,WC3,Prague,W,SF2,SG,G,1,Down-Right,4,,FOLLOW,,
