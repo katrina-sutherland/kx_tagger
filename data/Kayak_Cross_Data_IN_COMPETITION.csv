@@ -7875,7 +7875,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,H5,1st Up,G,2,Right-Up,4,,SPLIT,,
 2025,WC5,Augsburg,W,H5,2nd Up,R,3,Right-Up,1,,Right-Up,,
 2025,WC5,Augsburg,W,H5,2nd Up,G,2,Right-Up,2,,FOLLOW,,
-2025,WC5,Augsburg,W,H5,2nd Up,B,1,Left-Up,3,,SPLIT,,
+2025,WC5,Augsburg,W,H5,2nd Up,B,1,Left-Up,3,,SPLIT,,FLT
 2025,WC5,Augsburg,W,H5,2nd Up,Y,4,Left-Up,4,,FOLLOW,,
 2025,WC5,Augsburg,W,H5,Finish,R,3,Finish,1,1,,,
 2025,WC5,Augsburg,W,H5,Finish,G,2,Finish,2,2,,,
@@ -7899,7 +7899,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,H6,1st Up,Y,4,Right-Up,4,,FOLLOW,,
 2025,WC5,Augsburg,W,H6,2nd Up,B,2,Left-Up,1,,Left-Up,,
 2025,WC5,Augsburg,W,H6,2nd Up,G,3,Right-Up,2,,SPLIT,,
-2025,WC5,Augsburg,W,H6,2nd Up,R,1,Right-Up,3,,FOLLOW,,
+2025,WC5,Augsburg,W,H6,2nd Up,R,1,Right-Up,3,,FOLLOW,,FLT
 2025,WC5,Augsburg,W,H6,2nd Up,Y,4,Right-Up,4,,FOLLOW,,
 2025,WC5,Augsburg,W,H6,Finish,B,2,Finish,1,1,,,
 2025,WC5,Augsburg,W,H6,Finish,G,3,Finish,2,2,,,
@@ -7923,7 +7923,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,H7,1st Up,B,4,Left-Up,4,,SPLIT,,
 2025,WC5,Augsburg,W,H7,2nd Up,R,3,Right-Up,1,,Right-Up,,
 2025,WC5,Augsburg,W,H7,2nd Up,G,2,Left-Up,2,,SPLIT,,
-2025,WC5,Augsburg,W,H7,2nd Up,B,4,Right-Up,3,,SPLIT,,
+2025,WC5,Augsburg,W,H7,2nd Up,B,4,Right-Up,3,,SPLIT,,FLT
 2025,WC5,Augsburg,W,H7,2nd Up,Y,1,Left-Up,4,,SPLIT,,
 2025,WC5,Augsburg,W,H7,Finish,R,3,Finish,1,1,,,
 2025,WC5,Augsburg,W,H7,Finish,G,2,Finish,2,2,,,
@@ -7946,7 +7946,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,H8,1st Up,B,2,Left-Up,3,,FOLLOW,,
 2025,WC5,Augsburg,W,H8,1st Up,Y,1,Left-Up,4,,FOLLOW,,
 2025,WC5,Augsburg,W,H8,2nd Up,R,3,Left-Up,1,,Left-Up,,
-2025,WC5,Augsburg,W,H8,2nd Up,Y,1,Left-Up,2,,FOLLOW,,
+2025,WC5,Augsburg,W,H8,2nd Up,Y,1,Left-Up,2,,FOLLOW,,FLT
 2025,WC5,Augsburg,W,H8,2nd Up,B,2,Left-Up,3,,FOLLOW,,
 2025,WC5,Augsburg,W,H8,2nd Up,G,4,Left-Up,4,,FOLLOW,,
 2025,WC5,Augsburg,W,H8,Finish,R,3,Finish,1,1,,,
@@ -7967,11 +7967,11 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,QF1,Course,G,3,Roll,4,,,,
 2025,WC5,Augsburg,W,QF1,1st Up,B,4,Right-Up,1,,Right-Up,,
 2025,WC5,Augsburg,W,QF1,1st Up,Y,2,Left-Up,2,,SPLIT,,
-2025,WC5,Augsburg,W,QF1,1st Up,G,3,Right-Up,3,,SPLIT,,
+2025,WC5,Augsburg,W,QF1,1st Up,G,3,Right-Up,3,,SPLIT,,FLT
 2025,WC5,Augsburg,W,QF1,2nd Up,B,4,Right-Up,1,,Right-Up,,
 2025,WC5,Augsburg,W,QF1,2nd Up,R,1,Left-Up,2,,SPLIT,,
 2025,WC5,Augsburg,W,QF1,2nd Up,Y,2,Left-Up,3,,FOLLOW,,
-2025,WC5,Augsburg,W,QF1,2nd Up,G,3,Left-Up,4,,FOLLOW,,
+2025,WC5,Augsburg,W,QF1,2nd Up,G,3,Left-Up,4,,FOLLOW,,FLT
 2025,WC5,Augsburg,W,QF1,Finish,B,4,Finish,1,1,,,
 2025,WC5,Augsburg,W,QF1,Finish,R,1,Finish,2,2,,,
 2025,WC5,Augsburg,W,QF1,Finish,Y,2,Finish,3,3,,,
@@ -7993,7 +7993,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,QF2,1st Up,Y,2,Right-Up,3,,FOLLOW,,
 2025,WC5,Augsburg,W,QF2,1st Up,G,3,Left-Up,4,,SPLIT,,
 2025,WC5,Augsburg,W,QF2,2nd Up,R,1,Right-Up,1,,Right-Up,,
-2025,WC5,Augsburg,W,QF2,2nd Up,G,3,Right-Up,2,,FOLLOW,,
+2025,WC5,Augsburg,W,QF2,2nd Up,G,3,Right-Up,2,,FOLLOW,,FLT
 2025,WC5,Augsburg,W,QF2,2nd Up,B,4,Left-Up,3,,SPLIT,,
 2025,WC5,Augsburg,W,QF2,2nd Up,Y,2,Right-Up,4,,SPLIT,,
 2025,WC5,Augsburg,W,QF2,Finish,R,1,Finish,1,1,,,
@@ -8012,7 +8012,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,QF3,Course,B,1,Roll,2,,,,
 2025,WC5,Augsburg,W,QF3,Course,R,3,Roll,3,,,,
 2025,WC5,Augsburg,W,QF3,Course,G,2,Roll,4,,,,
-2025,WC5,Augsburg,W,QF3,1st Up,Y,4,Left-Up,1,,Left-Up,,
+2025,WC5,Augsburg,W,QF3,1st Up,Y,4,Left-Up,1,,Left-Up,,FLT
 2025,WC5,Augsburg,W,QF3,1st Up,B,1,Left-Up,2,,FOLLOW,,
 2025,WC5,Augsburg,W,QF3,1st Up,R,3,Right-Up,3,,SPLIT,,
 2025,WC5,Augsburg,W,QF3,1st Up,G,2,Left-Up,4,,SPLIT,,
@@ -8109,7 +8109,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WC5,Augsburg,W,Final,Course,B,4,Roll,3,,,,
 2025,WC5,Augsburg,W,Final,Course,Y,2,Roll,4,,,,
 2025,WC5,Augsburg,W,Final,1st Up,R,3,Left-Up,1,,Left-Up,,
-2025,WC5,Augsburg,W,Final,1st Up,G,1,Right-Up,2,,SPLIT,,
+2025,WC5,Augsburg,W,Final,1st Up,G,1,Right-Up,2,,SPLIT,,FLT
 2025,WC5,Augsburg,W,Final,1st Up,B,4,Left-Up,3,,SPLIT,,
 2025,WC5,Augsburg,W,Final,1st Up,Y,2,Left-Up,4,,FOLLOW,,
 2025,WC5,Augsburg,W,Final,2nd Up,R,3,Left-Up,1,,Left-Up,,
