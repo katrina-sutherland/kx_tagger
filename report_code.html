@@ -345,7 +345,7 @@
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                         <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Time Trial Sector Comparison v 1st:</h3>
                         <div id="tt-chart-diff" class="text-center text-slate-400 text-sm mb-4"></div>
-                        <div class="flex justify-center gap-2 mb-4">
+                        <div id="tt-view-toggle" class="flex justify-center gap-2 mb-4 hidden">
                             <button type="button" id="tt-view-line" class="px-3 py-1.5 rounded text-sm font-medium bg-slate-600 text-slate-200 border border-slate-500">Line graph</button>
                             <button type="button" id="tt-view-course" class="px-3 py-1.5 rounded text-sm font-medium text-slate-400 border border-slate-600 hover:bg-slate-700">Course view</button>
                         </div>
@@ -799,8 +799,7 @@
                     rampPositions.set(bib, 'DNS');
                     return;
                 }
-                const rampRow = rows.find(d => d.Gate === 'Ramp' && d.RampPosition > 0)
-                    || rows.find(d => d.RampPosition > 0);
+                const rampRow = rows.find(d => d.Gate === 'Ramp' && +(d.RampPosition ?? 0) > 0);
                 if (rampRow) rampPositions.set(bib, rampRow.RampPosition);
             });
 
@@ -1455,6 +1454,9 @@
         }
 
         // --- INDIVIDUAL TIME TRIAL ---
+        /** Set true to show Line / Course view toggle and course map overlay. */
+        const TT_COURSE_VIEW_ENABLED = false;
+
         function updateTTAthleteOptions() {
             if (!selectorsTT || !selectorsTT.athlete || masterDataTT.length === 0) return;
             const yearVal = selectorsTT.year.property("value");
@@ -1493,12 +1495,17 @@
             forceDefaults(selectorsTT, masterDataTT);
             updateCompetitionOptionsForYear(masterDataTT, selectorsTT);
             applyPersistedReportFilters(selectorsTT, masterDataTT, persistedUi && persistedUi.tt, true);
-            if (persistedUi && (persistedUi.ttView === 'line' || persistedUi.ttView === 'course')) {
-                setTTViewMode(persistedUi.ttView);
+            if (TT_COURSE_VIEW_ENABLED) {
+                d3.select("#tt-view-toggle").classed("hidden", false);
+                if (persistedUi && (persistedUi.ttView === 'line' || persistedUi.ttView === 'course')) {
+                    setTTViewMode(persistedUi.ttView);
+                }
+                d3.select("#tt-view-line").on("click", () => setTTViewMode('line'));
+                d3.select("#tt-view-course").on("click", () => setTTViewMode('course'));
+            } else {
+                setTTViewMode('line');
             }
             updateTimeTrialReport();
-            d3.select("#tt-view-line").on("click", () => setTTViewMode('line'));
-            d3.select("#tt-view-course").on("click", () => setTTViewMode('course'));
         }
 
         function drawTTSplitChart(splitNames, athleteTimes, firstPlaceTimes, athleteName) {
@@ -1733,6 +1740,7 @@
         }
 
         function setTTViewMode(mode) {
+            if (!TT_COURSE_VIEW_ENABLED) mode = 'line';
             ttViewMode = mode;
             const lineWrapper = d3.select("#tt-line-chart-wrapper");
             const courseWrapper = d3.select("#tt-course-view-wrapper");
@@ -1758,6 +1766,19 @@
             const container = d3.select("#tt-splits-table-container");
             container.selectAll("*").remove();
             const formatT = t => (typeof t === 'number' && !isNaN(t)) ? t.toFixed(2) : '—';
+            const winnerRow = rowData[0];
+            const winnerTotal = winnerRow
+                ? ((typeof winnerRow.total === 'number' && !isNaN(winnerRow.total))
+                    ? winnerRow.total
+                    : (winnerRow.times.length ? winnerRow.times[winnerRow.times.length - 1] : NaN))
+                : NaN;
+            const formatPctBehindWinner = (total) => {
+                if (typeof total !== 'number' || isNaN(total)) return '—';
+                if (typeof winnerTotal !== 'number' || isNaN(winnerTotal) || winnerTotal <= 0) return '—';
+                const pct = ((total - winnerTotal) / winnerTotal) * 100;
+                if (Math.abs(pct) < 0.005) return '0.00%';
+                return `${pct.toFixed(2)}%`;
+            };
             const numCols = splitNames.length + 2;
             const minPerCol = [];
             for (let j = 0; j < numCols; j++) {
@@ -1770,7 +1791,7 @@
             }
             const table = container.append("table").attr("class", "min-w-full divide-y divide-slate-700");
             const thead = table.append("thead").attr("class", "bg-slate-800");
-            thead.append("tr").selectAll("th").data(['', ...splitNames, 'Total']).join("th")
+            thead.append("tr").selectAll("th").data(['', ...splitNames, 'Total', '% Behind Winner']).join("th")
                 .attr("class", "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300")
                 .text((d, i) => i === 0 ? '' : d);
 
@@ -1791,20 +1812,25 @@
                     return sectorDescriptionsBySplit[n] || '';
                 });
 
-                thead.append("tr").selectAll("th").data(['', ...splitDescriptionColumns, '']).join("th")
+                thead.append("tr").selectAll("th").data(['', ...splitDescriptionColumns, '', '']).join("th")
                     .attr("class", "px-4 py-2 text-left text-[11px] font-medium text-slate-400 whitespace-normal leading-tight")
                     .text(d => d);
             }
             const tbody = table.append("tbody").attr("class", "divide-y divide-slate-700 bg-slate-800/50");
             const rows = tbody.selectAll("tr").data(rowData).join("tr").attr("class", "hover:bg-slate-700/50");
-            rows.selectAll("td").data((d, rowIdx) => {
+            rows.selectAll("td").data((d) => {
                 const total = (typeof d.total === 'number' && !isNaN(d.total)) ? d.total : (d.times.length ? d.times[d.times.length - 1] : NaN);
-                return [{ text: d.label, color: d.color, isLabel: true }, ...d.times.map((t, i) => ({ text: formatT(t), value: t, colIdx: i + 1 })), { text: formatT(total), value: total, colIdx: splitNames.length + 1 }];
+                return [
+                    { text: d.label, color: d.color, isLabel: true },
+                    ...d.times.map((t, i) => ({ text: formatT(t), value: t, colIdx: i + 1 })),
+                    { text: formatT(total), value: total, colIdx: splitNames.length + 1 },
+                    { text: formatPctBehindWinner(total), isPctBehind: true }
+                ];
             }).join("td")
                 .attr("class", (d, j) => {
                     const base = j === 0 ? "px-4 py-3 text-sm font-medium" : "px-4 py-3 text-sm text-slate-400";
                     const minVal = minPerCol[d.colIdx];
-                    const isFastest = !d.isLabel && typeof d.value === 'number' && !isNaN(d.value) && typeof minVal === 'number' && !isNaN(minVal) && Math.abs(d.value - minVal) < 0.005;
+                    const isFastest = !d.isLabel && !d.isPctBehind && typeof d.value === 'number' && !isNaN(d.value) && typeof minVal === 'number' && !isNaN(minVal) && Math.abs(d.value - minVal) < 0.005;
                     if (isFastest) return base + " rounded bg-amber-500/25 border border-amber-400/60";
                     return base;
                 })
@@ -1840,12 +1866,14 @@
                 d3.select("#tt-chart-container").classed("hidden", true);
                 return;
             }
-            applyTTCourseBackgroundImage(selected.location);
-            const isParis = isParisCourseLocation(selected.location);
-            ttCourseDirectionSign = isParis ? -1 : 1;
-            ttCourseReverseSplitOrder = isParis;
-            ttCourseYOffset = isParis ? -6 : 0;
-            ttParisFirstSplitRotationDelta = isParis ? -90 : 0;
+            if (TT_COURSE_VIEW_ENABLED) {
+                applyTTCourseBackgroundImage(selected.location);
+                const isParis = isParisCourseLocation(selected.location);
+                ttCourseDirectionSign = isParis ? -1 : 1;
+                ttCourseReverseSplitOrder = isParis;
+                ttCourseYOffset = isParis ? -6 : 0;
+                ttParisFirstSplitRotationDelta = isParis ? -90 : 0;
+            }
             const dataForVB = masterDataTT.filter(d =>
                 d.Year === selected.year &&
                 (selected.competition === 'All' || d.Competition === selected.competition) &&
@@ -1938,8 +1966,10 @@
                         '<span class="text-[#9B59B6] font-medium">—— ' + athleteName + '</span>' +
                         '<span class="text-[#E8C020] font-medium ml-6">—— ' + (rank1Name !== '—' ? rank1Name : 'Rank 1') + '</span>'
                     );
-                    d3.select("#tt-course-legend-athlete").text(athleteName);
-                    d3.select("#tt-course-legend-first").text(rank1Name !== '—' ? rank1Name : 'Rank 1');
+                    if (TT_COURSE_VIEW_ENABLED) {
+                        d3.select("#tt-course-legend-athlete").text(athleteName);
+                        d3.select("#tt-course-legend-first").text(rank1Name !== '—' ? rank1Name : 'Rank 1');
+                    }
                 } else {
                     chartContainer.classed("hidden", true);
                     diffEl.text("");
