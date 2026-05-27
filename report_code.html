@@ -375,7 +375,8 @@
                     <div id="tt-splits-table-wrapper" class="hidden">
                         <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                             <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Split breakdown</h3>
-                            <p class="text-slate-400 text-sm mb-4 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different). Gold boxes mark the fastest time in each sector.</p>
+                            <p class="text-slate-400 text-sm mb-2 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different). Gold boxes mark the fastest time in each sector.</p>
+                            <p id="tt-splits-sector-legend" class="hidden text-slate-400 text-xs mb-4 text-center">— USDR = Upside Down Roll</p>
                             <div id="tt-splits-table-container" class="overflow-x-auto rounded-xl border border-slate-700"></div>
                         </div>
                     </div>
@@ -1474,6 +1475,81 @@
         /** Set true to show Line / Course view toggle and course map overlay. */
         const TT_COURSE_VIEW_ENABLED = false;
 
+        /** Split sector labels under Split 1–7 headers (2025 WC5 Augsburg time trial only). */
+        const TT_AUGSBURG_2025_WC5_SPLIT_SECTORS = {
+            1: "GL to Gate 1",
+            2: "Gate 1 to Gate 2",
+            3: "Gate 2 to USDR",
+            4: "USDR to Gate 4",
+            5: "Gate 4 to Exit Gate 6",
+            6: "Exit Gate 6 to Exit Gate 7",
+            7: "Exit Gate 7 to Finish"
+        };
+
+        /** Split sector labels under Split 1–6 headers (2025 WC4 Tacen time trial only). */
+        const TT_TACEN_2025_WC4_SPLIT_SECTORS = {
+            1: "Green Light to Exit Gate 1",
+            2: "Exit Gate 1 to Exit Gate 2",
+            3: "Exit Gate 2 to Gate 5",
+            4: "Gate 5 to USDR",
+            5: "USDR to Gate 8",
+            6: "Gate 8 to Finish"
+        };
+
+        /** Split sector labels under Split 1–7 headers (2025 WC3 Prague time trial only). */
+        const TT_PRAGUE_2025_WC3_SPLIT_SECTORS = {
+            1: "Green Light to Gate 1",
+            2: "Gate 1 to Gate 3",
+            3: "Gate 3 to Exit Gate 4",
+            4: "Exit Gate 4 to Gate 7",
+            5: "Gate 7 to USDR",
+            6: "USDR to Exit Gate 8",
+            7: "Exit Gate 8 to Finish"
+        };
+
+        /** Split sector labels under Split 1–7 headers (2025 WC1 La Seu time trial only). */
+        const TT_LA_SEU_2025_WC1_SPLIT_SECTORS = {
+            1: "Green Light to Gate 1",
+            2: "Gate 1 to Exit Gate 2",
+            3: "Exit Gate 2 to Gate 4",
+            4: "Gate 4 to Gate 5",
+            5: "Gate 5 to USDR",
+            6: "USDR to Exit Gate 6",
+            7: "Exit Gate 6 to Finish"
+        };
+
+        function isTT2025WC5Augsburg(year, competition, location) {
+            if (+year !== 2025) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WC5') return false;
+            return normalizeCourseLocationKey(location) === 'augsburg';
+        }
+
+        function isTT2025WC4Tacen(year, competition, location) {
+            if (+year !== 2025) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WC4') return false;
+            return normalizeCourseLocationKey(location) === 'tacen';
+        }
+
+        function isTT2025WC3Prague(year, competition, location) {
+            if (+year !== 2025) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WC3') return false;
+            return normalizeCourseLocationKey(location) === 'prague';
+        }
+
+        function isTT2025WC1LaSeu(year, competition, location) {
+            if (+year !== 2025) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WC1') return false;
+            return normalizeCourseLocationKey(location) === 'la_seu_durgell';
+        }
+
+        function getTTSectorLabelsForSelection(year, competition, location) {
+            if (isTT2025WC5Augsburg(year, competition, location)) return TT_AUGSBURG_2025_WC5_SPLIT_SECTORS;
+            if (isTT2025WC4Tacen(year, competition, location)) return TT_TACEN_2025_WC4_SPLIT_SECTORS;
+            if (isTT2025WC3Prague(year, competition, location)) return TT_PRAGUE_2025_WC3_SPLIT_SECTORS;
+            if (isTT2025WC1LaSeu(year, competition, location)) return TT_LA_SEU_2025_WC1_SPLIT_SECTORS;
+            return null;
+        }
+
         function updateTTAthleteOptions() {
             if (!selectorsTT || !selectorsTT.athlete || masterDataTT.length === 0) return;
             const yearVal = selectorsTT.year.property("value");
@@ -1778,8 +1854,9 @@
             schedulePersistReportUiState();
         }
 
-        function drawTTSplitsTable(splitNames, rowData, showSectorDescriptions) {
+        function drawTTSplitsTable(splitNames, rowData, sectorDescriptions) {
             d3.select("#tt-splits-table-wrapper").classed("hidden", false);
+            d3.select("#tt-splits-sector-legend").classed("hidden", false);
             const container = d3.select("#tt-splits-table-container");
             container.selectAll("*").remove();
             const formatT = t => (typeof t === 'number' && !isNaN(t)) ? t.toFixed(2) : '—';
@@ -1812,21 +1889,11 @@
                 .attr("class", "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300")
                 .text((d, i) => i === 0 ? '' : d);
 
-            if (showSectorDescriptions) {
-                const sectorDescriptionsBySplit = {
-                    1: "Green Light to Drop In:",
-                    2: "Drop In to Exit Gate 2",
-                    3: "Exit Gate 2 to Gate 4 Gate Line",
-                    4: "Gate 4 to Gate 7 Gate Line",
-                    5: "Gate 7 to Upside down Roll",
-                    6: "Roll to Gate 8 Gate Line",
-                    7: "Gate 8 to Finish"
-                };
-
+            if (sectorDescriptions) {
                 const splitDescriptionColumns = splitNames.map(col => {
                     const m = String(col).match(/(\d+)/);
                     const n = m ? parseInt(m[1], 10) : NaN;
-                    return sectorDescriptionsBySplit[n] || '';
+                    return sectorDescriptions[n] || '';
                 });
 
                 thead.append("tr").selectAll("th").data(['', ...splitDescriptionColumns, '', '']).join("th")
@@ -1969,8 +2036,12 @@
                     if (athleteIsDistinctFrom5) {
                         rows.push({ label: athleteName, color: ttTableColors.athlete, times: athleteTimes, total: athleteTotal });
                     }
-                    const showSectorDescriptions = selected.year === 2025;
-                    drawTTSplitsTable(splitNames, rows, showSectorDescriptions);
+                    const sectorLabels = getTTSectorLabelsForSelection(selected.year, selected.competition, selected.location);
+                    drawTTSplitsTable(
+                        splitNames,
+                        rows,
+                        sectorLabels
+                    );
                     setTTViewMode(ttViewMode);
                     const diff = (athleteTotal != null && rank1Total != null) ? athleteTotal - rank1Total : null;
                     if (diff != null) {
@@ -1991,9 +2062,11 @@
                     chartContainer.classed("hidden", true);
                     diffEl.text("");
                     d3.select("#tt-splits-table-wrapper").classed("hidden", true);
+                    d3.select("#tt-splits-sector-legend").classed("hidden", true);
                 }
             } else {
                 d3.select("#tt-chart-container").classed("hidden", true);
+                d3.select("#tt-splits-sector-legend").classed("hidden", true);
             }
 
             if (hasSplits && selected.athlete !== 'All' && data.length > 0) {
