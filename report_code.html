@@ -1018,6 +1018,11 @@
         function getSplitColumns(row) {
             return Object.keys(row)
                 .filter(k => /^Split\s*\d+$/i.test(k))
+                .filter(k => {
+                    const m = String(k).match(/(\d+)/);
+                    const n = m ? parseInt(m[1], 10) : NaN;
+                    return typeof n === 'number' && !isNaN(n) && n >= 1 && n <= 7;
+                })
                 .sort((a, b) => parseInt(a.match(/\d+/)[0], 10) - parseInt(b.match(/\d+/)[0], 10));
         }
 
