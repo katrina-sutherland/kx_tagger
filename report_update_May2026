@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -108,6 +108,10 @@
                 <button id="tab-compact"
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
                     In-Competition Report
+                </button>
+                <button id="tab-tt"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                    Individual Time Trial
                 </button>
                 <button id="tab-athlete"
                     class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
@@ -298,6 +302,90 @@
             </div>
         </div>
 
+        <!-- INDIVIDUAL TIME TRIAL REPORT CONTAINER -->
+        <div id="report-tt" class="hidden">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <div id="filter-controls-tt"
+                    class="bg-slate-800 p-4 rounded-xl shadow-md border border-slate-700 mb-8 hidden">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+                        <div>
+                            <label for="year-select-tt"
+                                class="block text-sm font-medium text-slate-300 mb-1">Year</label>
+                            <select id="year-select-tt"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="competition-select-tt"
+                                class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
+                            <select id="competition-select-tt"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div id="location-wrapper-tt">
+                            <label for="location-select-tt"
+                                class="block text-sm font-medium text-slate-300 mb-1">Location</label>
+                            <select id="location-select-tt"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div class="max-w-[6.5rem]">
+                            <label for="gender-select-tt"
+                                class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
+                            <select id="gender-select-tt"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                        <div>
+                            <label for="athlete-select-tt"
+                                class="block text-sm font-medium text-slate-300 mb-1">Athlete</label>
+                            <select id="athlete-select-tt"
+                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-slate-400 text-sm mb-4">View individual time trial runs. Use filters to narrow by year, competition, location, gender, and athlete. Select an athlete to see their split line vs 1st place (gold).</p>
+                <div id="tt-chart-container" class="space-y-8 hidden">
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Time Trial Sector Comparison v 1st:</h3>
+                        <div id="tt-chart-diff" class="text-center text-slate-400 text-sm mb-4"></div>
+                        <div class="flex justify-center gap-2 mb-4">
+                            <button type="button" id="tt-view-line" class="px-3 py-1.5 rounded text-sm font-medium bg-slate-600 text-slate-200 border border-slate-500">Line graph</button>
+                            <button type="button" id="tt-view-course" class="px-3 py-1.5 rounded text-sm font-medium text-slate-400 border border-slate-600 hover:bg-slate-700">Course view</button>
+                        </div>
+                        <div id="tt-line-chart-wrapper">
+                            <div id="tt-chart" class="w-full h-[400px]">
+                                <svg id="tt-chart-svg" class="w-full h-full"></svg>
+                            </div>
+                            <div id="tt-chart-legend" class="flex justify-center gap-6 mt-4 text-sm"></div>
+                        </div>
+                        <div id="tt-course-view-wrapper" class="hidden w-full" style="max-width: 800px; margin: 0 auto;">
+                            <div id="tt-course-view" class="w-full rounded overflow-hidden border border-slate-600 relative" style="aspect-ratio: 1.2; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('whitewater_course.png'); filter: brightness(0.72) saturate(0.85) contrast(1.05);">
+                                <div class="absolute inset-0 bg-slate-900/50" aria-hidden="true"></div>
+                                <svg id="tt-course-overlay" class="absolute inset-0 w-full h-full" style="pointer-events: none;"></svg>
+                            </div>
+                            <div id="tt-course-legend" class="flex justify-center gap-6 mt-4 text-sm items-center">
+                                <span class="font-medium inline-flex items-center gap-1.5">
+                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0" aria-hidden="true"><path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#9B59B6" stroke="rgba(0,0,0,0.35)" stroke-width="0.6"/></svg>
+                                    <span id="tt-course-legend-athlete" class="text-[#9B59B6]">Athlete</span>
+                                </span>
+                                <span class="font-medium inline-flex items-center gap-1.5">
+                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0" aria-hidden="true"><path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#E8C020" stroke="rgba(0,0,0,0.35)" stroke-width="0.6"/></svg>
+                                    <span id="tt-course-legend-first" class="text-[#E8C020]">Rank 1</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tt-splits-table-wrapper" class="hidden">
+                        <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
+                            <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Split breakdown</h3>
+                            <p class="text-slate-400 text-sm mb-4 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different). Gold boxes mark the fastest time in each sector.</p>
+                            <div id="tt-splits-table-container" class="overflow-x-auto rounded-xl border border-slate-700"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tt-content-area" class="mt-6">
+                    <!-- Message when no filters selected or no data -->
+                </div>
+            </div>
+        </div>
+
         <!-- ATHLETE PROFILE CONTAINER -->
         <div id="report-athlete" class="hidden">
             <div class="max-w-7xl mx-auto space-y-8"> <!-- Expanded max-width for columns -->
@@ -387,27 +475,74 @@
         // --- DATA STATE & CONSTANTS ---
         let masterDataFull = [];
         let masterDataCompact = [];
+        let masterDataTT = [];
         const bibColors = { 'R': '#ef4444', 'G': '#22c55e', 'B': '#3b82f6', 'Y': '#eab308' };
         const bibFullNames = { 'R': 'RED', 'G': 'GREEN', 'B': 'BLUE', 'Y': 'YELLOW' };
         const medalColors = { gold: '#D4AF37', silver: '#C0C0C0', bronze: '#A97142' };
+        const SELECT_PLACEHOLDER = 'Select...';
+        const SPECIAL_GATE_ID = 'SG';
+        const GATE_COLOR_DOWNSTREAM = '#22c55e';
+        const GATE_COLOR_UPSTREAM_FULL = '#DC143C';
+        const GATE_COLOR_UPSTREAM_COMPACT = '#ef4444';
+        const GATE_COLOR_ROLL = '#eab308';
+        const GATE_COLOR_NEUTRAL = '#94a3b8';
+
+        function isSpecialGate(gate) {
+            return gate === SPECIAL_GATE_ID || gate === 'Special';
+        }
+
+        /** SG is always a downstream gate — never treat it as upstream for labels or colours. */
+        function withoutSpecialGateFromUpstreamList(upstreamGates) {
+            return (upstreamGates || []).filter(g => !isSpecialGate(g));
+        }
+
+        /** First upstream gate on the course for a competition (by tagged gate order). */
+        function getFirstUpstreamGate(compStructure) {
+            if (!compStructure) return null;
+            const upstreamSet = new Set(withoutSpecialGateFromUpstreamList(compStructure.upstreamGates || []));
+            if (!upstreamSet.size) return null;
+            for (const gate of compStructure.orderedGates || []) {
+                if (upstreamSet.has(gate)) return gate;
+            }
+            let fallback = null;
+            let bestIdx = Infinity;
+            upstreamSet.forEach(g => {
+                const idx = (compStructure.orderedGates || []).indexOf(g);
+                if (idx >= 0 && idx < bestIdx) {
+                    bestIdx = idx;
+                    fallback = g;
+                }
+            });
+            return fallback || [...upstreamSet][0];
+        }
+
+        function gateAxisLabelColor(gate, upstreamGates, options = {}) {
+            const { rollGates = [], upstreamColor = GATE_COLOR_UPSTREAM_COMPACT } = options;
+            if (gate === 'Finish' || gate === 'Start') return GATE_COLOR_NEUTRAL;
+            if (gate === 'Roll' || rollGates.includes(gate)) return GATE_COLOR_ROLL;
+            if (isSpecialGate(gate)) return GATE_COLOR_DOWNSTREAM;
+            if (upstreamGates.includes(gate)) return upstreamColor;
+            return GATE_COLOR_DOWNSTREAM;
+        }
 
         // Declare DOM variables
-        let tooltip, tabFull, tabCompact, tabAthlete, tabSummary;
-        let reportFull, reportCompact, reportAthlete, reportSummary, lastUpdatedEl;
-        let selectorsFull, filterControlsFull, selectorsCompact, filterControlsCompact, selectorsAthlete, selectorsSummary;
+        let tooltip, tabFull, tabCompact, tabTT, tabAthlete, tabSummary;
+        let reportFull, reportCompact, reportTT, reportAthlete, reportSummary, lastUpdatedEl;
+        let selectorsFull, filterControlsFull, selectorsCompact, filterControlsCompact, selectorsTT, filterControlsTT, selectorsAthlete, selectorsSummary;
 
         // --- TAB HANDLING ---
         // Map tab elements to URL hash values for persistence across refreshes
         const tabHashMap = {
             'tab-full': 'full-report',
             'tab-compact': 'in-competition',
+            'tab-tt': 'time-trial',
             'tab-athlete': 'athlete-profile',
             'tab-summary': 'season-summary'
         };
 
         function setActiveTab(activeTab, updateHash = true) {
-            const tabs = [tabFull, tabCompact, tabAthlete, tabSummary];
-            const reports = [reportFull, reportCompact, reportAthlete, reportSummary];
+            const tabs = [tabFull, tabCompact, tabTT, tabAthlete, tabSummary];
+            const reports = [reportFull, reportCompact, reportTT, reportAthlete, reportSummary];
 
             tabs.forEach(tab => {
                 const isActive = tab.node() === activeTab.node();
@@ -425,6 +560,7 @@
                 const hashValue = tabHashMap[tabId] || 'full-report';
                 history.replaceState(null, null, '#' + hashValue);
             }
+            schedulePersistReportUiState();
         }
 
         function getTabFromHash() {
@@ -432,10 +568,167 @@
             const hashToTab = {
                 'full-report': tabFull,
                 'in-competition': tabCompact,
+                'time-trial': tabTT,
                 'athlete-profile': tabAthlete,
                 'season-summary': tabSummary
             };
             return hashToTab[hash] || null;
+        }
+
+        /** Persist filter + tab state across refresh (localStorage). */
+        const REPORT_UI_STORAGE_KEY = 'kx_kayak_cross_report_ui_v1';
+        let reportUiPersistTimer = null;
+
+        function readReportUiState() {
+            try {
+                const raw = localStorage.getItem(REPORT_UI_STORAGE_KEY);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function writeReportUiState(obj) {
+            try {
+                localStorage.setItem(REPORT_UI_STORAGE_KEY, JSON.stringify(obj));
+            } catch (e) { /* quota / private mode */ }
+        }
+
+        function getActiveTabHashFromDom() {
+            const pairs = [
+                [reportFull, 'full-report'],
+                [reportCompact, 'in-competition'],
+                [reportTT, 'time-trial'],
+                [reportAthlete, 'athlete-profile'],
+                [reportSummary, 'season-summary']
+            ];
+            for (const [rep, hash] of pairs) {
+                if (rep && !rep.classed('hidden')) return hash;
+            }
+            return 'full-report';
+        }
+
+        function gatherReportUiState() {
+            const slotIds = ['athlete-select-1', 'athlete-select-2', 'athlete-select-3'];
+            const slots = {};
+            slotIds.forEach(id => {
+                const n = document.getElementById(id);
+                if (n) slots[id] = n.value || '';
+            });
+            return {
+                activeTab: getActiveTabHashFromDom(),
+                full: selectorsFull ? {
+                    year: selectorsFull.year.property("value"),
+                    competition: selectorsFull.competition.property("value"),
+                    location: selectorsFull.location.property("value"),
+                    gender: selectorsFull.gender.property("value"),
+                    phase: selectorsFull.phase.property("value")
+                } : {},
+                compact: selectorsCompact ? {
+                    year: selectorsCompact.year.property("value"),
+                    competition: selectorsCompact.competition.property("value"),
+                    location: selectorsCompact.location.property("value"),
+                    gender: selectorsCompact.gender.property("value"),
+                    phase: selectorsCompact.phase.property("value")
+                } : {},
+                tt: selectorsTT ? {
+                    year: selectorsTT.year.property("value"),
+                    competition: selectorsTT.competition.property("value"),
+                    location: selectorsTT.location.property("value"),
+                    gender: selectorsTT.gender.property("value"),
+                    athlete: selectorsTT.athlete.property("value")
+                } : {},
+                ttView: typeof ttViewMode !== 'undefined' ? ttViewMode : 'line',
+                athlete: selectorsAthlete ? {
+                    year: selectorsAthlete.year.property("value"),
+                    competition: selectorsAthlete.competition.property("value"),
+                    gender: selectorsAthlete.gender.property("value"),
+                    slots
+                } : { slots },
+                summary: selectorsSummary ? {
+                    year: selectorsSummary.year.property("value"),
+                    gender: selectorsSummary.gender.property("value"),
+                    athlete: selectorsSummary.athlete.property("value")
+                } : {}
+            };
+        }
+
+        function schedulePersistReportUiState() {
+            clearTimeout(reportUiPersistTimer);
+            reportUiPersistTimer = setTimeout(() => {
+                writeReportUiState(gatherReportUiState());
+                reportUiPersistTimer = null;
+            }, 120);
+        }
+
+        function flushPersistReportUiState() {
+            clearTimeout(reportUiPersistTimer);
+            reportUiPersistTimer = null;
+            writeReportUiState(gatherReportUiState());
+        }
+
+        function selectOptionExists(sel, val) {
+            if (!sel || !sel.node() || val === undefined || val === null) return false;
+            const s = String(val);
+            return [...sel.node().querySelectorAll('option')].some(o => o.value === s);
+        }
+
+        /** Restore year → competition → location → gender → phase (or TT athlete) when options allow. */
+        function applyPersistedReportFilters(selectorGroup, data, frag, isTT) {
+            if (!selectorGroup || !frag || !data || !data.length) return;
+            if (frag.year != null && frag.year !== '' && selectOptionExists(selectorGroup.year, frag.year)) {
+                selectorGroup.year.property("value", String(frag.year));
+            }
+            updateCompetitionOptionsForYear(data, selectorGroup);
+            if (frag.competition != null && frag.competition !== '' && selectOptionExists(selectorGroup.competition, frag.competition)) {
+                selectorGroup.competition.property("value", String(frag.competition));
+            }
+            updateLocationOptions(data, selectorGroup);
+            if (frag.location != null && frag.location !== '' && selectorGroup.location && selectOptionExists(selectorGroup.location, frag.location)) {
+                selectorGroup.location.property("value", String(frag.location));
+            }
+            if (frag.gender != null && frag.gender !== '' && selectOptionExists(selectorGroup.gender, frag.gender)) {
+                selectorGroup.gender.property("value", String(frag.gender));
+            }
+            if (!isTT && frag.phase != null && frag.phase !== '' && selectorGroup.phase && selectOptionExists(selectorGroup.phase, frag.phase)) {
+                selectorGroup.phase.property("value", String(frag.phase));
+            }
+            if (isTT && selectorGroup.athlete) {
+                updateTTAthleteOptions();
+                if (frag.athlete != null && frag.athlete !== '' && selectOptionExists(selectorGroup.athlete, frag.athlete)) {
+                    selectorGroup.athlete.property("value", String(frag.athlete));
+                }
+            }
+        }
+
+        function attachReportUiPersistence() {
+            const ns = 'persistReportUi';
+            const bind = (sel) => {
+                if (!sel || !sel.on) return;
+                sel.on(`change.${ns}`, schedulePersistReportUiState);
+            };
+            if (selectorsFull) {
+                Object.keys(selectorsFull).forEach(k => {
+                    if (k === 'locationWrapper') return;
+                    bind(selectorsFull[k]);
+                });
+            }
+            if (selectorsCompact) {
+                Object.keys(selectorsCompact).forEach(k => {
+                    if (k === 'locationWrapper') return;
+                    bind(selectorsCompact[k]);
+                });
+            }
+            if (selectorsTT) {
+                Object.keys(selectorsTT).forEach(k => {
+                    if (k === 'locationWrapper') return;
+                    bind(selectorsTT[k]);
+                });
+            }
+            if (selectorsAthlete) Object.values(selectorsAthlete).forEach(bind);
+            if (selectorsSummary) Object.values(selectorsSummary).forEach(bind);
+            d3.selectAll('#athlete-select-1, #athlete-select-2, #athlete-select-3').on(`change.${ns}`, schedulePersistReportUiState);
         }
 
         // --- DATA PARSING ---
@@ -448,6 +741,162 @@
                 return `${lastName} ${firstName}`;
             }
             return name.toUpperCase();
+        }
+
+        function isDnsRow(d) {
+            if (!d) return false;
+            const action = String(d.Action || '').trim().toUpperCase();
+            const finalPos = String(d.FinalPosition ?? '').trim().toUpperCase();
+            return action === 'DNS' || finalPos === 'DNS';
+        }
+
+        /** Standalone fault rows (FLT action, no live tag order) — exclude from line chart / gate order. */
+        function isFaultOnlyRow(d) {
+            if (!d) return false;
+            const action = String(d.Action || '').trim().toUpperCase();
+            if (action === 'FLT' || action === 'RAL') return true;
+            const order = +(d.Order ?? d.Position ?? 0);
+            if (order > 0) return false;
+            const faultVal = String(d.FaultVal || '').trim();
+            if (faultVal && /FLT|FAULT|RAL|DSQ|DNF/i.test(faultVal)) return true;
+            const gate = String(d.Gate || '').trim().toUpperCase();
+            if (gate === 'COURSE' && order === 0) return true;
+            return false;
+        }
+
+        /** Rows from live tagging (gate sequence + finish); ignores fault-only rows and backfilled final ranks. */
+        function isLiveRaceTagRow(d) {
+            if (!d || !d.BIB) return false;
+            if (d.Gate === 'Ramp' || d.Gate === 'Start') return false;
+            if (isDnsRow(d) || isFaultOnlyRow(d)) return false;
+            return +(d.Order ?? d.Position ?? 0) > 0;
+        }
+
+        function liveTagOrder(d) {
+            return +(d.Order ?? d.Position ?? 0);
+        }
+
+        function athleteNameFromRaceRows(rows, bib) {
+            const named = rows.filter(r => r.BIB === bib && r.AthleteName && String(r.AthleteName).trim());
+            if (!named.length) return '';
+            return formatAthleteName(named[0].AthleteName);
+        }
+
+        /** Names + ramp lane numbers (or 'DNS') for every BIB in a single race/phase. */
+        function buildRaceBibMeta(currentRaceData) {
+            const bibToNameMap = new Map();
+            const rampPositions = new Map();
+            const dnsBibs = new Set();
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB).filter(Boolean))];
+
+            bibsInRace.forEach(bib => {
+                const rows = currentRaceData.filter(d => d.BIB === bib);
+                const name = athleteNameFromRaceRows(rows, bib);
+                if (name) bibToNameMap.set(bib, name);
+
+                if (rows.some(isDnsRow)) {
+                    dnsBibs.add(bib);
+                    rampPositions.set(bib, 'DNS');
+                    return;
+                }
+                const rampRow = rows.find(d => d.Gate === 'Ramp' && d.RampPosition > 0)
+                    || rows.find(d => d.RampPosition > 0);
+                if (rampRow) rampPositions.set(bib, rampRow.RampPosition);
+            });
+
+            return { bibToNameMap, rampPositions, dnsBibs };
+        }
+
+        /** Line chart points from live tags only (Order at each gate; finish uses Finish row Order, not fault-adjusted Final Position). */
+        function buildLineChartSeriesForRace(currentRaceData, courseDisplayOrder, options = {}) {
+            const { startPosition = 4.5, dnsBibs = new Set() } = options;
+            const series = [];
+            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB).filter(Boolean))];
+            bibsInRace.forEach(bib => {
+                if (dnsBibs.has(bib)) return;
+                const athleteRows = currentRaceData.filter(d => d.BIB === bib);
+                series.push({ BIB: bib, Gate: 'Start', Position: startPosition });
+                athleteRows
+                    .filter(d => isLiveRaceTagRow(d) && d.Gate !== 'Finish' && courseDisplayOrder.includes(d.Gate))
+                    .forEach(d => {
+                        series.push({
+                            BIB: bib,
+                            Gate: d.Gate,
+                            Position: liveTagOrder(d),
+                            Action: d.Action,
+                            UpstreamTactic: d.UpstreamTactic,
+                            displayTactic: d.displayTactic
+                        });
+                    });
+                const finishRow = athleteRows.find(d => d.Gate === 'Finish' && isLiveRaceTagRow(d));
+                if (finishRow) {
+                    const finishPos = liveTagOrder(finishRow);
+                    series.push({ BIB: bib, Gate: 'Finish', Position: finishPos, FinalPosition: finishPos });
+                }
+            });
+            return series;
+        }
+
+        /**
+         * Per-phase results after faults (for pie charts). Line chart uses live tags only.
+         */
+        function buildFaultAdjustedPhaseOutcomes(aggregateData, compStructure) {
+            const phases = [...new Set(aggregateData.map(d => d.Phase).filter(Boolean))];
+            const outcomes = [];
+            phases.forEach(phase => {
+                const raceData = aggregateData.filter(d => d.Phase === phase);
+                const liveForStructure = raceData.filter(d => isLiveRaceTagRow(d));
+                const rs = getRaceStructure(
+                    liveForStructure,
+                    compStructure.orderedGates,
+                    compStructure.upstreamGates
+                );
+                const orderedGates = rs.orderedGates.length ? rs.orderedGates : compStructure.orderedGates;
+                getCalculatedRaceResults(raceData, orderedGates).forEach(r => {
+                    if (r.isDNS) return;
+                    const rampPos = r.rampPosition;
+                    if (rampPos === 'DNS' || rampPos === '-') return;
+                    outcomes.push({
+                        Phase: phase,
+                        BIB: r.bib,
+                        FinalPosition: r.calculatedRank,
+                        RampPosition: typeof rampPos === 'number' ? rampPos : parseInt(rampPos, 10) || 0
+                    });
+                });
+            });
+            return outcomes;
+        }
+
+        function sortRampPositionEntries(rampPositions) {
+            const bibOrder = ['R', 'G', 'B', 'Y'];
+            return Array.from(rampPositions).sort((a, b) => {
+                const [bibA, posA] = a;
+                const [bibB, posB] = b;
+                const dnsA = posA === 'DNS';
+                const dnsB = posB === 'DNS';
+                if (dnsA && dnsB) return bibOrder.indexOf(bibA) - bibOrder.indexOf(bibB);
+                if (dnsA) return 1;
+                if (dnsB) return -1;
+                if (posA !== posB) return posA - posB;
+                return bibOrder.indexOf(bibA) - bibOrder.indexOf(bibB);
+            });
+        }
+
+        function appendRampPosChartLabel(chart, x, y, bib, pos, bibToNameMap) {
+            const fullName = bibToNameMap.get(bib);
+            const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+            const textNode = chart.append("text")
+                .attr("x", x)
+                .attr("y", y)
+                .attr("text-anchor", "end")
+                .style("fill", bibColors[bib])
+                .style("font-size", "10px");
+            textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
+            if (pos === 'DNS') {
+                textNode.append("tspan").style("font-weight", "normal").style("font-size", "8px").text("DNS");
+            } else {
+                textNode.append("tspan").style("font-weight", "normal").text(pos);
+            }
         }
 
         function parseCsvData(csvString) {
@@ -500,6 +949,79 @@
             });
         }
 
+        /** Parse time trial CSV: same as parseCsvData but preserves Split 1, Split 2, ... as numbers (seconds). */
+        function parseTimeToSeconds(val) {
+            if (val == null || val === '') return NaN;
+            const s = String(val).trim().toLowerCase();
+            if (s === 'n/a' || s === 'na' || s === '-') return NaN;
+            // Prefer mm:ss(.ss) parsing when a colon is present (avoid parseFloat("0:30") === 0).
+            const mm = String(val).trim().match(/^(\d+):(\d+(?:\.\d+)?)$/);
+            if (mm) {
+                const secs = parseInt(mm[1], 10) * 60 + parseFloat(mm[2]);
+                return secs === 0 ? NaN : secs;
+            }
+            // Treat "0" (and "0.0", "00") as missing split info, but do NOT affect values like "2026".
+            if (/^0+(\.0+)?$/.test(s)) return NaN;
+            const n = parseFloat(s);
+            if (!isNaN(n)) return n;
+            return NaN;
+        }
+
+        function parseTimeTrialCsv(csvString) {
+            const rows = d3.csvParse(csvString, (d) => {
+                for (const key in d) {
+                    if (d[key] && typeof d[key] === 'string') d[key] = d[key].trim();
+                }
+                const year = +d.Year || 0;
+                const competition = (d.Competition || '').trim();
+                const location = (d.Location || '').trim();
+                const gender = (d.Gender || '').trim();
+                const phase = (d.Phase || '').trim();
+                const gate = (d.Gate || '').trim();
+                const bib = (d.BIB || d.Bib || '').trim();
+                const position = +(d.Order || d.Position || 0);
+                const rampPosition = +(d['Ramp Position'] || d['RampPosition'] || 0);
+                const finalPosition = +(d['Final Position'] || d['FinalPosition'] || 0);
+                const athleteName = (d['Athlete Name'] || d['Athlete'] || d['Name'] || '').trim();
+                const faultVal = (d.Faults || d.Fault || '').trim();
+                const rank = +(d.Rank || d['Time Trial Rank'] || d['TT Rank'] || '');
+                const totalTimeRaw = d['Total Time'] || d['TotalTime'] || d['Total'] || '';
+                const totalTime = typeof totalTimeRaw === 'number' ? (isNaN(totalTimeRaw) ? NaN : totalTimeRaw) : parseTimeToSeconds(totalTimeRaw);
+                const out = {
+                    Year: year,
+                    Competition: competition,
+                    Location: location,
+                    Gender: gender,
+                    Phase: phase,
+                    Gate: gate,
+                    BIB: bib,
+                    Position: position,
+                    RampPosition: rampPosition,
+                    FinalPosition: finalPosition,
+                    AthleteName: athleteName,
+                    FaultVal: faultVal,
+                    Rank: isNaN(rank) ? undefined : rank,
+                    TotalTime: (typeof totalTime === 'number' && !isNaN(totalTime)) ? totalTime : undefined
+                };
+                Object.keys(d).forEach(k => {
+                    const m = k.match(/^Split\s*(\d+)$/i);
+                    if (m) {
+                        const t = parseTimeToSeconds(d[k]);
+                        if (typeof t === 'number' && !isNaN(t) && t > 0) out[k] = t;
+                    }
+                });
+                return out;
+            });
+            return rows;
+        }
+
+        /** Get ordered split column names from a row that has Split N keys. */
+        function getSplitColumns(row) {
+            return Object.keys(row)
+                .filter(k => /^Split\s*\d+$/i.test(k))
+                .sort((a, b) => parseInt(a.match(/\d+/)[0], 10) - parseInt(b.match(/\d+/)[0], 10));
+        }
+
         // --- GLOBAL COMPETITION SCANNER ---
         function scanCompetitionStructure(year, competition, allData) {
             const compData = allData.filter(d => d.Year === year && d.Competition === competition);
@@ -513,6 +1035,7 @@
             compData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+                if (isFaultOnlyRow(d)) return;
                 if (gate === 'SG') return; // SG is a downstream gate, skip upstream detection
 
                 const action = (d.Action || "").trim().toLowerCase();
@@ -524,7 +1047,7 @@
             compData.forEach(d => {
                 const runId = `${d.Phase}-${d.Gender}-${d.BIB}`;
                 if (!runs[runId]) runs[runId] = [];
-                if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp') {
+                if (d.Gate && d.Gate !== 'Start' && d.Gate !== 'Finish' && d.Gate !== 'Ramp' && isLiveRaceTagRow(d)) {
                     runs[runId].push(d.Gate);
                 }
             });
@@ -565,7 +1088,7 @@
             const gatesInRace = new Set();
             raceData.forEach(d => {
                 const g = d.Gate;
-                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish') gatesInRace.add(g);
+                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish' && !isFaultOnlyRow(d)) gatesInRace.add(g);
             });
 
             const compUpstreamSet = new Set(competitionUpstreamGates || []);
@@ -575,6 +1098,7 @@
             raceData.forEach(d => {
                 const gate = d.Gate;
                 if (!gate || gate === 'Ramp' || gate === 'Start' || gate === 'Finish') return;
+                if (isFaultOnlyRow(d)) return;
                 if (gate === 'SG') return; // SG is downstream, skip upstream detection
                 const action = (d.Action || '').toLowerCase();
                 if (action.includes('up')) upstreamCandidates.add(gate);
@@ -592,7 +1116,7 @@
             const seen = new Set();
             raceData.forEach(d => {
                 const g = d.Gate;
-                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish' && !seen.has(g)) {
+                if (g && g !== 'Ramp' && g !== 'Start' && g !== 'Finish' && !isFaultOnlyRow(d) && !seen.has(g)) {
                     seen.add(g);
                     orderedGates.push(g);
                 }
@@ -622,7 +1146,10 @@
                 });
             }
 
-            return { orderedGates, upstreamGates: Array.from(upstreamGates) };
+            return {
+                orderedGates,
+                upstreamGates: withoutSpecialGateFromUpstreamList(Array.from(upstreamGates))
+            };
         }
 
         // --- INITIALIZATION ---
@@ -630,11 +1157,13 @@
             tooltip = d3.select(".tooltip");
             tabFull = d3.select("#tab-full");
             tabCompact = d3.select("#tab-compact");
+            tabTT = d3.select("#tab-tt");
             tabAthlete = d3.select("#tab-athlete");
             tabSummary = d3.select("#tab-summary");
 
             reportFull = d3.select("#report-full");
             reportCompact = d3.select("#report-compact");
+            reportTT = d3.select("#report-tt");
             reportAthlete = d3.select("#report-athlete");
             reportSummary = d3.select("#report-summary");
 
@@ -672,19 +1201,38 @@
                 athlete: d3.select("#athlete-select-summary")
             };
 
+            selectorsTT = {
+                year: d3.select("#year-select-tt"),
+                competition: d3.select("#competition-select-tt"),
+                location: d3.select("#location-select-tt"),
+                locationWrapper: d3.select("#location-wrapper-tt"),
+                gender: d3.select("#gender-select-tt"),
+                athlete: d3.select("#athlete-select-tt")
+            };
+            filterControlsTT = d3.select("#filter-controls-tt");
+
             const now = new Date();
             lastUpdatedEl.html(`<span class="w-1.5 h-1.5 rounded-full bg-green-500 live-indicator"></span> Refreshing...`);
             const cacheBuster = now.getTime();
 
             try {
+                const persistedUi = readReportUiState();
                 // Full Report: kx_race_analysis_git.csv (columns: Year, Competition, Location, Gender, Phase, Gate, BIB, ...)
                 const urlFull = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
                 const urlCompact = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
+                // Individual Time Trial: prefer GitHub raw (contains 2025+), fallback to local `data/` next to report.
+                const urlTTLocal = `data/kayak_timetrial.csv?t=${cacheBuster}`;
+                const urlTTGitHub = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kayak_timetrial.csv?t=${cacheBuster}`;
 
                 const [responseFull, responseCompact] = await Promise.all([
                     fetch(urlFull),
                     fetch(urlCompact)
                 ]);
+
+                let responseTT = await fetch(urlTTGitHub).catch(() => ({ ok: false }));
+                if (!responseTT.ok) {
+                    responseTT = await fetch(urlTTLocal).catch(() => ({ ok: false }));
+                }
 
                 if (!responseFull.ok) throw new Error(`Failed to load Full Report CSV`);
                 if (!responseCompact.ok) throw new Error(`Failed to load In-Competition CSV`);
@@ -696,6 +1244,15 @@
                 masterDataFull = parseCsvData(csvStringFull);
                 masterDataCompact = parseCsvData(csvStringCompact);
 
+                if (responseTT.ok) {
+                    const csvStringTT = await responseTT.text();
+                    masterDataTT = parseTimeTrialCsv(csvStringTT);
+                    console.log(`Loaded ${masterDataTT.length} rows for Individual Time Trial (kayak_timetrial.csv)`);
+                } else {
+                    masterDataTT = [];
+                    console.warn('kayak_timetrial.csv not loaded (file missing or wrong path). Individual Time Trial tab will show no data.');
+                }
+
                 console.log(`Loaded ${masterDataFull.length} rows for Full Report`);
                 console.log(`Loaded ${masterDataCompact.length} rows for In-Competition Report`);
 
@@ -705,10 +1262,14 @@
                     populateFilters(masterDataFull, selectorsFull);
                     forceDefaults(selectorsFull, masterDataFull);
                     updateCompetitionOptionsForYear(masterDataFull, selectorsFull);
+                    applyPersistedReportFilters(selectorsFull, masterDataFull, persistedUi && persistedUi.full, false);
                     updateAllChartsFull();
 
+                    // Setup Individual Time Trial (using kayak_timetrial.csv)
+                    if (masterDataTT.length > 0) setupTimeTrialTab(persistedUi);
+
                     // Setup Season Summary (using full data)
-                    setupSeasonSummaryTab();
+                    setupSeasonSummaryTab(persistedUi && persistedUi.summary);
                 } else {
                     console.warn("Full Report data is empty.");
                 }
@@ -719,10 +1280,11 @@
                     populateFilters(masterDataCompact, selectorsCompact);
                     forceDefaults(selectorsCompact, masterDataCompact);
                     updateCompetitionOptionsForYear(masterDataCompact, selectorsCompact);
+                    applyPersistedReportFilters(selectorsCompact, masterDataCompact, persistedUi && persistedUi.compact, false);
                     updateAllChartsCompact();
 
                     // Setup Athlete Profile (Using Compact/In-Comp Data)
-                    setupAthleteProfileTab();
+                    setupAthleteProfileTab(persistedUi && persistedUi.athlete);
                 } else {
                     console.warn("In-Competition Report data is empty.");
                 }
@@ -734,16 +1296,34 @@
                 if (!tabFull.on("click")) {
                     tabFull.on("click", () => { setActiveTab(tabFull); if (masterDataFull.length > 0) updateAllChartsFull(); });
                     tabCompact.on("click", () => { setActiveTab(tabCompact); if (masterDataCompact.length > 0) updateAllChartsCompact(); });
+                    tabTT.on("click", () => { setActiveTab(tabTT); updateTimeTrialReport(); });
                     tabAthlete.on("click", () => { setActiveTab(tabAthlete); });
                     tabSummary.on("click", () => { setActiveTab(tabSummary); });
                 }
 
-                // Restore active tab from URL hash (so refresh stays on the same tab)
-                const savedTab = getTabFromHash();
-                if (savedTab && savedTab.node() !== tabFull.node()) {
-                    setActiveTab(savedTab, false);
-                    // Trigger chart rendering for the restored tab
+                // Restore active tab: URL hash wins when set; otherwise last tab from localStorage
+                let savedTab = getTabFromHash();
+                if (!savedTab && persistedUi && persistedUi.activeTab) {
+                    const idToTab = {
+                        'full-report': tabFull,
+                        'in-competition': tabCompact,
+                        'time-trial': tabTT,
+                        'athlete-profile': tabAthlete,
+                        'season-summary': tabSummary
+                    };
+                    savedTab = idToTab[persistedUi.activeTab] || null;
+                }
+                if (savedTab && savedTab.node()) {
+                    setActiveTab(savedTab, true);
                     if (savedTab.node() === tabCompact.node() && masterDataCompact.length > 0) updateAllChartsCompact();
+                    if (savedTab.node() === tabTT.node()) updateTimeTrialReport();
+                    if (savedTab.node() === tabAthlete.node()) updateAthleteProfiles();
+                }
+
+                attachReportUiPersistence();
+                if (!window.__kxReportUiPagehide) {
+                    window.__kxReportUiPagehide = true;
+                    window.addEventListener('pagehide', flushPersistReportUiState);
                 }
 
                 window.addEventListener('resize', () => {
@@ -768,29 +1348,38 @@
 
         /** Updates the competition dropdown to only show competitions that have data for the selected year. */
         function updateCompetitionOptionsForYear(data, selectorGroup) {
-            const selectedYear = +selectorGroup.year.property("value");
+            const yearVal = selectorGroup.year.property("value");
+            if (yearVal === SELECT_PLACEHOLDER || yearVal === '' || isNaN(+yearVal)) {
+                selectorGroup.competition.selectAll("option").data([SELECT_PLACEHOLDER]).join("option").attr("value", d => d).text(d => d);
+                selectorGroup.competition.property("value", SELECT_PLACEHOLDER);
+                updateLocationOptions(data, selectorGroup);
+                return;
+            }
+            const selectedYear = +yearVal;
             const compsInYear = [...new Set(data.filter(d => d.Year === selectedYear).map(d => d.Competition))].sort();
-            const options = compsInYear.length > 0 ? ['All', ...compsInYear] : ['All'];
+            const options = compsInYear.length > 0 ? [SELECT_PLACEHOLDER, 'All', ...compsInYear] : [SELECT_PLACEHOLDER];
             const currentComp = selectorGroup.competition.property("value");
             selectorGroup.competition.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
             if (!options.includes(currentComp)) selectorGroup.competition.property("value", options[0]);
             updateLocationOptions(data, selectorGroup);
         }
 
-        /** Always show Location dropdown; populate with locations for selected year + competition. For non-WRR (single location) auto-select it. */
+        /** Always show Location dropdown; populate with locations for selected year + competition. */
         function updateLocationOptions(data, selectorGroup) {
             if (selectorGroup.locationWrapper) selectorGroup.locationWrapper.classed("hidden", false);
-            const selectedYear = +selectorGroup.year.property("value");
+            const yearVal = selectorGroup.year.property("value");
             const comp = selectorGroup.competition.property("value");
+            if (yearVal === SELECT_PLACEHOLDER || comp === SELECT_PLACEHOLDER || yearVal === '' || isNaN(+yearVal)) {
+                selectorGroup.location.selectAll("option").data([SELECT_PLACEHOLDER]).join("option").attr("value", d => d).text(d => d);
+                selectorGroup.location.property("value", SELECT_PLACEHOLDER);
+                return;
+            }
+            const selectedYear = +yearVal;
             const locations = [...new Set(data.filter(d => d.Year === selectedYear && (comp === 'All' || d.Competition === comp) && d.Location).map(d => d.Location))].sort();
-            const options = locations.length > 0 ? ['All', ...locations] : ['All'];
+            const options = locations.length > 0 ? [SELECT_PLACEHOLDER, 'All', ...locations] : [SELECT_PLACEHOLDER];
             const currentLoc = selectorGroup.location.property("value");
             selectorGroup.location.selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
-            if (locations.length === 1) {
-                selectorGroup.location.property("value", locations[0]);
-            } else if (!options.includes(currentLoc)) {
-                selectorGroup.location.property("value", options[0]);
-            }
+            if (!options.includes(currentLoc)) selectorGroup.location.property("value", options[0]);
         }
 
         function populateFilters(data, selectorGroup) {
@@ -799,7 +1388,7 @@
                 gender: [...new Set(data.map(d => d.Gender))].sort(),
                 phase: [...new Set(data.map(d => d.Phase))]
             };
-            const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
+            const phaseSortOrder = { 'TT': 0, 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
             uniqueValues.phase.sort((a, b) => {
                 const regex = /^([A-Za-z]+)(\d*)$/;
                 const matchA = a.match(regex) || [a, a, ''];
@@ -812,18 +1401,22 @@
             for (const key in selectorGroup) {
                 if (key === 'locationWrapper') continue;
                 if (key === 'location') {
-                    selectorGroup[key].on("change", () => { if (selectorGroup === selectorsFull) updateAllChartsFull(); else updateAllChartsCompact(); });
+                    selectorGroup[key].on("change", () => {
+                        if (selectorGroup === selectorsFull) updateAllChartsFull();
+                        else if (selectorGroup === selectorsTT) { updateTTAthleteOptions(); updateTimeTrialReport(); }
+                        else updateAllChartsCompact();
+                    });
                     continue;
                 }
                 let options;
                 if (key === 'year') {
-                    options = uniqueValues.year;
+                    options = [SELECT_PLACEHOLDER, ...uniqueValues.year];
                 } else if (key === 'competition') {
-                    const initialYear = uniqueValues.year[0];
-                    const compsInYear = [...new Set(data.filter(d => d.Year === initialYear).map(d => d.Competition))].sort();
-                    options = compsInYear.length > 0 ? ['All', ...compsInYear] : ['All'];
+                    options = [SELECT_PLACEHOLDER];
+                } else if (key === 'athlete' && selectorGroup === selectorsTT) {
+                    options = [SELECT_PLACEHOLDER, 'All', ...[...new Set(data.map(d => formatAthleteName(d.AthleteName)).filter(Boolean))].sort()];
                 } else {
-                    options = ['All', ...uniqueValues[key]];
+                    options = [SELECT_PLACEHOLDER, 'All', ...(uniqueValues[key] || [])];
                 }
                 selectorGroup[key].selectAll("option").data(options).join("option").attr("value", d => d).text(d => d);
 
@@ -831,12 +1424,20 @@
                     selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataFull, selectorsFull); updateAllChartsFull(); });
                 } else if (key === 'year' && selectorGroup === selectorsCompact) {
                     selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
+                } else if (key === 'year' && selectorGroup === selectorsTT) {
+                    selectorGroup[key].on("change", () => { updateCompetitionOptionsForYear(masterDataTT, selectorsTT); updateTTAthleteOptions(); updateTimeTrialReport(); });
                 } else if (key === 'competition' && selectorGroup === selectorsFull) {
                     selectorGroup[key].on("change", () => { updateLocationOptions(masterDataFull, selectorsFull); updateAllChartsFull(); });
                 } else if (key === 'competition' && selectorGroup === selectorsCompact) {
                     selectorGroup[key].on("change", () => { updateLocationOptions(masterDataCompact, selectorsCompact); updateAllChartsCompact(); });
+                } else if (key === 'competition' && selectorGroup === selectorsTT) {
+                    selectorGroup[key].on("change", () => { updateLocationOptions(masterDataTT, selectorsTT); updateTTAthleteOptions(); updateTimeTrialReport(); });
+                } else if (key === 'gender' && selectorGroup === selectorsTT) {
+                    selectorGroup[key].on("change", () => { updateTTAthleteOptions(); updateTimeTrialReport(); });
                 } else if (selectorGroup === selectorsFull) {
                     selectorGroup[key].on("change", updateAllChartsFull);
+                } else if (selectorGroup === selectorsTT) {
+                    selectorGroup[key].on("change", () => { updateTTAthleteOptions(); updateTimeTrialReport(); });
                 } else {
                     selectorGroup[key].on("change", updateAllChartsCompact);
                 }
@@ -845,19 +1446,514 @@
         }
 
         function forceDefaults(selectorGroup, data) {
-            const latestYear = d3.max(data, d => d.Year);
-            if (latestYear) selectorGroup.year.property("value", latestYear);
+            selectorGroup.year.property("value", SELECT_PLACEHOLDER);
+            selectorGroup.competition.property("value", SELECT_PLACEHOLDER);
+            if (selectorGroup.location) selectorGroup.location.property("value", SELECT_PLACEHOLDER);
+            selectorGroup.gender.property("value", SELECT_PLACEHOLDER);
+            if (selectorGroup.phase) selectorGroup.phase.property("value", SELECT_PLACEHOLDER);
+            if (selectorGroup.athlete) selectorGroup.athlete.property("value", SELECT_PLACEHOLDER);
+        }
 
-            const compsInYear = [...new Set(data.filter(d => d.Year === latestYear).map(d => d.Competition))].sort();
-            if (compsInYear.length > 0) selectorGroup.competition.property("value", compsInYear[0]);
+        // --- INDIVIDUAL TIME TRIAL ---
+        function updateTTAthleteOptions() {
+            if (!selectorsTT || !selectorsTT.athlete || masterDataTT.length === 0) return;
+            const yearVal = selectorsTT.year.property("value");
+            if (yearVal === SELECT_PLACEHOLDER || yearVal === '' || isNaN(+yearVal)) {
+                selectorsTT.athlete.selectAll("option").data([SELECT_PLACEHOLDER]).join("option").attr("value", d => d).text(d => d);
+                selectorsTT.athlete.property("value", SELECT_PLACEHOLDER);
+                return;
+            }
+            const selected = {
+                year: +yearVal,
+                competition: selectorsTT.competition.property("value"),
+                location: selectorsTT.location.property("value"),
+                gender: selectorsTT.gender.property("value")
+            };
+            if (selected.competition === SELECT_PLACEHOLDER || selected.location === SELECT_PLACEHOLDER || selected.gender === SELECT_PLACEHOLDER) {
+                selectorsTT.athlete.selectAll("option").data([SELECT_PLACEHOLDER]).join("option").attr("value", d => d).text(d => d);
+                selectorsTT.athlete.property("value", SELECT_PLACEHOLDER);
+                return;
+            }
+            let data = masterDataTT.filter(d =>
+                d.Year === selected.year &&
+                (selected.competition === 'All' || d.Competition === selected.competition) &&
+                (selected.location === 'All' || d.Location === selected.location) &&
+                (selected.gender === 'All' || d.Gender === selected.gender)
+            );
+            const athletes = [SELECT_PLACEHOLDER, 'All', ...[...new Set(data.map(d => formatAthleteName(d.AthleteName)).filter(Boolean))].sort()];
+            const current = selectorsTT.athlete.property("value");
+            selectorsTT.athlete.selectAll("option").data(athletes).join("option").attr("value", d => d).text(d => d);
+            if (!athletes.includes(current)) selectorsTT.athlete.property("value", SELECT_PLACEHOLDER);
+        }
 
-            const genders = [...new Set(data.map(d => d.Gender))];
-            if (genders.includes("Men")) selectorGroup.gender.property("value", "Men");
-            else if (genders.length > 0) selectorGroup.gender.property("value", genders[0]);
+        function setupTimeTrialTab(persistedUi) {
+            if (masterDataTT.length === 0) return;
+            filterControlsTT.classed("hidden", false);
+            populateFilters(masterDataTT, selectorsTT);
+            forceDefaults(selectorsTT, masterDataTT);
+            updateCompetitionOptionsForYear(masterDataTT, selectorsTT);
+            applyPersistedReportFilters(selectorsTT, masterDataTT, persistedUi && persistedUi.tt, true);
+            if (persistedUi && (persistedUi.ttView === 'line' || persistedUi.ttView === 'course')) {
+                setTTViewMode(persistedUi.ttView);
+            }
+            updateTimeTrialReport();
+            d3.select("#tt-view-line").on("click", () => setTTViewMode('line'));
+            d3.select("#tt-view-course").on("click", () => setTTViewMode('course'));
+        }
 
-            const phases = [...new Set(data.map(d => d.Phase))];
-            if (phases.includes("Final")) selectorGroup.phase.property("value", "Final");
-            else if (phases.length > 0) selectorGroup.phase.property("value", phases[0]);
+        function drawTTSplitChart(splitNames, athleteTimes, firstPlaceTimes, athleteName) {
+            const container = d3.select("#tt-chart-svg");
+            container.selectAll("*").remove();
+            if (!splitNames.length || !athleteTimes.length) return;
+
+            const margin = { top: 24, right: 24, bottom: 48, left: 52 };
+            const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+
+            const dataAthlete = splitNames.map((name, i) => ({ split: name, time: athleteTimes[i], type: 'athlete' }));
+            const dataFirst = splitNames.map((name, i) => ({ split: name, time: firstPlaceTimes[i], type: 'first' }));
+
+            const xScale = d3.scalePoint().domain(splitNames).range([0, width]).padding(0.2);
+            const allTimes = [...athleteTimes, ...firstPlaceTimes].filter(t => typeof t === 'number' && !isNaN(t));
+            const yMin = Math.min(...allTimes, 0);
+            const yMax = Math.max(...allTimes);
+            const yPadding = (yMax - yMin) * 0.05 || 1;
+            const yScale = d3.scaleLinear().domain([yMin - yPadding, yMax + yPadding]).range([height, 0]);
+
+            const line = d3.line().x(d => xScale(d.split)).y(d => yScale(d.time)).curve(d3.curveMonotoneX);
+
+            const g = container.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+            g.append("g").attr("class", "x-axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
+                .selectAll("text").attr("class", "text-slate-400").attr("font-size", "12px");
+            g.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).ticks(6))
+                .selectAll("text").attr("class", "text-slate-400").attr("font-size", "12px");
+
+            g.append("path").datum(dataFirst).attr("fill", "none").attr("stroke", "#E8C020").attr("stroke-width", 2.5).attr("d", line);
+            g.append("path").datum(dataAthlete).attr("fill", "none").attr("stroke", "#9B59B6").attr("stroke-width", 2.5).attr("d", line);
+
+            g.selectAll(".dot-first").data(dataFirst).join("circle").attr("class", "dot-first").attr("cx", d => xScale(d.split)).attr("cy", d => yScale(d.time)).attr("r", 4).attr("fill", "#E8C020");
+            g.selectAll(".dot-athlete").data(dataAthlete).join("circle").attr("class", "dot-athlete").attr("cx", d => xScale(d.split)).attr("cy", d => yScale(d.time)).attr("r", 4).attr("fill", "#9B59B6");
+        }
+
+        const ttTableColors = {
+            athlete: '#9B59B6',
+            firstPlace: '#E8C020',
+            rank3: '#A97142',
+            rank1: '#E8C020',
+            rank5: '#a3e635' // sage green
+        };
+
+        // Default course background; custom maps only when CSV Location matches a file stem (see data/course_maps/README.md).
+        const TT_DEFAULT_COURSE_IMAGE = 'whitewater_course.png';
+        // Exact filenames in data/course_maps/ — keep in sync with disk (case matters on some servers).
+        const TT_COURSE_MAP_FILENAMES = [
+            'la seu d\'urgell.png',
+            'tacen.png',
+            'augsburg.png',
+            'paris.png',
+        ];
+
+        function normalizeCourseLocationKey(s) {
+            return String(s).trim().toLowerCase()
+                .replace(/'/g, '')
+                .replace(/[\s_\-]+/g, '_')
+                .replace(/_+/g, '_')
+                .replace(/^_|_$/g, '');
+        }
+
+        function isParisCourseLocation(location) {
+            return normalizeCourseLocationKey(location) === 'paris';
+        }
+
+        function getParisSplitOffset(i, n) {
+            if (i < 0 || n <= 0) return { x: 0, y: 0 };
+            let x = 0;
+            let y = 0;
+            // Move first split a little left.
+            if (i === 0) x -= 3;
+            // Lift the last 4 splits higher.
+            if (i >= n - 4) y -= 3;
+            // Lift the 3rd-last a little more.
+            if (i === n - 3) y -= 3;
+            // Lift the final 2 splits higher again.
+            if (i >= n - 2) y -= 9;
+            // Lift the very final split a little more.
+            if (i === n - 1) y -= 3;
+            return { x, y };
+        }
+
+        function getParisSplitRotationDelta(i, n) {
+            if (i < 0 || n <= 0) return 0;
+            // Angle the very final split a touch further right.
+            if (i === n - 1) return 24;
+            // Angle the final 2 splits a bit more to the right.
+            if (i >= n - 2) return 18;
+            return 0;
+        }
+
+        const TT_COURSE_IMAGE_BY_LOCATION = {};
+        for (const fname of TT_COURSE_MAP_FILENAMES) {
+            const stem = fname.replace(/\.(png|jpe?g|webp)$/i, '');
+            TT_COURSE_IMAGE_BY_LOCATION[normalizeCourseLocationKey(stem)] = `data/course_maps/${fname}`;
+        }
+
+        function getTTCourseBackgroundImageUrl(location) {
+            if (!location || location === SELECT_PLACEHOLDER || location === 'All') return TT_DEFAULT_COURSE_IMAGE;
+            const key = normalizeCourseLocationKey(location);
+            return TT_COURSE_IMAGE_BY_LOCATION[key] || TT_DEFAULT_COURSE_IMAGE;
+        }
+
+        function applyTTCourseBackgroundImage(location) {
+            const url = getTTCourseBackgroundImageUrl(location);
+            d3.select('#tt-course-view').style('background-image', `url('${url}')`);
+        }
+
+        let ttViewMode = 'line';
+        let lastTTChartData = null;
+        let ttCourseDirectionSign = 1;
+        let ttCourseReverseSplitOrder = false;
+        let ttCourseYOffset = 0;
+        let ttParisFirstSplitRotationDelta = 0;
+
+        // Centre of channel path: follows course down and around (split sections 1–7: bottom-left → along bottom → up right). No visible line drawn.
+        const ttCourseCentrePath = "M 16 74 Q 28 76 42 75 T 68 74 T 76 68 Q 76 52 76 38 T 76 22";
+        // Fixed split anchor points (0–100 overlay coords) so placement is consistent across competitions.
+        // Keys are split numbers (from "Split N" columns).
+        const ttSplitAnchors = {
+            1: { pt: [18, 70], tan: [1, 0] },
+            2: { pt: [26, 76], tan: [1, 0] },
+            3: { pt: [44, 76], tan: [1, 0] },
+            4: { pt: [64, 78], tan: [1, 0] },
+            5: { pt: [82, 76], tan: [0.8, -0.45] },
+            6: { pt: [94, 66], tan: [0.4, -0.9] },
+            7: { pt: [96, 52], tan: [0.4, -0.9] }
+        };
+
+        function drawTTCourseView(splitNames, athleteTimes, firstPlaceTimes) {
+            const svg = d3.select("#tt-course-overlay");
+            svg.selectAll("*").remove();
+            if (!splitNames || !splitNames.length || !athleteTimes || !firstPlaceTimes) return;
+
+            const n = splitNames.length;
+            const w = 100, h = 100;
+
+            svg.attr("viewBox", `0 0 ${w} ${h}`).attr("preserveAspectRatio", "xMidYMid meet");
+            const g = svg.append("g");
+
+            // Path used only for sampling points (no stroke — no coloured squiggles or centre line)
+            const pathEl = g.append("path")
+                .attr("d", ttCourseCentrePath)
+                .attr("fill", "none")
+                .attr("stroke", "none");
+            const totalLen = pathEl.node().getTotalLength();
+
+            const pts = [];
+            const tangents = [];
+            for (let i = 0; i < n; i++) {
+                const t = (i + 0.5) / n;
+                const len = t * totalLen;
+                const pt = pathEl.node().getPointAtLength(len);
+                pts.push([pt.x, pt.y]);
+                const delta = i < n - 1 ? 1 : -1;
+                const lenAdj = Math.max(0, Math.min(totalLen, len + delta));
+                const ptAdj = pathEl.node().getPointAtLength(lenAdj);
+                const tx = i < n - 1 ? ptAdj.x - pt.x : pt.x - ptAdj.x;
+                const ty = i < n - 1 ? ptAdj.y - pt.y : pt.y - ptAdj.y;
+                tangents.push([tx, ty]);
+            }
+            // Override sampled points with fixed anchors by split number (consistent across competitions).
+            // Example: if this competition only has Split 1..5, we place those 5 at anchors 1..5.
+            for (let i = 0; i < n; i++) {
+                const m = String(splitNames[i] || '').match(/(\d+)/);
+                const splitNum = m ? parseInt(m[1], 10) : NaN;
+                const anchor = ttSplitAnchors[splitNum];
+                if (anchor) {
+                    pts[i] = anchor.pt.slice();
+                    tangents[i] = anchor.tan.slice();
+                }
+            }
+
+            const norm = (v) => {
+                const len = Math.hypot(v[0], v[1]) || 1;
+                return [v[0] / len, v[1] / len];
+            };
+
+            const canoePath = "M -8,0 L 6,-2 L 8,0 L 6,2 Z";
+            const alongOffBase = 1.2;
+            const alongOffPerSecond = 1.4;
+            const alongOffMax = 4.5;
+            const perpOff = 1.0;
+            const boatScale = 0.33;
+
+            for (let i = 0; i < n; i++) {
+                const ax = athleteTimes[i], vx = firstPlaceTimes[i];
+                const aNum = typeof ax === 'number' && !isNaN(ax);
+                const vNum = typeof vx === 'number' && !isNaN(vx);
+                const posIdx = ttCourseReverseSplitOrder ? (n - 1 - i) : i;
+                const [tx, ty] = norm(tangents[posIdx]);
+                const dx = tx * ttCourseDirectionSign;
+                const dy = ty * ttCourseDirectionSign;
+                const perpX = -dy;
+                const perpY = dx;
+                const parisOffset = (ttCourseReverseSplitOrder || ttCourseDirectionSign < 0) ? getParisSplitOffset(i, n) : { x: 0, y: 0 };
+                const xMid = pts[posIdx][0] + parisOffset.x;
+                const yMid = pts[posIdx][1] + ttCourseYOffset + parisOffset.y;
+                const boatRotationOffset = (i === 0 ? 48 : 12);
+                const placeCanoe = (x, y, color) => {
+                    const splitRotationDelta =
+                        (i === 0 ? ttParisFirstSplitRotationDelta : 0) +
+                        ((ttCourseReverseSplitOrder || ttCourseDirectionSign < 0) ? getParisSplitRotationDelta(i, n) : 0);
+                    const deg = (Math.atan2(dy, dx) * 180 / Math.PI) + boatRotationOffset + splitRotationDelta;
+                    g.append("path")
+                        .attr("d", canoePath)
+                        .attr("fill", color)
+                        .attr("stroke", "rgba(0,0,0,0.35)")
+                        .attr("stroke-width", 0.4)
+                        .attr("transform", `translate(${x},${y}) rotate(${deg}) scale(${boatScale})`);
+                };
+                if (aNum && vNum) {
+                    const diffSeconds = Math.abs(vx - ax);
+                    const alongOff = Math.min(alongOffMax, alongOffBase + diffSeconds * alongOffPerSecond);
+                    const athleteAhead = ax < vx;
+                    const along = athleteAhead ? 1 : -1;
+                    const xA = xMid + dx * along * alongOff + perpX * perpOff;
+                    const yA = yMid + dy * along * alongOff + perpY * perpOff;
+                    // Keep athlete (purple) fixed; bring rank-1 (yellow) a bit closer.
+                    const rank1SeparationScale = 0.56;
+                    const xV = xMid - dx * along * alongOff * rank1SeparationScale - perpX * perpOff * rank1SeparationScale;
+                    const yV = yMid - dy * along * alongOff * rank1SeparationScale - perpY * perpOff * rank1SeparationScale;
+                    placeCanoe(xA, yA, '#9B59B6');
+                    placeCanoe(xV, yV, '#E8C020');
+                } else {
+                    if (aNum) placeCanoe(xMid, yMid, '#9B59B6');
+                    if (vNum) placeCanoe(xMid, yMid, '#E8C020');
+                }
+            }
+        }
+
+        function setTTViewMode(mode) {
+            ttViewMode = mode;
+            const lineWrapper = d3.select("#tt-line-chart-wrapper");
+            const courseWrapper = d3.select("#tt-course-view-wrapper");
+            const btnLine = d3.select("#tt-view-line");
+            const btnCourse = d3.select("#tt-view-course");
+            if (mode === 'line') {
+                lineWrapper.classed("hidden", false);
+                courseWrapper.classed("hidden", true);
+                btnLine.classed("bg-slate-600 text-slate-200 border-slate-500", true).classed("text-slate-400 border-slate-600", false);
+                btnCourse.classed("bg-slate-600 text-slate-200 border-slate-500", false).classed("text-slate-400 border-slate-600", true);
+            } else {
+                lineWrapper.classed("hidden", true);
+                courseWrapper.classed("hidden", false);
+                btnLine.classed("bg-slate-600 text-slate-200 border-slate-500", false).classed("text-slate-400 border-slate-600", true);
+                btnCourse.classed("bg-slate-600 text-slate-200 border-slate-500", true).classed("text-slate-400 border-slate-600", false);
+                if (lastTTChartData) drawTTCourseView(lastTTChartData.splitNames, lastTTChartData.athleteTimes, lastTTChartData.firstPlaceTimes);
+            }
+            schedulePersistReportUiState();
+        }
+
+        function drawTTSplitsTable(splitNames, rowData, showSectorDescriptions) {
+            d3.select("#tt-splits-table-wrapper").classed("hidden", false);
+            const container = d3.select("#tt-splits-table-container");
+            container.selectAll("*").remove();
+            const formatT = t => (typeof t === 'number' && !isNaN(t)) ? t.toFixed(2) : '—';
+            const numCols = splitNames.length + 2;
+            const minPerCol = [];
+            for (let j = 0; j < numCols; j++) {
+                if (j === 0) continue;
+                const vals = rowData.map(d => {
+                    if (j <= splitNames.length) return d.times[j - 1];
+                    return (typeof d.total === 'number' && !isNaN(d.total)) ? d.total : (d.times.length ? d.times[d.times.length - 1] : NaN);
+                }).filter(v => typeof v === 'number' && !isNaN(v));
+                minPerCol[j] = vals.length ? Math.min(...vals) : NaN;
+            }
+            const table = container.append("table").attr("class", "min-w-full divide-y divide-slate-700");
+            const thead = table.append("thead").attr("class", "bg-slate-800");
+            thead.append("tr").selectAll("th").data(['', ...splitNames, 'Total']).join("th")
+                .attr("class", "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300")
+                .text((d, i) => i === 0 ? '' : d);
+
+            if (showSectorDescriptions) {
+                const sectorDescriptionsBySplit = {
+                    1: "Green Light to Drop In:",
+                    2: "Drop In to Exit Gate 2",
+                    3: "Exit Gate 2 to Gate 4 Gate Line",
+                    4: "Gate 4 to Gate 7 Gate Line",
+                    5: "Gate 7 to Upside down Roll",
+                    6: "Roll to Gate 8 Gate Line",
+                    7: "Gate 8 to Finish"
+                };
+
+                const splitDescriptionColumns = splitNames.map(col => {
+                    const m = String(col).match(/(\d+)/);
+                    const n = m ? parseInt(m[1], 10) : NaN;
+                    return sectorDescriptionsBySplit[n] || '';
+                });
+
+                thead.append("tr").selectAll("th").data(['', ...splitDescriptionColumns, '']).join("th")
+                    .attr("class", "px-4 py-2 text-left text-[11px] font-medium text-slate-400 whitespace-normal leading-tight")
+                    .text(d => d);
+            }
+            const tbody = table.append("tbody").attr("class", "divide-y divide-slate-700 bg-slate-800/50");
+            const rows = tbody.selectAll("tr").data(rowData).join("tr").attr("class", "hover:bg-slate-700/50");
+            rows.selectAll("td").data((d, rowIdx) => {
+                const total = (typeof d.total === 'number' && !isNaN(d.total)) ? d.total : (d.times.length ? d.times[d.times.length - 1] : NaN);
+                return [{ text: d.label, color: d.color, isLabel: true }, ...d.times.map((t, i) => ({ text: formatT(t), value: t, colIdx: i + 1 })), { text: formatT(total), value: total, colIdx: splitNames.length + 1 }];
+            }).join("td")
+                .attr("class", (d, j) => {
+                    const base = j === 0 ? "px-4 py-3 text-sm font-medium" : "px-4 py-3 text-sm text-slate-400";
+                    const minVal = minPerCol[d.colIdx];
+                    const isFastest = !d.isLabel && typeof d.value === 'number' && !isNaN(d.value) && typeof minVal === 'number' && !isNaN(minVal) && Math.abs(d.value - minVal) < 0.005;
+                    if (isFastest) return base + " rounded bg-amber-500/25 border border-amber-400/60";
+                    return base;
+                })
+                .style("color", (d, j) => j === 0 ? d.color : null)
+                .text(d => d.text);
+        }
+
+        function updateTimeTrialReport() {
+            if (masterDataTT.length === 0) {
+                const container = d3.select("#tt-content-area");
+                container.selectAll("*").remove();
+                container.append("p").attr("class", "text-slate-500").text("No time trial data loaded. Place kayak_timetrial.csv in the data folder next to this report and run a local server from the kx_tagger folder (e.g. python3 -m http.server 8888), then open http://localhost:8888/kayak_cross_report.html");
+                d3.select("#tt-chart-container").classed("hidden", true);
+                return;
+            }
+            const yearVal = selectorsTT.year.property("value");
+            if (yearVal === SELECT_PLACEHOLDER) {
+                d3.select("#tt-content-area").selectAll("*").remove();
+                d3.select("#tt-content-area").append("p").attr("class", "text-slate-500").text("Select year, competition, location, gender and athlete to view time trial data.");
+                d3.select("#tt-chart-container").classed("hidden", true);
+                return;
+            }
+            const selected = {
+                year: +yearVal,
+                competition: selectorsTT.competition.property("value"),
+                location: selectorsTT.location.property("value"),
+                gender: selectorsTT.gender.property("value"),
+                athlete: selectorsTT.athlete.property("value")
+            };
+            if (selected.competition === SELECT_PLACEHOLDER || selected.location === SELECT_PLACEHOLDER || selected.gender === SELECT_PLACEHOLDER || selected.athlete === SELECT_PLACEHOLDER) {
+                d3.select("#tt-content-area").selectAll("*").remove();
+                d3.select("#tt-content-area").append("p").attr("class", "text-slate-500").text("Select year, competition, location, gender and athlete to view time trial data.");
+                d3.select("#tt-chart-container").classed("hidden", true);
+                return;
+            }
+            applyTTCourseBackgroundImage(selected.location);
+            const isParis = isParisCourseLocation(selected.location);
+            ttCourseDirectionSign = isParis ? -1 : 1;
+            ttCourseReverseSplitOrder = isParis;
+            ttCourseYOffset = isParis ? -6 : 0;
+            ttParisFirstSplitRotationDelta = isParis ? -90 : 0;
+            const dataForVB = masterDataTT.filter(d =>
+                d.Year === selected.year &&
+                (selected.competition === 'All' || d.Competition === selected.competition) &&
+                (selected.location === 'All' || d.Location === selected.location) &&
+                (selected.gender === 'All' || d.Gender === selected.gender)
+            );
+            let data = masterDataTT.filter(d =>
+                d.Year === selected.year &&
+                (selected.competition === 'All' || d.Competition === selected.competition) &&
+                (selected.location === 'All' || d.Location === selected.location) &&
+                (selected.gender === 'All' || d.Gender === selected.gender) &&
+                (selected.athlete === 'All' || formatAthleteName(d.AthleteName) === selected.athlete)
+            );
+
+            const firstRowWithSplits = dataForVB.find(r => getSplitColumns(r).length > 0);
+            const allSplitNames = firstRowWithSplits ? getSplitColumns(firstRowWithSplits) : [];
+            // Only include splits that this course has: at least one valid (> 0, non-NaN) value in the data
+            const splitNames = allSplitNames.filter(col =>
+                dataForVB.some(d => {
+                    const v = d[col];
+                    return typeof v === 'number' && !isNaN(v) && v > 0;
+                })
+            );
+            const hasSplits = splitNames.length > 0;
+
+            if (hasSplits) {
+                const virtualBestTimes = splitNames.map(col => {
+                    const vals = dataForVB.map(d => d[col]).filter(v => typeof v === 'number' && !isNaN(v));
+                    return vals.length ? Math.min(...vals) : NaN;
+                });
+                const chartContainer = d3.select("#tt-chart-container");
+                const diffEl = d3.select("#tt-chart-diff");
+                const legendEl = d3.select("#tt-chart-legend");
+
+                if (selected.athlete !== 'All' && data.length > 0) {
+                    const athleteRow = data[0];
+                    const athleteTimes = splitNames.map(col => athleteRow[col]);
+                    const athleteName = formatAthleteName(athleteRow.AthleteName) || selected.athlete;
+                    const lastCol = splitNames[splitNames.length - 1];
+                    let rank1Row = dataForVB.find(d => d.Rank === 1);
+                    let rank3Row = dataForVB.find(d => d.Rank === 3);
+                    if (!rank1Row || !rank3Row) {
+                        const ranked = dataForVB.slice().filter(d => typeof d[lastCol] === 'number' && !isNaN(d[lastCol])).sort((a, b) => a[lastCol] - b[lastCol]);
+                        if (!rank1Row) rank1Row = ranked.length >= 1 ? ranked[0] : null;
+                        if (!rank3Row) rank3Row = ranked.length >= 3 ? ranked[2] : null;
+                    }
+                    const rank1Name = rank1Row ? (formatAthleteName(rank1Row.AthleteName) || '—') : '—';
+                    const rank3Name = rank3Row ? (formatAthleteName(rank3Row.AthleteName) || '—') : '—';
+                    const rank1Times = rank1Row ? splitNames.map(col => rank1Row[col]) : splitNames.map(() => NaN);
+                    const rank3Times = rank3Row ? splitNames.map(col => rank3Row[col]) : splitNames.map(() => NaN);
+                    const athleteTotal = (athleteRow.TotalTime != null && !isNaN(athleteRow.TotalTime)) ? athleteRow.TotalTime : athleteTimes.filter(t => !isNaN(t)).pop();
+                    const rank1Total = rank1Row && (rank1Row.TotalTime != null && !isNaN(rank1Row.TotalTime)) ? rank1Row.TotalTime : rank1Times.filter(t => !isNaN(t)).pop();
+                    const rank3Total = rank3Row && (rank3Row.TotalTime != null && !isNaN(rank3Row.TotalTime)) ? rank3Row.TotalTime : rank3Times.filter(t => !isNaN(t)).pop();
+                    // Rank 5 (optional, for split breakdown only)
+                    let rank5Row = dataForVB.find(d => d.Rank === 5);
+                    if (!rank5Row) {
+                        const rankedByTotal = dataForVB.slice().filter(d => typeof d.TotalTime === 'number' && !isNaN(d.TotalTime))
+                            .sort((a, b) => a.TotalTime - b.TotalTime);
+                        rank5Row = rankedByTotal.length >= 5 ? rankedByTotal[4] : null;
+                    }
+                    const rank5Name = rank5Row ? (formatAthleteName(rank5Row.AthleteName) || '—') : '—';
+                    const rank5Times = rank5Row ? splitNames.map(col => rank5Row[col]) : splitNames.map(() => NaN);
+                    const rank5Total = rank5Row && (rank5Row.TotalTime != null && !isNaN(rank5Row.TotalTime)) ? rank5Row.TotalTime : rank5Times.filter(t => !isNaN(t)).pop();
+                    chartContainer.classed("hidden", false);
+                    lastTTChartData = { splitNames, athleteTimes, firstPlaceTimes: rank1Times };
+                    drawTTSplitChart(splitNames, athleteTimes, rank1Times, athleteName);
+                    // Build rows in order: 1st, 3rd, 5th, selected (if distinct from rank5)
+                    const rows = [];
+                    rows.push({ label: rank1Name, color: ttTableColors.rank1, times: rank1Times, total: rank1Total });
+                    rows.push({ label: rank3Name, color: ttTableColors.rank3, times: rank3Times, total: rank3Total });
+                    const rank5IsDistinct = rank5Name && rank5Name !== '—' && rank5Name !== athleteName;
+                    if (rank5IsDistinct) {
+                        rows.push({ label: rank5Name, color: ttTableColors.rank5, times: rank5Times, total: rank5Total });
+                    }
+                    const athleteIsDistinctFrom5 = !rank5IsDistinct || athleteName !== rank5Name;
+                    if (athleteIsDistinctFrom5) {
+                        rows.push({ label: athleteName, color: ttTableColors.athlete, times: athleteTimes, total: athleteTotal });
+                    }
+                    const showSectorDescriptions = selected.year === 2025;
+                    drawTTSplitsTable(splitNames, rows, showSectorDescriptions);
+                    setTTViewMode(ttViewMode);
+                    const diff = (athleteTotal != null && rank1Total != null) ? athleteTotal - rank1Total : null;
+                    if (diff != null) {
+                        const sign = diff >= 0 ? '+' : '';
+                        diffEl.text(`Difference from 1st place (total time): ${sign}${diff.toFixed(2)}s`).classed("text-amber-400", diff > 0).classed("text-emerald-400", diff <= 0);
+                    } else {
+                        diffEl.text("");
+                    }
+                    legendEl.html(
+                        '<span class="text-[#9B59B6] font-medium">—— ' + athleteName + '</span>' +
+                        '<span class="text-[#E8C020] font-medium ml-6">—— ' + (rank1Name !== '—' ? rank1Name : 'Rank 1') + '</span>'
+                    );
+                    d3.select("#tt-course-legend-athlete").text(athleteName);
+                    d3.select("#tt-course-legend-first").text(rank1Name !== '—' ? rank1Name : 'Rank 1');
+                } else {
+                    chartContainer.classed("hidden", true);
+                    diffEl.text("");
+                    d3.select("#tt-splits-table-wrapper").classed("hidden", true);
+                }
+            } else {
+                d3.select("#tt-chart-container").classed("hidden", true);
+            }
+
+            if (hasSplits && selected.athlete !== 'All' && data.length > 0) {
+                d3.select("#tt-content-area").classed("hidden", true);
+            } else {
+                d3.select("#tt-content-area").classed("hidden", false);
+            }
         }
 
         // --- ATHLETE PROFILE ---
@@ -872,19 +1968,26 @@
             if (!options.includes(currentComp)) selectorsAthlete.competition.property("value", "All");
         }
 
-        function setupAthleteProfileTab() {
+        function setupAthleteProfileTab(persistedAthlete) {
             // NOTE: This explicitly uses masterDataCompact (In-Competition Data)
             const years = [...new Set(masterDataCompact.map(d => d.Year))].sort((a, b) => b - a);
             const latestYear = years[0];
+            const ap = persistedAthlete || {};
             const currentFilters = {
-                year: selectorsAthlete.year.property("value") || latestYear,
-                competition: selectorsAthlete.competition.property("value"),
-                gender: selectorsAthlete.gender.property("value")
+                year: (ap.year !== undefined && ap.year !== null && ap.year !== '')
+                    ? ap.year
+                    : (selectorsAthlete.year.property("value") || latestYear),
+                competition: ap.competition != null && ap.competition !== ''
+                    ? ap.competition
+                    : selectorsAthlete.competition.property("value"),
+                gender: ap.gender != null && ap.gender !== ''
+                    ? ap.gender
+                    : selectorsAthlete.gender.property("value")
             };
 
             selectorsAthlete.year.selectAll("option").data(['All', ...years]).join("option").attr("value", d => d).text(d => d);
             if (currentFilters.year && (currentFilters.year === 'All' || years.includes(+currentFilters.year))) {
-                selectorsAthlete.year.property("value", currentFilters.year);
+                selectorsAthlete.year.property("value", String(currentFilters.year));
             } else if (latestYear) selectorsAthlete.year.property("value", latestYear);
 
             const compsInYear = currentFilters.year === 'All' || !currentFilters.year
@@ -907,6 +2010,17 @@
             d3.selectAll(".athlete-select").on("change", updateAthleteProfiles);
 
             updateAthleteSelectors();
+
+            const slots = ap.slots || {};
+            ['athlete-select-1', 'athlete-select-2', 'athlete-select-3'].forEach((id) => {
+                const v = slots[id];
+                if (!v) return;
+                const sel = d3.select(`#${id}`);
+                if (sel.empty()) return;
+                const opts = [...sel.node().querySelectorAll('option')].map(o => o.value);
+                if (opts.includes(v)) sel.property("value", v);
+            });
+            updateAthleteProfiles();
         }
 
         function updateAthleteSelectors() {
@@ -936,7 +2050,7 @@
                 filteredData = filteredData.filter(d => d.Gender === selectedFilters.gender);
             }
 
-            const athleteRampData = filteredData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
+            const athleteRampData = filteredData.filter(d => d.AthleteName && (d.Gate === 'Ramp' || isDnsRow(d)));
             const uniqueAthleteNames = ['', ...[...new Set(athleteRampData.map(d => formatAthleteName(d.AthleteName)))].sort()];
 
             const selects = d3.selectAll(".athlete-select");
@@ -1007,8 +2121,10 @@
 
             const originalName = originalAthleteEntry.AthleteName;
 
-            // 4. Get Ramp entries (runs) for this athlete IN THIS CONTEXT ONLY
-            const athleteRampEntries = contextData.filter(d => d.AthleteName === originalName && d.Gate === 'Ramp');
+            // 4. Get Ramp / DNS (Start) entries (runs) for this athlete IN THIS CONTEXT ONLY
+            const athleteRampEntries = contextData.filter(d =>
+                d.AthleteName === originalName && (d.Gate === 'Ramp' || (d.Gate === 'Start' && isDnsRow(d)))
+            );
 
             const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
             athleteRampEntries.sort((a, b) => {
@@ -1021,25 +2137,42 @@
                 return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
             });
 
-            const profileData = athleteRampEntries.map(rampEntry => {
-                const { Phase: phase, BIB: bib, RampPosition: rampPos } = rampEntry;
+            const compStructureCache = new Map();
+            const getCompStructure = (year, competition) => {
+                const key = `${year}|${competition}`;
+                if (!compStructureCache.has(key)) {
+                    compStructureCache.set(key, scanCompetitionStructure(year, competition, contextData));
+                }
+                return compStructureCache.get(key);
+            };
 
-                // 5. Get full race data from CONTEXT DATA
+            const profileData = athleteRampEntries.map(rampEntry => {
+                const { Phase: phase, BIB: bib, Year: raceYear, Competition: raceComp } = rampEntry;
+                const rampPos = isDnsRow(rampEntry) ? 'DNS' : rampEntry.RampPosition;
+
                 const fullRaceDataForAthlete = contextData.filter(d => d.Phase === phase && d.BIB === bib);
 
-                const upstreamData = fullRaceDataForAthlete.find(d =>
-                    d.Gate !== 'Ramp' &&
-                    d.Gate !== 'Start' &&
-                    d.Gate !== 'Finish' &&
-                    d.UpstreamTactic &&
-                    d.UpstreamTactic.trim() !== ''
-                );
+                let tactic = 'N/A';
+                let direction = 'N/A';
 
-                let tactic = upstreamData?.UpstreamTactic || 'N/A';
-                let direction = upstreamData?.Action || 'N/A';
+                if (!isDnsRow(rampEntry)) {
+                    const compStructure = getCompStructure(raceYear, raceComp);
+                    const firstUpstreamGate = getFirstUpstreamGate(compStructure);
 
-                if (tactic === 'Left-Up' || tactic === 'Right-Up') {
-                    tactic = 'in 1st Place';
+                    if (firstUpstreamGate) {
+                        const upstreamData = fullRaceDataForAthlete.find(d =>
+                            d.Gate === firstUpstreamGate && isLiveRaceTagRow(d)
+                        ) || fullRaceDataForAthlete.find(d =>
+                            d.Gate === firstUpstreamGate && !isFaultOnlyRow(d)
+                        );
+
+                        tactic = upstreamData?.UpstreamTactic || 'N/A';
+                        direction = upstreamData?.Action || 'N/A';
+
+                        if (tactic === 'Left-Up' || tactic === 'Right-Up') {
+                            tactic = 'in 1st Place';
+                        }
+                    }
                 }
 
                 return { phase, bib, rampPos, direction, tactic };
@@ -1083,8 +2216,13 @@
                 // Centered Bib Cell
                 row.append("td").attr("class", `${cellClass} text-center`).html(`<div class="w-2 h-2 md:w-4 md:h-4 rounded-sm inline-block align-middle" style="background-color:${bibColors[d.bib] || '#fff'}"></div>`);
 
-                // Centered Ramp Cell
-                row.append("td").attr("class", `${cellClass} text-center`).text(d.rampPos);
+                // Centered Ramp Cell (DNS shown smaller)
+                const rampCell = row.append("td").attr("class", `${cellClass} text-center`);
+                if (d.rampPos === 'DNS') {
+                    rampCell.append("span").attr("class", "text-[9px] lg:text-[10px] text-slate-400").text("DNS");
+                } else {
+                    rampCell.text(d.rampPos);
+                }
 
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.direction);
                 row.append("td").attr("class", `${cellClass} whitespace-nowrap`).text(d.tactic);
@@ -1120,8 +2258,10 @@
         }
 
         function calculateTacticLogic(raceData, upstreamGates) {
+            upstreamGates = withoutSpecialGateFromUpstreamList(upstreamGates);
+            const liveRows = raceData.filter(isLiveRaceTagRow);
             upstreamGates.forEach(gate => {
-                const gateEvents = raceData.filter(d => d.Gate === gate).sort((a, b) => a.Position - b.Position);
+                const gateEvents = liveRows.filter(d => d.Gate === gate).sort((a, b) => liveTagOrder(a) - liveTagOrder(b));
                 if (gateEvents.length === 0) return;
                 const leader = gateEvents[0];
                 leader.displayTactic = leader.UpstreamTactic;
@@ -1140,15 +2280,15 @@
                 }
             });
             // Non-upstream gates: clear displayTactic so no carryover from previous upstream is shown
-            raceData.forEach(d => {
+            liveRows.forEach(d => {
                 if (!upstreamGates.includes(d.Gate)) {
                     d.displayTactic = '';
                 }
             });
 
-            // --- SPECIAL GATE: Set displayTactic to L or R based on Action ---
-            raceData.forEach(d => {
-                if (d.Gate === 'SG') {
+            // --- SPECIAL GATE (downstream): L / R labels from action ---
+            liveRows.forEach(d => {
+                if (isSpecialGate(d.Gate)) {
                     const action = (d.Action || '').toLowerCase();
                     if (action.includes('left')) {
                         d.displayTactic = 'L';
@@ -1177,9 +2317,7 @@
             const athleteStats = bibsInRace.map(bib => {
                 const myFaults = faultData.filter(d => d.BIB === bib);
 
-                // Name lookup (grab from first valid entry)
-                const nameEntry = raceData.find(d => d.BIB === bib && d.AthleteName);
-                const name = nameEntry ? formatAthleteName(nameEntry.AthleteName) : (bibFullNames[bib] || bib);
+                const name = athleteNameFromRaceRows(raceData, bib) || (bibFullNames[bib] || bib);
 
                 let isRAL = false;
                 let deepestFaultIndex = -1;
@@ -1208,9 +2346,13 @@
                     return f.FaultVal || f.Action || "Fault";
                 });
 
-                const finishEntry = raceData.find(d => d.BIB === bib && d.FinalPosition > 0);
-                const originalRank = finishEntry ? finishEntry.FinalPosition : 99;
+                const dnsRow = raceData.find(d => d.BIB === bib && isDnsRow(d));
+                const finishRow = raceData.find(d => d.BIB === bib && d.Gate === 'Finish' && isLiveRaceTagRow(d));
+                const originalRank = dnsRow ? 99 : (finishRow ? liveTagOrder(finishRow) : 99);
                 const rampEntry = raceData.find(d => d.BIB === bib && d.Gate === 'Ramp');
+                let rampPosition = '-';
+                if (dnsRow) rampPosition = 'DNS';
+                else if (rampEntry && rampEntry.RampPosition > 0) rampPosition = rampEntry.RampPosition;
 
                 // Capture finish rank from any entry for this athlete in this race
                 const finishRankEntry = raceData.find(d => d.BIB === bib && d.FinishRank);
@@ -1219,7 +2361,8 @@
                 return {
                     bib: bib,
                     name: name,
-                    rampPosition: rampEntry ? rampEntry.RampPosition : '-',
+                    rampPosition: rampPosition,
+                    isDNS: !!dnsRow,
                     faults: faultStrings,
                     faultCount: faultStrings.length,
                     deepestFaultIndex: deepestFaultIndex,
@@ -1318,7 +2461,8 @@
                 row.append("span").attr("class", "text-slate-200 truncate").text(athlete.name);
 
                 let reason = "Clean";
-                if (athlete.isRAL) reason = "RAL";
+                if (athlete.isDNS) reason = "DNS";
+                else if (athlete.isRAL) reason = "RAL";
                 else if (athlete.faultCount > 0) {
                     const gateName = orderedGates[athlete.deepestFaultIndex] || "Start";
                     reason = athlete.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athlete.faultCount} Faults`;
@@ -1328,7 +2472,8 @@
         }
 
         // --- SEASON SUMMARY LOGIC ---
-        function setupSeasonSummaryTab() {
+        function setupSeasonSummaryTab(persistedSummary) {
+            const ps = persistedSummary || {};
             // Populate Year
             const uniqueYears = [...new Set(masterDataFull.map(d => d.Year))].sort((a, b) => b - a);
             selectorsSummary.year.selectAll("option")
@@ -1346,7 +2491,15 @@
                 .attr("value", d => d)
                 .text(d => d);
             if (uniqueGenders.includes("Men")) selectorsSummary.gender.property("value", "Men");
+            else if (uniqueGenders.includes("M")) selectorsSummary.gender.property("value", "M");
             else if (genderOptions.length > 0) selectorsSummary.gender.property("value", genderOptions[0]);
+
+            if (ps.year != null && ps.year !== '' && uniqueYears.map(String).includes(String(ps.year))) {
+                selectorsSummary.year.property("value", String(ps.year));
+            }
+            if (ps.gender != null && ps.gender !== '' && genderOptions.includes(String(ps.gender))) {
+                selectorsSummary.gender.property("value", String(ps.gender));
+            }
 
             // Listeners
             selectorsSummary.year.on("change", updateSeasonSummaryAthletes);
@@ -1355,6 +2508,11 @@
 
             // Init Athlete Dropdown
             updateSeasonSummaryAthletes();
+
+            if (ps.athlete != null && ps.athlete !== '' && selectOptionExists(selectorsSummary.athlete, ps.athlete)) {
+                selectorsSummary.athlete.property("value", String(ps.athlete));
+                generateSeasonSummary();
+            }
         }
 
         function updateSeasonSummaryAthletes() {
@@ -1450,7 +2608,14 @@
                     );
                     const structure = scanCompetitionStructure(selectedYear, compName, masterDataFull);
                     const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
-                    const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
+                    const finalContext = athleteYearData.find(d =>
+                        d.Competition === compName &&
+                        d.Phase === 'Final' &&
+                        d.Gender === finalRace.gender
+                    );
+                    const athleteResult = finalContext
+                        ? rankedResults.find(r => r.bib === finalContext.BIB)
+                        : rankedResults.find(r => r.name === selectedAthleteName);
 
                     if (athleteResult) {
                         // Use Calculated Phase Rank as Finish Rank for Final
@@ -1469,6 +2634,7 @@
 
             const tbody = table.append("tbody");
 
+            let rowsRendered = 0;
             races.forEach(race => {
                 // 1. Get Full Race Data context (all athletes in that race)
                 const fullRaceData = masterDataFull.filter(d =>
@@ -1478,16 +2644,28 @@
                     d.Gender === race.gender
                 );
 
+                // Bib for this athlete in this race (from any row we have with their name — avoids
+                // mismatch when getCalculatedRaceResults falls back to "RED"/"GREEN" etc. if gate rows lack names)
+                const athleteContextRow = athleteYearData.find(d =>
+                    d.Competition === race.competition &&
+                    d.Phase === race.phase &&
+                    d.Gender === race.gender
+                );
+                const targetBib = athleteContextRow ? athleteContextRow.BIB : null;
+
                 // 2. Get Ordered Gates for ranking logic
                 const structure = scanCompetitionStructure(selectedYear, race.competition, masterDataFull);
 
                 // 3. Calculate Results
                 const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
 
-                // 4. Find Selected Athlete in results
-                const athleteResult = rankedResults.find(r => r.name === selectedAthleteName);
+                // 4. Find Selected Athlete in results (prefer BIB — matches ranking helper when names are sparse)
+                const athleteResult = targetBib
+                    ? rankedResults.find(r => r.bib === targetBib)
+                    : rankedResults.find(r => r.name === selectedAthleteName);
 
                 if (athleteResult) {
+                    rowsRendered++;
                     const tr = tbody.append("tr").attr("class", "border-t border-slate-700 hover:bg-slate-700/30");
                     tr.append("td").attr("class", "p-3 font-medium text-white").text(race.competition);
                     tr.append("td").attr("class", "p-3").text(race.location || '-');
@@ -1498,7 +2676,12 @@
                     bibCell.append("div").attr("class", "w-4 h-4 rounded-sm inline-block align-middle mr-2").style("background-color", bibColors[athleteResult.bib]);
                     bibCell.append("span").text(athleteResult.bib);
 
-                    tr.append("td").attr("class", "p-3").text(athleteResult.rampPosition);
+                    const rampTd = tr.append("td").attr("class", "p-3");
+                    if (athleteResult.rampPosition === 'DNS') {
+                        rampTd.append("span").attr("class", "text-xs text-slate-400").text("DNS");
+                    } else {
+                        rampTd.text(athleteResult.rampPosition);
+                    }
 
                     // Phase Rank (Result)
                     const phaseRank = athleteResult.calculatedRank;
@@ -1533,7 +2716,8 @@
 
                     // Notes
                     let note = "-";
-                    if (athleteResult.isRAL) note = "RAL";
+                    if (athleteResult.isDNS) note = "DNS";
+                    else if (athleteResult.isRAL) note = "RAL";
                     else if (athleteResult.faultCount > 0) {
                         const gateName = structure.orderedGates[athleteResult.deepestFaultIndex] || "Start";
                         note = athleteResult.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athleteResult.faultCount} Faults`;
@@ -1541,6 +2725,10 @@
                     tr.append("td").attr("class", "p-3 text-slate-500 italic").text(note);
                 }
             });
+
+            if (rowsRendered === 0 && races.length > 0) {
+                container.html("<p class='text-center text-slate-400'>Found race list for this athlete but could not resolve phase rows (check BIB / name tagging in the source CSV).</p>");
+            }
         }
 
         function drawLineChartFull(raceData, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates) {
@@ -1562,12 +2750,9 @@
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 5.2]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => {
-                if (d === 'Finish' || d === 'Start') return '#94a3b8';
-                if (d === 'Roll') return '#eab308';
-                if (upstreamGates.includes(d)) return '#DC143C';
-                return '#22c55e';
-            });
+            xAxis.selectAll(".tick text").style("fill", d => gateAxisLabelColor(d, upstreamGates, {
+                upstreamColor: GATE_COLOR_UPSTREAM_FULL
+            }));
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const finishTextNode = finishTick.select('text').node();
@@ -1580,14 +2765,10 @@
             svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
             svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
-                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                const sortedRamps = sortRampPositionEntries(rampPositions);
                 chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 10) - 4).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
                 sortedRamps.forEach(([bib, pos], i) => {
-                    const fullName = bibToNameMap.get(bib);
-                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
-                    const textNode = chart.append("text").attr("x", -10).attr("y", yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
-                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
-                    textNode.append("tspan").style("font-weight", "normal").text(pos);
+                    appendRampPosChartLabel(chart, -10, yScale(5) - (sortedRamps.length * 6) + ((i + 1) * 12), bib, pos, bibToNameMap);
                 });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
@@ -1599,7 +2780,7 @@
                 const pointsData = values.filter(d => d.Gate !== 'Start');
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    const showLabel = (upstreamGates.includes(d.Gate) || d.Gate === 'SG') && d.displayTactic;
+                    const showLabel = (upstreamGates.includes(d.Gate) || isSpecialGate(d.Gate)) && d.displayTactic;
                     if (showLabel) {
                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
@@ -1622,11 +2803,10 @@
             legendContainer.selectAll("*").remove();
 
             // Legend Sorting Logic
+            const bibOrderLegendFull = ['R', 'G', 'B', 'Y'];
+            const legendBibsFull = [...new Set([...groupedData.keys(), ...rampPositions.keys()])].sort((a, b) => bibOrderLegendFull.indexOf(a) - bibOrderLegendFull.indexOf(b));
             const legendItems = legendContainer.selectAll("div")
-                .data(Array.from(groupedData.keys()).sort((a, b) => {
-                    const order = ['R', 'G', 'B', 'Y'];
-                    return order.indexOf(a) - order.indexOf(b);
-                }))
+                .data(legendBibsFull)
                 .join("div")
                 .attr("class", "flex items-center");
 
@@ -1653,12 +2833,7 @@
             const xScale = d3.scalePoint().domain(lineAndScaleDomain).range([0, width - margin.left - margin.right]).padding(0.5);
             const yScale = d3.scaleLinear().domain([0.8, 4.8]).range([0, height - margin.top - margin.bottom]);
             const xAxis = chart.append("g").attr("class", "x-axis").call(d3.axisTop(xScale).tickValues([...courseDisplayOrder, 'Finish']).tickSize(-(height - margin.top - margin.bottom)));
-            xAxis.selectAll(".tick text").style("fill", d => {
-                if (d === 'Finish' || d === 'Start') return '#94a3b8';
-                if (d === 'Roll' || rollGates.includes(d)) return '#eab308'; // Yellow for Rolls
-                if (upstreamGates.includes(d)) return '#ef4444'; // Red for Upstreams
-                return '#22c55e'; // Green for Downstreams
-            });
+            xAxis.selectAll(".tick text").style("fill", d => gateAxisLabelColor(d, upstreamGates, { rollGates }));
             const finishTick = xAxis.selectAll(".tick").filter(d => d === 'Finish');
             if (!finishTick.empty()) {
                 const bbox = finishTick.select('text').node().getBBox();
@@ -1668,14 +2843,10 @@
             svg.append("text").attr("transform", "rotate(-90)").attr("y", 0).attr("x", 0 - (height / 2)).attr("dy", "1em").style("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Position in Race");
             svg.append("text").attr("x", (width / 2) + (margin.left / 2)).attr("y", margin.top / 2).attr("text-anchor", "middle").attr("class", "fill-slate-400 text-sm font-medium").text("Course/ Gate");
             if (rampPositions.size > 0) {
-                const sortedRamps = Array.from(rampPositions).sort((a, b) => a[1] - b[1]);
+                const sortedRamps = sortRampPositionEntries(rampPositions);
                 chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) - 2).attr("text-anchor", "end").style("font-size", "10px").style("font-weight", "bold").style("fill", "#94a3b8").text("Ramp Pos:");
                 sortedRamps.forEach(([bib, pos], i) => {
-                    const fullName = bibToNameMap.get(bib);
-                    const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
-                    const textNode = chart.append("text").attr("x", -10).attr("y", yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12)).attr("text-anchor", "end").style("fill", bibColors[bib]).style("font-size", "10px");
-                    textNode.append("tspan").style("font-weight", "bold").text(`${lastName}: `);
-                    textNode.append("tspan").style("font-weight", "normal").text(pos);
+                    appendRampPosChartLabel(chart, -10, yScale(4.5) - (sortedRamps.length * 6) + ((i + 1) * 12), bib, pos, bibToNameMap);
                 });
             }
             const groupedData = d3.group(raceData, d => d.BIB);
@@ -1687,7 +2858,7 @@
                 const pointsData = values.filter(d => d.Gate !== 'Start');
                 chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
                 values.forEach(d => {
-                    const showLabel = (upstreamGates.includes(d.Gate) || d.Gate === 'SG') && d.displayTactic;
+                    const showLabel = (upstreamGates.includes(d.Gate) || isSpecialGate(d.Gate)) && d.displayTactic;
                     if (showLabel) {
                         if (!labelYPositions[d.Gate]) labelYPositions[d.Gate] = [];
                         const yBase = yScale(d.Position);
@@ -1709,12 +2880,10 @@
             const legendContainer = d3.select("#legend-compact");
             legendContainer.selectAll("*").remove();
 
-            // Legend Sorting Logic (Updated)
+            const bibOrderLegendCompact = ['R', 'G', 'B', 'Y'];
+            const legendBibsCompact = [...new Set([...groupedData.keys(), ...rampPositions.keys()])].sort((a, b) => bibOrderLegendCompact.indexOf(a) - bibOrderLegendCompact.indexOf(b));
             const legendItems = legendContainer.selectAll("div")
-                .data(Array.from(groupedData.keys()).sort((a, b) => {
-                    const order = ['R', 'G', 'B', 'Y'];
-                    return order.indexOf(a) - order.indexOf(b);
-                }))
+                .data(legendBibsCompact)
                 .join("div")
                 .attr("class", "flex items-center");
 
@@ -1724,6 +2893,11 @@
 
         function updateAllChartsFull() {
             if (masterDataFull.length === 0) return;
+            if (selectorsFull.year.property("value") === SELECT_PLACEHOLDER) {
+                showInitialMessage("#chart-full", "Select year, competition, location, gender and phase to view the report.");
+                d3.select("#fault-analysis-full").classed("hidden", true);
+                return;
+            }
             const selected = {
                 year: +selectorsFull.year.property("value"),
                 competition: selectorsFull.competition.property("value"),
@@ -1731,41 +2905,28 @@
                 gender: selectorsFull.gender.property("value"),
                 phase: selectorsFull.phase.property("value")
             };
+            if (selected.competition === SELECT_PLACEHOLDER || selected.gender === SELECT_PLACEHOLDER || selected.phase === SELECT_PLACEHOLDER) {
+                showInitialMessage("#chart-full", "Select year, competition, location, gender and phase to view the report.");
+                d3.select("#fault-analysis-full").classed("hidden", true);
+                return;
+            }
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
             let currentRaceData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             if (selected.location && selected.location !== 'All') currentRaceData = currentRaceData.filter(d => d.Location === selected.location);
 
-            // Gate order and upstream from race; upstream only where competition says upstream (stops carryover e.g. Gate 7)
-            const raceStructure = getRaceStructure(currentRaceData, structure.orderedGates, structure.upstreamGates);
+            // Gate order from live tags only; faults do not change the line chart
+            const liveForStructure = currentRaceData.filter(isLiveRaceTagRow);
+            const raceStructure = getRaceStructure(liveForStructure, structure.orderedGates, structure.upstreamGates);
             const courseDisplayOrder = raceStructure.orderedGates.length > 0 ? raceStructure.orderedGates : structure.orderedGates;
-            const upstreamGatesFull = raceStructure.upstreamGates;
+            const upstreamGatesFull = withoutSpecialGateFromUpstreamList(raceStructure.upstreamGates);
 
             calculateTacticLogic(currentRaceData, upstreamGatesFull);
 
-            const bibToNameMap = new Map();
-            const rampPositions = new Map();
-            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
-            rampEntriesForCurrentRace.forEach(d => {
-                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
-            });
-            currentRaceData.forEach(d => {
-                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
-            });
+            const { bibToNameMap, rampPositions, dnsBibs } = buildRaceBibMeta(currentRaceData);
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
-            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
-            let lineChartReadyDataFull = [];
-            bibsInRace.forEach(bib => {
-                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
-                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
-                lineChartReadyDataFull.push({ BIB: bib, Gate: 'Start', Position: 5 });
-                const gateData = athleteRaceData.filter(d =>
-                    d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0 && courseDisplayOrder.includes(d.Gate)
-                );
-                lineChartReadyDataFull.push(...gateData);
-                if (finalPosition) {
-                    lineChartReadyDataFull.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
-                }
+            const lineChartReadyDataFull = buildLineChartSeriesForRace(currentRaceData, courseDisplayOrder, {
+                startPosition: 5,
+                dnsBibs
             });
             drawLineChartFull(lineChartReadyDataFull, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGatesFull);
 
@@ -1773,12 +2934,7 @@
 
             let pieChartAggregateData = masterDataFull.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             if (selected.location && selected.location !== 'All') pieChartAggregateData = pieChartAggregateData.filter(d => d.Location === selected.location);
-            const uniqueFinalPositions = [];
-            const seenEntries = new Set();
-            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
-                const key = `${d.Phase}-${d.BIB}`;
-                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
-            });
+            const uniqueFinalPositions = buildFaultAdjustedPhaseOutcomes(pieChartAggregateData, structure);
             const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
             const allBibLabels = Object.values(bibFullNames).sort();
             const bibColorScale = d3.scaleOrdinal().domain(allBibLabels).range(allBibLabels.map(label => bibColors[Object.keys(bibFullNames).find(key => bibFullNames[key] === label)]));
@@ -1789,7 +2945,7 @@
             const bibSecondPlaceCounts = d3.rollup(secondPlaceData, v => v.length, d => bibFullNames[d.BIB]);
             const bibSecondPlacePieData = allBibLabels.map(label => ({ label: label, value: bibSecondPlaceCounts.get(label) || 0 }));
             drawPieChartAndLegend("#pie-chart-bib-second-full", "#pie-legend-bib-second-full", bibSecondPlacePieData, bibColorScale);
-            const gate2Leaders = pieChartAggregateData.filter(d => d.Gate === '2' && d.Position === 1);
+            const gate2Leaders = pieChartAggregateData.filter(d => d.Gate === '2' && d.Position === 1 && isLiveRaceTagRow(d));
             const finishPositionsOfLeaders = new Map([[1, 0], [2, 0], [3, 0], [4, 0]]);
             gate2Leaders.forEach(leader => {
                 const finalResult = uniqueFinalPositions.find(d => d.Phase === leader.Phase && d.BIB === leader.BIB);
@@ -1812,6 +2968,10 @@
         // --- UPDATE ALL CHARTS (COMPACT) ---
         function updateAllChartsCompact() {
             if (masterDataCompact.length === 0) return;
+            if (selectorsCompact.year.property("value") === SELECT_PLACEHOLDER) {
+                showInitialMessage("#chart-compact", "Select year, competition, location, gender and phase to view the report.");
+                return;
+            }
             const selected = {
                 year: +selectorsCompact.year.property("value"),
                 competition: selectorsCompact.competition.property("value"),
@@ -1819,72 +2979,47 @@
                 gender: selectorsCompact.gender.property("value"),
                 phase: selectorsCompact.phase.property("value")
             };
+            if (selected.competition === SELECT_PLACEHOLDER || selected.gender === SELECT_PLACEHOLDER || selected.phase === SELECT_PLACEHOLDER) {
+                showInitialMessage("#chart-compact", "Select year, competition, location, gender and phase to view the report.");
+                return;
+            }
 
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataCompact);
             let currentRaceData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender && d.Phase === selected.phase);
             if (selected.location && selected.location !== 'All') currentRaceData = currentRaceData.filter(d => d.Location === selected.location);
 
-            // --- BUILD GATE ORDER DIRECTLY FROM RACE DATA ---
-            // In-competition tagger saves display-ready gate names ("1", "1st Up", etc.)
-            // so no mapping is needed. We build the order from the data itself.
-            const orderedGatesSet = new Set();
-            currentRaceData.forEach(d => {
-                if (d.Gate && d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish') {
-                    orderedGatesSet.add(d.Gate);
-                }
-            });
-            const courseDisplayOrder = [...orderedGatesSet];
+            // Gate order from live tags only (same as full report — faults do not reorder gates)
+            const liveForStructure = currentRaceData.filter(isLiveRaceTagRow);
+            const raceStructure = getRaceStructure(liveForStructure, structure.orderedGates, structure.upstreamGates);
+            const courseDisplayOrder = raceStructure.orderedGates.length > 0 ? raceStructure.orderedGates : structure.orderedGates;
 
-            // Detect upstream gates from the competition-wide scan AND current race data
-            const upstreamGates = [...structure.upstreamGates.filter(g => courseDisplayOrder.includes(g))];
-            currentRaceData.forEach(d => {
+            const upstreamGates = withoutSpecialGateFromUpstreamList(
+                structure.upstreamGates.filter(g => courseDisplayOrder.includes(g))
+            );
+            liveForStructure.forEach(d => {
+                const gate = d.Gate;
+                if (!gate || gate === 'Finish' || isSpecialGate(gate)) return;
                 const action = d.Action || "";
                 const tactic = d.UpstreamTactic || "";
                 if ((action.includes('Up') || (tactic.trim().length > 0 && tactic !== 'N/A')) &&
-                    d.Gate && d.Gate !== 'Ramp' && d.Gate !== 'Start' && d.Gate !== 'Finish') {
-                    if (!upstreamGates.includes(d.Gate)) upstreamGates.push(d.Gate);
+                    !upstreamGates.includes(gate)) {
+                    upstreamGates.push(gate);
                 }
             });
 
             calculateTacticLogic(currentRaceData, upstreamGates);
 
-            // Population of map variables
-            const bibToNameMap = new Map();
-            const rampPositions = new Map();
-            const rampEntriesForCurrentRace = currentRaceData.filter(d => d.Gate === 'Ramp' && d.AthleteName);
-            rampEntriesForCurrentRace.forEach(d => {
-                bibToNameMap.set(d.BIB, formatAthleteName(d.AthleteName));
-            });
-            currentRaceData.forEach(d => {
-                if (d.RampPosition && d.BIB) rampPositions.set(d.BIB, d.RampPosition);
-            });
+            const { bibToNameMap, rampPositions, dnsBibs } = buildRaceBibMeta(currentRaceData);
 
             const lineAndScaleDomain = ['Start', ...courseDisplayOrder, 'Finish'];
 
-            const bibsInRace = [...new Set(currentRaceData.map(d => d.BIB))];
-            let lineChartReadyDataCompact = [];
-            bibsInRace.forEach(bib => {
-                const athleteRaceData = currentRaceData.filter(d => d.BIB === bib);
-                const finalPositionEntry = athleteRaceData.find(d => d.FinalPosition > 0);
-                const finalPosition = finalPositionEntry ? finalPositionEntry.FinalPosition : null;
-
-                lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Start', Position: 4.5 });
-
-                // No mapping needed — gate names are already display-ready
-                const gateData = athleteRaceData.filter(d =>
-                    d.Gate !== 'Ramp' && d.Gate !== 'Finish' && d.Position > 0 &&
-                    courseDisplayOrder.includes(d.Gate)
-                );
-                lineChartReadyDataCompact.push(...gateData);
-
-                if (finalPosition) {
-                    lineChartReadyDataCompact.push({ BIB: bib, Gate: 'Finish', Position: finalPosition, FinalPosition: finalPosition });
-                }
+            const lineChartReadyDataCompact = buildLineChartSeriesForRace(currentRaceData, courseDisplayOrder, {
+                startPosition: 4.5,
+                dnsBibs
             });
 
-            // --- ROLL DETECTION (no mapping needed) ---
             const rollGates = [];
-            currentRaceData.forEach(d => {
+            liveForStructure.forEach(d => {
                 const actionStr = (d.Action || "").toLowerCase();
                 const gateStr = (d.Gate || "").toLowerCase();
                 if (gateStr === 'roll' || gateStr.includes('roll') || actionStr.includes('roll')) {
@@ -1894,17 +3029,11 @@
 
             drawLineChartCompact(lineChartReadyDataCompact, rampPositions, bibToNameMap, courseDisplayOrder, lineAndScaleDomain, upstreamGates, rollGates);
 
-            // Fault Analysis — use race-specific ordered gates
             updateFaultAnalysis("#fault-analysis-compact", currentRaceData, courseDisplayOrder, bibToNameMap);
 
             let pieChartAggregateData = masterDataCompact.filter(d => d.Year === selected.year && d.Competition === selected.competition && d.Gender === selected.gender);
             if (selected.location && selected.location !== 'All') pieChartAggregateData = pieChartAggregateData.filter(d => d.Location === selected.location);
-            const uniqueFinalPositions = [];
-            const seenEntries = new Set();
-            pieChartAggregateData.filter(d => d.FinalPosition > 0).forEach(d => {
-                const key = `${d.Phase}-${d.BIB}`;
-                if (!seenEntries.has(key)) { seenEntries.add(key); uniqueFinalPositions.push(d); }
-            });
+            const uniqueFinalPositions = buildFaultAdjustedPhaseOutcomes(pieChartAggregateData, structure);
             const winnersData = uniqueFinalPositions.filter(d => d.FinalPosition === 1);
             const secondPlaceData = uniqueFinalPositions.filter(d => d.FinalPosition === 2);
             const allBibLabels = Object.values(bibFullNames).sort();
