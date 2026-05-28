@@ -790,6 +790,34 @@
             return +(d.Order ?? d.Position ?? 0);
         }
 
+        /** Numeric finish position from CSV "Final Position" (ignores 0/empty — parsed rows default missing to 0). */
+        function parseFinishPositionFromRow(d) {
+            if (!d) return NaN;
+            const raw = d['Final Position'] ?? d.FinalPosition ?? d['FinalPosition'];
+            if (raw == null || raw === '') return NaN;
+            const s = String(raw).trim();
+            if (!s || /^DNS$/i.test(s) || /^DSQ$/i.test(s)) return NaN;
+            const n = parseFloat(s);
+            return Number.isFinite(n) && n > 0 ? n : NaN;
+        }
+
+        /**
+         * Authoritative finish position for fault-adjusted rankings (Updated Phase Result).
+         * Prefer Finish row Final Position (DSQ rows keep it there); never use live Order.
+         */
+        function getAthleteFinishPositionForRanking(raceData, bib) {
+            const rows = raceData.filter(d => d.BIB === bib);
+            for (const row of rows.filter(d => d.Gate === 'Finish')) {
+                const fp = parseFinishPositionFromRow(row);
+                if (Number.isFinite(fp)) return fp;
+            }
+            for (const row of rows) {
+                const fp = parseFinishPositionFromRow(row);
+                if (Number.isFinite(fp)) return fp;
+            }
+            return NaN;
+        }
+
         function athleteNameFromRaceRows(rows, bib) {
             const named = rows.filter(r => r.BIB === bib && r.AthleteName && String(r.AthleteName).trim());
             if (!named.length) return '';
@@ -2513,19 +2541,18 @@
 
                 const dnsRow = raceData.find(d => d.BIB === bib && isDnsRow(d));
                 const finishRow = raceData.find(d => d.BIB === bib && d.Gate === 'Finish' && isLiveRaceTagRow(d));
-                // When faults exist in a race, the updated (fault-adjusted) result should come from the
-                // finish position column ("Final Position"). If not present, fall back to FinishRank, then live tag order.
-                const finishPositionEntry = raceData.find(d => d.BIB === bib && (d['Final Position'] != null || d.FinalPosition != null || d['FinalPosition'] != null));
-                const finishPosRaw = finishPositionEntry ? String(finishPositionEntry['Final Position'] ?? finishPositionEntry.FinalPosition ?? finishPositionEntry['FinalPosition']).trim() : '';
-                const finishPosNum = finishPosRaw && /^[0-9]+(\.[0-9]+)?$/.test(finishPosRaw) ? +finishPosRaw : NaN;
-                if (!isDSQ && finishPosRaw.toUpperCase() === 'DSQ') isDSQ = true;
+                const finishPosNum = getAthleteFinishPositionForRanking(raceData, bib);
+                if (!isDSQ) {
+                    const dsqOnFinish = finishRow && String(finishRow.FaultVal || finishRow.Action || '').toUpperCase().includes('DSQ');
+                    if (dsqOnFinish) isDSQ = true;
+                }
                 const originalRank = dnsRow ? 999 : (
                     raceHasAnyFaults
                         ? (Number.isFinite(finishPosNum) ? finishPosNum
                             : (() => {
                                 const finishRankEntry = raceData.find(d => d.BIB === bib && d.FinishRank != null && String(d.FinishRank).trim() !== '');
                                 const finishRankNum = finishRankEntry ? parseFloat(String(finishRankEntry.FinishRank).trim()) : NaN;
-                                return Number.isFinite(finishRankNum) ? finishRankNum : (finishRow ? liveTagOrder(finishRow) : 999);
+                                return Number.isFinite(finishRankNum) ? finishRankNum : 999;
                             })()
                         )
                         : (finishRow ? liveTagOrder(finishRow) : 999)
@@ -2563,8 +2590,8 @@
                 if (raceHasAnyFaults) {
                     const aPos = a.finishPosition;
                     const bPos = b.finishPosition;
-                    const aHas = typeof aPos === 'number' && !isNaN(aPos);
-                    const bHas = typeof bPos === 'number' && !isNaN(bPos);
+                    const aHas = typeof aPos === 'number' && !isNaN(aPos) && aPos > 0;
+                    const bHas = typeof bPos === 'number' && !isNaN(bPos) && bPos > 0;
                     if (aHas && bHas && aPos !== bPos) return aPos - bPos;
                     if (aHas !== bHas) return aHas ? -1 : 1;
                     return a.originalRank - b.originalRank;
