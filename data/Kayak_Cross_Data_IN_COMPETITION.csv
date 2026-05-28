@@ -8653,3 +8653,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WRR,Tacen,W,SF2,Ramp,Y,2,Assigned,,,,COCHRANE Georgina,
 2026,WRR,Tacen,W,SF2,Ramp,R,3,Assigned,,,,PINTERIC Naja,
 2026,WRR,Tacen,W,SF2,Ramp,G,4,Assigned,,,,VOLK Tia,
+2026,WRR,Tacen,W,SF2,1,G,4,Down-Left,1,,,,
+2026,WRR,Tacen,W,SF2,1,Y,2,Down-Left,2,,,,
+2026,WRR,Tacen,W,SF2,1,R,3,Down-Left,3,,,,
+2026,WRR,Tacen,W,SF2,1st Up,G,4,Right-Up,1,,Right-Up,,
