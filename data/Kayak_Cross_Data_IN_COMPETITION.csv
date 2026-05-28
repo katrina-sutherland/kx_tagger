@@ -8517,3 +8517,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WRR,Tacen,M,QF2,Finish,R,1,Finish,1,1,,,
 2026,WRR,Tacen,M,QF2,Finish,G,2,Finish,2,2,,,
 2026,WRR,Tacen,M,QF2,Finish,B,3,Finish,3,3,,,
+2026,WRR,Tacen,M,QF3,Ramp,R,1,Assigned,,,,HOCEVAR Ziga Lin,
+2026,WRR,Tacen,M,QF3,Ramp,B,1,Assigned,,,,CROSBEE Mark,
+2026,WRR,Tacen,M,QF3,Ramp,R,2,Assigned,,,,HOCEVAR Ziga Lin,
+2026,WRR,Tacen,M,QF3,Ramp,G,3,Assigned,,,,PANICO Tommaso,
