@@ -8649,3 +8649,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WRR,Tacen,W,SF1,Finish,G,2,Finish,2,2,,,
 2026,WRR,Tacen,W,SF1,Finish,B,4,Finish,3,4,,,
 2026,WRR,Tacen,W,SF1,Finish,Y,1,Finish,4,3,,,
+2026,WRR,Tacen,W,SF2,Start,B,N/A,DNS,,DNS,,CROSBEE Mark,
+2026,WRR,Tacen,W,SF2,Ramp,Y,2,Assigned,,,,COCHRANE Georgina,
+2026,WRR,Tacen,W,SF2,Ramp,R,3,Assigned,,,,PINTERIC Naja,
+2026,WRR,Tacen,W,SF2,Ramp,G,4,Assigned,,,,VOLK Tia,
