@@ -36,6 +36,19 @@
             font-weight: 700;
         }
 
+        .y-axis-minor path {
+            display: none;
+        }
+
+        .y-axis-minor .tick line {
+            stroke: #475569;
+            stroke-dasharray: none;
+        }
+
+        .y-axis-minor .tick text {
+            display: none;
+        }
+
         .domain {
             display: none;
         }
@@ -1601,12 +1614,25 @@
             updateTimeTrialReport();
         }
 
+        function ttYAxisMinorTicks(scale, majorCount) {
+            const majors = scale.ticks(majorCount);
+            const minors = [];
+            const subdivisions = 5;
+            for (let i = 0; i < majors.length - 1; i++) {
+                const step = (majors[i + 1] - majors[i]) / subdivisions;
+                for (let j = 1; j < subdivisions; j++) {
+                    minors.push(majors[i] + step * j);
+                }
+            }
+            return minors;
+        }
+
         function drawTTSplitChart(splitNames, athleteTimes, firstPlaceTimes, athleteName) {
             const container = d3.select("#tt-chart-svg");
             container.selectAll("*").remove();
             if (!splitNames.length || !athleteTimes.length) return;
 
-            const margin = { top: 24, right: 24, bottom: 48, left: 52 };
+            const margin = { top: 24, right: 24, bottom: 48, left: 64 };
             const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
             const height = 400 - margin.top - margin.bottom;
 
@@ -1624,10 +1650,25 @@
 
             const g = container.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
+            const majorTickCount = 6;
+            const yTickFormat = (yMax - yMin) >= 20 ? d3.format("d") : d3.format(".1f");
+
             g.append("g").attr("class", "x-axis").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale))
                 .selectAll("text").attr("class", "text-slate-400").attr("font-size", "12px");
-            g.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).ticks(6))
+            g.append("g").attr("class", "y-axis-minor")
+                .call(d3.axisLeft(yScale).tickValues(ttYAxisMinorTicks(yScale, majorTickCount)).tickSize(4).tickFormat(""));
+            g.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale).ticks(majorTickCount).tickFormat(yTickFormat))
                 .selectAll("text").attr("class", "text-slate-400").attr("font-size", "12px");
+            g.append("text")
+                .attr("class", "tt-y-axis-label")
+                .attr("transform", "rotate(-90)")
+                .attr("y", -margin.left + 16)
+                .attr("x", -height / 2)
+                .attr("text-anchor", "middle")
+                .attr("fill", "#94a3b8")
+                .attr("font-size", "12px")
+                .attr("font-weight", "600")
+                .text("Time (s)");
 
             g.append("path").datum(dataFirst).attr("fill", "none").attr("stroke", "#E8C020").attr("stroke-width", 2.5).attr("d", line);
             g.append("path").datum(dataAthlete).attr("fill", "none").attr("stroke", "#9B59B6").attr("stroke-width", 2.5).attr("d", line);
@@ -2440,11 +2481,13 @@
                 const name = athleteNameFromRaceRows(raceData, bib) || (bibFullNames[bib] || bib);
 
                 let isRAL = false;
+                let isDSQ = false;
                 let deepestFaultIndex = -1;
 
                 const faultStrings = myFaults.map(f => {
                     const combinedRaw = (f.Gate + " " + f.FaultVal + " " + f.Action).toUpperCase();
                     if (combinedRaw.includes("RAL")) isRAL = true;
+                    if (combinedRaw.includes("DSQ")) isDSQ = true;
 
                     // Normalize Gate name logic (same as original updateFaultAnalysis)
                     let gateName = f.Gate || "";
@@ -2461,6 +2504,7 @@
 
                     // Construct display string
                     if (combinedRaw.includes("RAL")) return "RAL";
+                    if (combinedRaw.includes("DSQ")) return "DSQ";
                     if (f.Gate && !f.Gate.toUpperCase().includes('FLT') && !f.Gate.toUpperCase().includes('FAULT')) return `FLT ${f.Gate}`;
                     else if (cleanGateName) return `FLT ${cleanGateName}`;
                     return f.FaultVal || f.Action || "Fault";
@@ -2483,6 +2527,7 @@
                     name: name,
                     rampPosition: rampPosition,
                     isDNS: !!dnsRow,
+                    isDSQ: isDSQ,
                     faults: faultStrings,
                     faultCount: faultStrings.length,
                     deepestFaultIndex: deepestFaultIndex,
@@ -2494,6 +2539,8 @@
 
             // 3. Sort (Calculate Rankings)
             const sortedAthletes = [...athleteStats].sort((a, b) => {
+                // DNS always comes last in updated results (did not start)
+                if (a.isDNS !== b.isDNS) return a.isDNS ? 1 : -1;
                 if (a.isRAL !== b.isRAL) return a.isRAL ? 1 : -1;
                 if (a.isRAL && b.isRAL) {
                     if (a.deepestFaultIndex !== b.deepestFaultIndex) return b.deepestFaultIndex - a.deepestFaultIndex;
@@ -2560,7 +2607,11 @@
                 const row = statusList.append("div").attr("class", "flex items-center justify-between text-sm border-b border-slate-800 pb-1 last:border-0");
                 const leftSide = row.append("div").attr("class", "flex items-center gap-2");
                 leftSide.append("div").attr("class", "w-3 h-3 rounded-sm").style("background-color", bibColors[athlete.bib]);
-                leftSide.append("span").attr("class", "text-slate-200 font-medium").text(athlete.name);
+                const nameWrap = leftSide.append("span").attr("class", "text-slate-200 font-medium");
+                nameWrap.append("span").text(athlete.name);
+                if (athlete.isDSQ) {
+                    nameWrap.append("span").attr("class", "ml-2 text-[10px] font-bold text-red-400").text("DSQ");
+                }
                 const faultText = athlete.faultCount > 0 ? athlete.faults.join(", ") : "-";
                 const faultClass = athlete.faultCount > 0 ? "text-red-400 font-bold" : "text-slate-500";
                 row.append("span").attr("class", `${faultClass}`).text(faultText);
@@ -2583,6 +2634,7 @@
                 let reason = "Clean";
                 if (athlete.isDNS) reason = "DNS";
                 else if (athlete.isRAL) reason = "RAL";
+                else if (athlete.isDSQ) reason = "DSQ";
                 else if (athlete.faultCount > 0) {
                     const gateName = orderedGates[athlete.deepestFaultIndex] || "Start";
                     reason = athlete.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athlete.faultCount} Faults`;
@@ -2838,6 +2890,7 @@
                     let note = "-";
                     if (athleteResult.isDNS) note = "DNS";
                     else if (athleteResult.isRAL) note = "RAL";
+                    else if (athleteResult.isDSQ) note = "DSQ";
                     else if (athleteResult.faultCount > 0) {
                         const gateName = structure.orderedGates[athleteResult.deepestFaultIndex] || "Start";
                         note = athleteResult.faultCount === 1 ? `1 Fault (Gate ${gateName})` : `${athleteResult.faultCount} Faults`;
