@@ -9234,3 +9234,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC1,Tacen,M,QF3,2nd Up,G,2,Left-Up,2,,FOLLOW,,
 2026,WC1,Tacen,M,QF3,2nd Up,R,3,Left-Up,3,,FOLLOW,,
 2026,WC1,Tacen,M,QF3,2nd Up,Y,4,Right-Up,4,,SPLIT,,
+2026,WC1,Tacen,M,QF3,Finish,B,1,Finish,1,1,,,
+2026,WC1,Tacen,M,QF3,Finish,Y,4,Finish,2,2,,,
+2026,WC1,Tacen,M,QF3,Finish,G,2,Finish,3,3,,,
+2026,WC1,Tacen,M,QF3,Finish,R,3,Finish,4,4,,,
