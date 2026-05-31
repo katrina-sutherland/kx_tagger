@@ -9190,3 +9190,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC1,Tacen,M,QF1,Finish,G,1,Finish,2,2,,,
 2026,WC1,Tacen,M,QF1,Finish,R,2,Finish,3,3,,,
 2026,WC1,Tacen,M,QF1,Finish,Y,4,Finish,4,4,,,
+2026,WC1,Tacen,M,QF2,Ramp,B,1,Assigned,,,,SMOLEN Michal,
+2026,WC1,Tacen,M,QF2,Ramp,R,2,Assigned,,,,CLARKE Joseph,
+2026,WC1,Tacen,M,QF2,Ramp,G,3,Assigned,,,,HELLO Joris,
+2026,WC1,Tacen,M,QF2,Ramp,Y,4,Assigned,,,,PISTONI Michele,
