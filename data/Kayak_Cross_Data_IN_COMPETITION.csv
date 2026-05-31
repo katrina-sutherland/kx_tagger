@@ -8934,3 +8934,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC1,Tacen,M,H2,Finish,B,4,Finish,2,2,,,
 2026,WC1,Tacen,M,H2,Finish,R,2,Finish,3,3,,,
 2026,WC1,Tacen,M,H2,Finish,Y,1,Finish,4,4,,,
+2026,WC1,Tacen,M,H3,Ramp,B,1,Assigned,,,,FEHLMANN Nicolas,
+2026,WC1,Tacen,M,H3,Ramp,R,2,Assigned,,,,SMOLEN Michal,
+2026,WC1,Tacen,M,H3,Ramp,G,3,Assigned,,,,HELLO Joris,
