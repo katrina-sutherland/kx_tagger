@@ -1713,6 +1713,17 @@
             7: "Exit Gate 6 to Finish"
         };
 
+        /** Split sector labels (2026 WC1 Tacen time trial only). */
+        const TT_TACEN_2026_WC1_SPLIT_SECTORS = {
+            1: "Green Light to Gate 1",
+            2: "Gate 1 to Gate 2",
+            3: "Gate 2 to Gate 4",
+            4: "Gate 4 to Gate 6",
+            5: "Gate 6 to USDR",
+            7: "USDR to Gate 7",
+            8: "Gate 7 to Gate 8"
+        };
+
         function isTT2025WC5Augsburg(year, competition, location) {
             if (+year !== 2025) return false;
             if (String(competition || '').trim().toUpperCase() !== 'WC5') return false;
@@ -1737,7 +1748,14 @@
             return normalizeCourseLocationKey(location) === 'la_seu_durgell';
         }
 
+        function isTT2026WC1Tacen(year, competition, location) {
+            if (+year !== 2026) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WC1') return false;
+            return normalizeCourseLocationKey(location) === 'tacen';
+        }
+
         function getTTSectorLabelsForSelection(year, competition, location) {
+            if (isTT2026WC1Tacen(year, competition, location)) return TT_TACEN_2026_WC1_SPLIT_SECTORS;
             if (isTT2025WC5Augsburg(year, competition, location)) return TT_AUGSBURG_2025_WC5_SPLIT_SECTORS;
             if (isTT2025WC4Tacen(year, competition, location)) return TT_TACEN_2025_WC4_SPLIT_SECTORS;
             if (isTT2025WC3Prague(year, competition, location)) return TT_PRAGUE_2025_WC3_SPLIT_SECTORS;
