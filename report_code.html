@@ -361,7 +361,7 @@
                     </div>
                 </div>
                 <p class="text-slate-400 text-sm mb-4">View individual time trial runs. Use filters to narrow by year, competition, location, gender, and athlete. Select an athlete to see their split line vs 1st place (gold).</p>
-                <div id="tt-chart-container" class="space-y-8 hidden">
+                <div id="tt-chart-container" class="mb-8 hidden">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                         <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Time Trial Sector Comparison v 1st:</h3>
                         <div id="tt-chart-diff" class="text-center text-slate-400 text-sm mb-4"></div>
@@ -392,13 +392,18 @@
                             </div>
                         </div>
                     </div>
-                    <div id="tt-splits-table-wrapper" class="hidden">
-                        <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
-                            <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Split breakdown</h3>
-                            <p class="text-slate-400 text-sm mb-2 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different). Gold boxes mark the fastest time in each sector.</p>
-                            <p id="tt-splits-sector-legend" class="hidden text-slate-400 text-xs mb-4 text-center">— USDR = Upside Down Roll</p>
-                            <div id="tt-splits-table-container" class="overflow-x-auto rounded-xl border border-slate-700"></div>
-                        </div>
+                </div>
+                <div id="competition-notes-tt"
+                    class="hidden bg-slate-800 p-4 sm:p-5 rounded-xl shadow-md border border-slate-700 mb-8">
+                    <h3 class="text-sm font-semibold text-slate-100 mb-3 uppercase tracking-wider">Notes &amp; Comments</h3>
+                    <div id="competition-notes-tt-content" class="text-sm text-slate-300 space-y-3 whitespace-pre-wrap"></div>
+                </div>
+                <div id="tt-splits-table-wrapper" class="hidden mb-8">
+                    <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
+                        <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Split breakdown</h3>
+                        <p class="text-slate-400 text-sm mb-2 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different). Gold boxes mark the fastest time in each sector.</p>
+                        <p id="tt-splits-sector-legend" class="hidden text-slate-400 text-xs mb-4 text-center">— USDR = Upside Down Roll</p>
+                        <div id="tt-splits-table-container" class="overflow-x-auto rounded-xl border border-slate-700"></div>
                     </div>
                 </div>
                 <div id="tt-content-area" class="mt-6">
@@ -775,9 +780,25 @@
             return String(d.Gate || '').trim().toLowerCase() === 'notes';
         }
 
+        /** Time trial CSV: competition notes row (no athlete) or Gate = Notes. */
+        function isTimeTrialNotesRow(d) {
+            if (!d) return false;
+            if (isNotesRow(d)) return true;
+            const athlete = String(d.AthleteName || '').trim();
+            return !athlete && !!getNotesCommentsText(d);
+        }
+
+        function isTimeTrialAthleteRow(d) {
+            return d && !isTimeTrialNotesRow(d) && String(d.AthleteName || '').trim().length > 0;
+        }
+
         function getNotesCommentsText(d) {
             if (!d) return '';
-            return String(d.NotesComments ?? d['NOTES & COMMENTS'] ?? '').trim();
+            const raw = String(d.NotesComments ?? d['NOTES & COMMENTS'] ?? '');
+            // Guard against stray spreadsheet error strings (e.g. "#NAME?") being pasted into notes.
+            const lines = raw.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+            const cleaned = lines.filter(line => !/^#NAME\?$/i.test(line));
+            return cleaned.join('\n').trim();
         }
 
         /** Unique notes for Year + Competition + Location (all phases, M & W). */
@@ -792,19 +813,17 @@
                 const text = getNotesCommentsText(d);
                 if (!text || seen.has(text)) return;
                 seen.add(text);
-                const parts = [];
-                if (d.Gender) parts.push(d.Gender);
-                if (d.Phase) parts.push(d.Phase);
-                items.push({ text, label: parts.length ? parts.join(' · ') : null });
+                // Only display the note itself (no gender/phase metadata).
+                items.push({ text, label: null });
             });
             return items;
         }
 
-        function updateCompetitionNotesCompact(year, competition, location) {
-            const box = d3.select('#competition-notes-compact');
-            const content = d3.select('#competition-notes-compact-content');
+        function updateCompetitionNotesPanel(boxSelector, contentSelector, data, year, competition, location) {
+            const box = d3.select(boxSelector);
+            const content = d3.select(contentSelector);
             content.selectAll('*').remove();
-            const items = collectCompetitionNotes(masterDataCompact, year, competition, location);
+            const items = collectCompetitionNotes(data, year, competition, location);
             if (!items.length) {
                 box.classed('hidden', true);
                 return;
@@ -812,11 +831,30 @@
             box.classed('hidden', false);
             items.forEach(item => {
                 const block = content.append('div').attr('class', 'border-t border-slate-700 pt-3 first:border-0 first:pt-0');
-                if (item.label) {
-                    block.append('p').attr('class', 'text-xs text-slate-500 mb-1').text(item.label);
-                }
                 block.append('p').text(item.text);
             });
+        }
+
+        function updateCompetitionNotesCompact(year, competition, location) {
+            updateCompetitionNotesPanel(
+                '#competition-notes-compact',
+                '#competition-notes-compact-content',
+                masterDataCompact,
+                year,
+                competition,
+                location
+            );
+        }
+
+        function updateCompetitionNotesTT(year, competition, location) {
+            updateCompetitionNotesPanel(
+                '#competition-notes-tt',
+                '#competition-notes-tt-content',
+                masterDataTT,
+                year,
+                competition,
+                location
+            );
         }
 
         /** Standalone fault rows (FLT action, no live tag order) — exclude from line chart / gate order. */
@@ -1085,6 +1123,7 @@
                 const rank = +(d.Rank || d['Time Trial Rank'] || d['TT Rank'] || '');
                 const totalTimeRaw = d['Total Time'] || d['TotalTime'] || d['Total'] || '';
                 const totalTime = typeof totalTimeRaw === 'number' ? (isNaN(totalTimeRaw) ? NaN : totalTimeRaw) : parseTimeToSeconds(totalTimeRaw);
+                const notesComments = (d['NOTES & COMMENTS'] || d['Notes & Comments'] || '').trim();
                 const out = {
                     Year: year,
                     Competition: competition,
@@ -1099,7 +1138,8 @@
                     AthleteName: athleteName,
                     FaultVal: faultVal,
                     Rank: isNaN(rank) ? undefined : rank,
-                    TotalTime: (typeof totalTime === 'number' && !isNaN(totalTime)) ? totalTime : undefined
+                    TotalTime: (typeof totalTime === 'number' && !isNaN(totalTime)) ? totalTime : undefined,
+                    NotesComments: notesComments
                 };
                 Object.keys(d).forEach(k => {
                     const m = k.match(/^Split\s*(\d+)$/i);
@@ -1172,6 +1212,58 @@
             }
 
             return { orderedGates: finalOrder, upstreamGates: Array.from(detectedUpstreams) };
+        }
+
+        /** Calendar order for competition codes (matches tagger / in-competition apps). */
+        const SEASON_COMPETITION_ORDER = [
+            'WC1', 'WC2', 'WC3', 'WC4', 'WC5', 'WCh', 'OLY', 'CCh', 'NCh', 'WRR', 'AO'
+        ];
+
+        function seasonCompetitionSortIndex(competition) {
+            const c = String(competition || '').trim();
+            const idx = SEASON_COMPETITION_ORDER.indexOf(c);
+            return idx >= 0 ? idx : 1000;
+        }
+
+        function seasonEventKey(competition, location) {
+            return `${String(competition || '').trim()}\0${String(location || '').trim()}`;
+        }
+
+        function compareSeasonPhases(phaseA, phaseB) {
+            const phaseSortOrder = { 'TT': 0, 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
+            const regex = /^([A-Za-z]+)(\d*)$/;
+            const matchA = (phaseA || '').match(regex) || [phaseA, phaseA, ''];
+            const matchB = (phaseB || '').match(regex) || [phaseB, phaseB, ''];
+            const orderA = phaseSortOrder[matchA[1] === 'Final' ? 'Final' : matchA[1]] || 99;
+            const orderB = phaseSortOrder[matchB[1] === 'Final' ? 'Final' : matchB[1]] || 99;
+            if (orderA !== orderB) return orderA - orderB;
+            return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
+        }
+
+        /** Unique Competition + Location events for a year, in season order (includes WRR, AO, etc.). */
+        function buildSeasonEventOrder(data, year) {
+            const seen = new Set();
+            const events = [];
+            data.filter(d => d.Year === year).forEach(d => {
+                const comp = (d.Competition || '').trim();
+                const loc = (d.Location || '').trim();
+                if (!comp) return;
+                const key = seasonEventKey(comp, loc);
+                if (seen.has(key)) return;
+                seen.add(key);
+                events.push({ competition: comp, location: loc, key });
+            });
+            events.sort((a, b) => {
+                const ia = seasonCompetitionSortIndex(a.competition);
+                const ib = seasonCompetitionSortIndex(b.competition);
+                if (ia !== ib) return ia - ib;
+                if (ia >= 1000) {
+                    const compCmp = a.competition.localeCompare(b.competition);
+                    if (compCmp !== 0) return compCmp;
+                }
+                return a.location.localeCompare(b.location);
+            });
+            return events;
         }
 
         /**
@@ -1673,6 +1765,7 @@
                 return;
             }
             let data = masterDataTT.filter(d =>
+                isTimeTrialAthleteRow(d) &&
                 d.Year === selected.year &&
                 (selected.competition === 'All' || d.Competition === selected.competition) &&
                 (selected.location === 'All' || d.Location === selected.location) &&
@@ -2059,6 +2152,7 @@
                 container.selectAll("*").remove();
                 container.append("p").attr("class", "text-slate-500").text("No time trial data loaded. Place kayak_timetrial.csv in the data folder next to this report and run a local server from the kx_tagger folder (e.g. python3 -m http.server 8888), then open http://localhost:8888/kayak_cross_report.html");
                 d3.select("#tt-chart-container").classed("hidden", true);
+                d3.select("#competition-notes-tt").classed("hidden", true);
                 return;
             }
             const yearVal = selectorsTT.year.property("value");
@@ -2066,6 +2160,7 @@
                 d3.select("#tt-content-area").selectAll("*").remove();
                 d3.select("#tt-content-area").append("p").attr("class", "text-slate-500").text("Select year, competition, location, gender and athlete to view time trial data.");
                 d3.select("#tt-chart-container").classed("hidden", true);
+                d3.select("#competition-notes-tt").classed("hidden", true);
                 return;
             }
             const selected = {
@@ -2075,7 +2170,19 @@
                 gender: selectorsTT.gender.property("value"),
                 athlete: selectorsTT.athlete.property("value")
             };
-            if (selected.competition === SELECT_PLACEHOLDER || selected.location === SELECT_PLACEHOLDER || selected.gender === SELECT_PLACEHOLDER || selected.athlete === SELECT_PLACEHOLDER) {
+            if (selected.competition === SELECT_PLACEHOLDER || selected.location === SELECT_PLACEHOLDER) {
+                d3.select("#tt-content-area").selectAll("*").remove();
+                d3.select("#tt-content-area").append("p").attr("class", "text-slate-500").text("Select year, competition, location, gender and athlete to view time trial data.");
+                d3.select("#tt-chart-container").classed("hidden", true);
+                d3.select("#competition-notes-tt").classed("hidden", true);
+                return;
+            }
+            updateCompetitionNotesTT(
+                selected.year,
+                selected.competition,
+                selected.location && selected.location !== SELECT_PLACEHOLDER ? selected.location : 'All'
+            );
+            if (selected.gender === SELECT_PLACEHOLDER || selected.athlete === SELECT_PLACEHOLDER) {
                 d3.select("#tt-content-area").selectAll("*").remove();
                 d3.select("#tt-content-area").append("p").attr("class", "text-slate-500").text("Select year, competition, location, gender and athlete to view time trial data.");
                 d3.select("#tt-chart-container").classed("hidden", true);
@@ -2090,12 +2197,14 @@
                 ttParisFirstSplitRotationDelta = isParis ? -90 : 0;
             }
             const dataForVB = masterDataTT.filter(d =>
+                isTimeTrialAthleteRow(d) &&
                 d.Year === selected.year &&
                 (selected.competition === 'All' || d.Competition === selected.competition) &&
                 (selected.location === 'All' || d.Location === selected.location) &&
                 (selected.gender === 'All' || d.Gender === selected.gender)
             );
             let data = masterDataTT.filter(d =>
+                isTimeTrialAthleteRow(d) &&
                 d.Year === selected.year &&
                 (selected.competition === 'All' || d.Competition === selected.competition) &&
                 (selected.location === 'All' || d.Location === selected.location) &&
@@ -2849,67 +2958,73 @@
             // We need unique identifiers for a "race" = Comp + Phase (assuming 1 race per phase per comp)
             // But we actually need to process *each race context* which includes OTHER athletes to calc rank.
 
-            // Find unique Race Keys: Competition + Phase + Gender (Gender implied by athlete usually, but safer to check)
+            // Unique races: Competition + Location + Phase + Gender
             const races = [];
             const processedKeys = new Set();
 
             athleteYearData.forEach(d => {
-                const key = `${d.Competition}|${d.Phase}|${d.Gender}`;
+                const loc = (d.Location || '').trim();
+                const key = `${d.Competition}|${loc}|${d.Phase}|${d.Gender}`;
                 if (!processedKeys.has(key)) {
                     processedKeys.add(key);
-                    races.push({ competition: d.Competition, location: d.Location || '', phase: d.Phase, gender: d.Gender });
+                    races.push({
+                        competition: d.Competition,
+                        location: loc,
+                        phase: d.Phase,
+                        gender: d.Gender
+                    });
                 }
             });
 
-            // Sort Races: Alphabetical Comp, then Phase Order
-            const phaseSortOrder = { 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
+            const seasonEvents = buildSeasonEventOrder(masterDataFull, selectedYear);
+            const eventOrderIndex = new Map(seasonEvents.map((e, i) => [e.key, i]));
+
             races.sort((a, b) => {
-                if (a.competition !== b.competition) return a.competition.localeCompare(b.competition);
-                // Phase sort
-                const matchA = a.phase.match(/^([A-Za-z]+)(\d*)$/) || [a.phase, a.phase, ''];
-                const matchB = b.phase.match(/^([A-Za-z]+)(\d*)$/) || [b.phase, b.phase, ''];
-                const orderA = phaseSortOrder[matchA[1] === 'Final' ? 'Final' : matchA[1]] || 99;
-                const orderB = phaseSortOrder[matchB[1] === 'Final' ? 'Final' : matchB[1]] || 99;
+                const keyA = seasonEventKey(a.competition, a.location);
+                const keyB = seasonEventKey(b.competition, b.location);
+                const orderA = eventOrderIndex.has(keyA) ? eventOrderIndex.get(keyA) : 9999;
+                const orderB = eventOrderIndex.has(keyB) ? eventOrderIndex.get(keyB) : 9999;
                 if (orderA !== orderB) return orderA - orderB;
-                return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
+                const phaseCmp = compareSeasonPhases(a.phase, b.phase);
+                if (phaseCmp !== 0) return phaseCmp;
+                return (a.gender || '').localeCompare(b.gender || '');
             });
 
-            // --- PRE-CALCULATE FINISH RANKS FOR COMPETITIONS WITH FINALS ---
+            // --- PRE-CALCULATE FINISH RANKS FOR EVENTS (COMP + LOCATION) WITH FINALS ---
             const competitionFinalRankMap = {};
-            // Group races by competition
-            const racesByComp = {};
+            const racesByEvent = {};
             races.forEach(r => {
-                if (!racesByComp[r.competition]) racesByComp[r.competition] = [];
-                racesByComp[r.competition].push(r);
+                const ek = seasonEventKey(r.competition, r.location);
+                if (!racesByEvent[ek]) racesByEvent[ek] = [];
+                racesByEvent[ek].push(r);
             });
 
-            Object.keys(racesByComp).forEach(compName => {
-                const compRaces = racesByComp[compName];
-                const finalRace = compRaces.find(r => r.phase === 'Final');
+            Object.keys(racesByEvent).forEach(eventKey => {
+                const eventRaces = racesByEvent[eventKey];
+                const finalRace = eventRaces.find(r => r.phase === 'Final');
+                if (!finalRace) return;
 
-                if (finalRace) {
-                    // Calculate rank for this final
-                    const fullRaceData = masterDataFull.filter(d =>
-                        d.Year === selectedYear &&
-                        d.Competition === compName &&
-                        d.Phase === 'Final' &&
-                        d.Gender === finalRace.gender
-                    );
-                    const structure = scanCompetitionStructure(selectedYear, compName, masterDataFull);
-                    const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
-                    const finalContext = athleteYearData.find(d =>
-                        d.Competition === compName &&
-                        d.Phase === 'Final' &&
-                        d.Gender === finalRace.gender
-                    );
-                    const athleteResult = finalContext
-                        ? rankedResults.find(r => r.bib === finalContext.BIB)
-                        : rankedResults.find(r => r.name === selectedAthleteName);
+                const fullRaceData = masterDataFull.filter(d =>
+                    d.Year === selectedYear &&
+                    d.Competition === finalRace.competition &&
+                    (d.Location || '').trim() === finalRace.location &&
+                    d.Phase === 'Final' &&
+                    d.Gender === finalRace.gender
+                );
+                const structure = scanCompetitionStructure(selectedYear, finalRace.competition, masterDataFull);
+                const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
+                const finalContext = athleteYearData.find(d =>
+                    d.Competition === finalRace.competition &&
+                    (d.Location || '').trim() === finalRace.location &&
+                    d.Phase === 'Final' &&
+                    d.Gender === finalRace.gender
+                );
+                const athleteResult = finalContext
+                    ? rankedResults.find(r => r.bib === finalContext.BIB)
+                    : rankedResults.find(r => r.name === selectedAthleteName);
 
-                    if (athleteResult) {
-                        // Use Calculated Phase Rank as Finish Rank for Final
-                        competitionFinalRankMap[compName] = athleteResult.calculatedRank;
-                    }
+                if (athleteResult) {
+                    competitionFinalRankMap[eventKey] = athleteResult.calculatedRank;
                 }
             });
 
@@ -2925,10 +3040,12 @@
 
             let rowsRendered = 0;
             races.forEach(race => {
+                const eventKey = seasonEventKey(race.competition, race.location);
                 // 1. Get Full Race Data context (all athletes in that race)
                 const fullRaceData = masterDataFull.filter(d =>
                     d.Year === selectedYear &&
                     d.Competition === race.competition &&
+                    (d.Location || '').trim() === race.location &&
                     d.Phase === race.phase &&
                     d.Gender === race.gender
                 );
@@ -2937,6 +3054,7 @@
                 // mismatch when getCalculatedRaceResults falls back to "RED"/"GREEN" etc. if gate rows lack names)
                 const athleteContextRow = athleteYearData.find(d =>
                     d.Competition === race.competition &&
+                    (d.Location || '').trim() === race.location &&
                     d.Phase === race.phase &&
                     d.Gender === race.gender
                 );
@@ -2981,9 +3099,9 @@
                     // Finish Rank (Overall)
                     let finalFinishRank = athleteResult.finishRank;
 
-                    // APPLY OVERRIDE: If we found a rank from the Final phase for this competition, use it.
-                    if (competitionFinalRankMap[race.competition] !== undefined) {
-                        finalFinishRank = competitionFinalRankMap[race.competition];
+                    // APPLY OVERRIDE: If we found a rank from the Final phase for this event, use it.
+                    if (competitionFinalRankMap[eventKey] !== undefined) {
+                        finalFinishRank = competitionFinalRankMap[eventKey];
                     } else if (race.phase === 'Final') {
                         // Just in case map logic missed it but we are in final now
                         finalFinishRank = phaseRank;
