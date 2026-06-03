@@ -9793,3 +9793,5 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WRR,Prague,M,QF1,Ramp,G,2,Assigned,,,,ROHRER P,,
 2025,WRR,Prague,M,QF1,Ramp,B,3,Assigned,,,,CHIARELLA G,,
 2025,WRR,Prague,M,QF1,Ramp,Y,4,Assigned,,,,HANRAHAN J,,
+2025,WRR,Prague,M,QF1,SG,R,,Down-Right,1,,Down-Right,,,
+2025,WRR,Prague,M,QF1,SG,G,,Down-Left,2,,SPLIT,,,
