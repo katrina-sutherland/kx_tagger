@@ -9795,3 +9795,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WRR,Prague,M,QF1,Ramp,Y,4,Assigned,,,,HANRAHAN J,,
 2025,WRR,Prague,M,QF1,SG,R,,Down-Right,1,,Down-Right,,,
 2025,WRR,Prague,M,QF1,SG,G,,Down-Left,2,,SPLIT,,,
+2025,WRR,Prague,M,QF1,SG,B,,Down-Left,3,,FOLLOW,,,
+2025,WRR,Prague,M,QF1,SG,Y,,Down-Left,4,,FOLLOW,,,
+2025,WRR,Prague,M,QF1,1st Up,G,,Down-Right-Up,1,,Down-Right-Up,,,
