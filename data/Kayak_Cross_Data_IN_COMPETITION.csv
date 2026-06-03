@@ -9778,3 +9778,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2024,WC5,La Seu,W,H2,1st Up,B,,Left-Up,3,,SPLIT,,,
 2024,WC5,La Seu,W,H2,1st Up,G,,Right-Up,4,,SPLIT,,,
 2024,WC5,La Seu,W,H2,Next Gate,R,,Down-Left,1,,,,,
+2024,WC5,La Seu,W,H2,Next Gate,B,,Down-Left,2,,,,,
+2024,WC5,La Seu,W,H2,Next Gate,Y,,Down-Left,3,,,,,
+2024,WC5,La Seu,W,H2,Next Gate,G,,Down-Left,4,,,,,
+2024,WC5,La Seu,W,H2,2nd Up,R,,Right-Up,1,,Right-Up,,,
