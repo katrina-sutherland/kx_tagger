@@ -9798,3 +9798,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WRR,Prague,M,QF1,SG,B,,Down-Left,3,,FOLLOW,,,
 2025,WRR,Prague,M,QF1,SG,Y,,Down-Left,4,,FOLLOW,,,
 2025,WRR,Prague,M,QF1,1st Up,G,,Down-Right-Up,1,,Down-Right-Up,,,
+2025,WRR,Prague,M,QF1,1st Up,R,,Down-Left-Up,2,,SPLIT,,,
+2025,WRR,Prague,M,QF1,1st Up,Y,,Down-Right-Up,3,,SPLIT,,,
+2025,WRR,Prague,M,QF1,1st Up,B,,Down-Right-Up,4,,FOLLOW,,,
