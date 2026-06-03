@@ -9813,3 +9813,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2025,WRR,Prague,M,QF1,Finish,R,,Finish,2,2,,,,
 2025,WRR,Prague,M,QF1,Finish,Y,,Finish,3,3,,,,
 2025,WRR,Prague,M,QF1,Finish,B,,Finish,4,4,,,,
+2025,WRR,Prague,M,QF2,Ramp,G,1,Assigned,,,,RUDORFER M,,
+2025,WRR,Prague,M,QF2,Ramp,R,2,Assigned,,,,ROHRER J,,
+2025,WRR,Prague,M,QF2,Ramp,Y,3,Assigned,,,,BENINI G,,
+2025,WRR,Prague,M,QF2,Ramp,B,4,Assigned,,,,POPE B,,
