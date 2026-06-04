@@ -96,10 +96,39 @@
         .live-indicator {
             animation: pulse-green 2s infinite;
         }
+
+        #race-video-modal:not(.hidden) {
+            display: flex;
+        }
+
+        #race-video-modal .race-video-modal-panel {
+            max-height: min(90vh, 720px);
+        }
+
+        #race-video-player {
+            max-height: min(80vh, 640px);
+            background: #000;
+        }
     </style>
 </head>
 
 <body class="bg-slate-900 text-slate-200 antialiased">
+    <div id="race-video-modal"
+        class="hidden fixed inset-0 z-[100] items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm"
+        role="dialog" aria-modal="true" aria-labelledby="race-video-modal-title">
+        <div
+            class="race-video-modal-panel relative w-full max-w-4xl bg-slate-800 border border-slate-600 rounded-xl shadow-2xl overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-slate-700">
+                <h2 id="race-video-modal-title" class="text-lg font-semibold text-slate-100">Race Video</h2>
+                <button type="button" id="race-video-modal-close"
+                    class="text-slate-400 hover:text-slate-100 text-2xl leading-none px-2"
+                    aria-label="Close video">&times;</button>
+            </div>
+            <div class="p-4 bg-black flex items-center justify-center min-h-[200px]">
+                <video id="race-video-player" class="w-full rounded-md" controls playsinline></video>
+            </div>
+        </div>
+    </div>
     <div class="tooltip"></div>
     <div class="container mx-auto p-4 md:p-8">
         <header class="flex flex-col lg:flex-row justify-between items-center mb-8 relative">
@@ -193,31 +222,41 @@
                         class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700 hidden"></div>
                 </div>
 
-                <div class="lg:col-span-2 grid grid-cols-2 gap-4">
-                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by
-                            Bib Color</h3>
-                        <div id="pie-chart-bib-full" class="w-full h-40 flex items-center justify-center"></div>
-                        <div id="pie-legend-bib-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
-                    </div>
-                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd
-                            Place % by Bib Color</h3>
-                        <div id="pie-chart-bib-second-full" class="w-full h-40 flex items-center justify-center"></div>
-                        <div id="pie-legend-bib-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
-                    </div>
-                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish Position
-                            % when Leading at 1st Upstream</h3>
-                        <div id="pie-chart-gate2-full" class="w-full h-40 flex items-center justify-center"></div>
-                        <div id="pie-legend-gate2-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
-                    </div>
-                    <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st
-                            Upstream When Overall Finish 2nd</h3>
-                        <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center">
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by
+                                Bib Color</h3>
+                            <div id="pie-chart-bib-full" class="w-full h-40 flex items-center justify-center"></div>
+                            <div id="pie-legend-bib-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                         </div>
-                        <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                        <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd
+                                Place % by Bib Color</h3>
+                            <div id="pie-chart-bib-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                            <div id="pie-legend-bib-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                        </div>
+                        <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish Position
+                                % when Leading at 1st Upstream</h3>
+                            <div id="pie-chart-gate2-full" class="w-full h-40 flex items-center justify-center"></div>
+                            <div id="pie-legend-gate2-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                        </div>
+                        <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
+                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Rank at 1st
+                                Upstream When Overall Finish 2nd</h3>
+                            <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center">
+                            </div>
+                            <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                        </div>
+                    </div>
+                    <div id="race-video-full"
+                        class="hidden bg-slate-800 p-4 sm:p-5 rounded-xl shadow-md border border-slate-700 chart-card">
+                        <h3 class="text-sm font-semibold text-slate-100 mb-3 uppercase tracking-wider">Race Video</h3>
+                        <button type="button" id="race-video-trigger-full"
+                            class="text-sm font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-2 text-left">
+                            Watch race video
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1063,6 +1102,7 @@
                 const finishRank = d['Finish Rank'] || d['FinishRank'] || d.Rank || d.rank || d['Overall Rank'] || d['OverallRank'] || '';
                 const location = (d.Location || '').trim();
                 const notesComments = (d['NOTES & COMMENTS'] || d['Notes & Comments'] || '').trim();
+                const videoLink = (d['Video Link'] || d['VideoLink'] || d['video link'] || '').trim();
 
                 return {
                     Year: year,
@@ -1080,9 +1120,107 @@
                     Action: action,
                     FaultVal: faultVal,
                     FinishRank: finishRank,
-                    NotesComments: notesComments
+                    NotesComments: notesComments,
+                    VideoLink: videoLink
                 };
             });
+        }
+
+        /** First non-empty Video Link for the selected race (year, competition, location, gender, phase). */
+        function getRaceVideoLink(data, selected) {
+            if (!data || !data.length || !selected) return '';
+            let rows = data.filter(d =>
+                d.Year === selected.year &&
+                d.Competition === selected.competition &&
+                d.Gender === selected.gender &&
+                d.Phase === selected.phase
+            );
+            if (selected.location && selected.location !== 'All') {
+                rows = rows.filter(d => (d.Location || '') === selected.location);
+            }
+            for (const row of rows) {
+                const link = (row.VideoLink || '').trim();
+                if (link) return link;
+            }
+            return '';
+        }
+
+        function isSafeVideoUrl(url) {
+            try {
+                const parsed = new URL(url);
+                return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+            } catch {
+                return false;
+            }
+        }
+
+        let raceVideoModalInitialized = false;
+
+        function closeRaceVideoModal() {
+            const modal = document.getElementById('race-video-modal');
+            const player = document.getElementById('race-video-player');
+            if (!modal || !player) return;
+            player.pause();
+            player.removeAttribute('src');
+            player.load();
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function openRaceVideoModal(url) {
+            if (!isSafeVideoUrl(url)) return;
+            const modal = document.getElementById('race-video-modal');
+            const player = document.getElementById('race-video-player');
+            if (!modal || !player) return;
+            player.pause();
+            player.src = url;
+            player.load();
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            player.play().catch(() => { /* autoplay may be blocked until user interacts */ });
+        }
+
+        function initRaceVideoModal() {
+            if (raceVideoModalInitialized) return;
+            raceVideoModalInitialized = true;
+            const modal = document.getElementById('race-video-modal');
+            const closeBtn = document.getElementById('race-video-modal-close');
+            const panel = modal?.querySelector('.race-video-modal-panel');
+
+            closeBtn?.addEventListener('click', closeRaceVideoModal);
+            modal?.addEventListener('click', (e) => {
+                if (e.target === modal) closeRaceVideoModal();
+            });
+            panel?.addEventListener('click', (e) => e.stopPropagation());
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+                    closeRaceVideoModal();
+                }
+            });
+
+            document.getElementById('race-video-trigger-full')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                const url = e.currentTarget.getAttribute('data-video-url');
+                if (url) openRaceVideoModal(url);
+            });
+        }
+
+        function updateRaceVideoPanel(boxSelector, triggerSelector, data, selected) {
+            const box = d3.select(boxSelector);
+            const trigger = document.querySelector(triggerSelector);
+            const url = getRaceVideoLink(data, selected);
+            if (!url || !trigger) {
+                box.classed('hidden', true);
+                trigger?.removeAttribute('data-video-url');
+                return;
+            }
+            box.classed('hidden', false);
+            trigger.setAttribute('data-video-url', url);
+        }
+
+        function hideRaceVideoPanel() {
+            d3.select('#race-video-full').classed('hidden', true);
+            document.querySelector('#race-video-trigger-full')?.removeAttribute('data-video-url');
         }
 
         /** Parse time trial CSV: same as parseCsvData but preserves Split 1, Split 2, ... as numbers (seconds). */
@@ -3328,6 +3466,7 @@
             if (selectorsFull.year.property("value") === SELECT_PLACEHOLDER) {
                 showInitialMessage("#chart-full", "Select year, competition, location, gender and phase to view the report.");
                 d3.select("#fault-analysis-full").classed("hidden", true);
+                hideRaceVideoPanel();
                 return;
             }
             const selected = {
@@ -3340,6 +3479,7 @@
             if (selected.competition === SELECT_PLACEHOLDER || selected.gender === SELECT_PLACEHOLDER || selected.phase === SELECT_PLACEHOLDER) {
                 showInitialMessage("#chart-full", "Select year, competition, location, gender and phase to view the report.");
                 d3.select("#fault-analysis-full").classed("hidden", true);
+                hideRaceVideoPanel();
                 return;
             }
             const structure = scanCompetitionStructure(selected.year, selected.competition, masterDataFull);
@@ -3395,6 +3535,8 @@
             const gate2SecondPieData = [1, 2, 3, 4].map(p => ({ label: `${p}${p === 1 ? 'st' : p === 2 ? 'nd' : p === 3 ? 'rd' : 'th'} at Gate 2`, value: secondPlaceGate2Positions.get(p) || 0 }));
             const gate2SecondColorScale = d3.scaleOrdinal().domain(gate2SecondPieData.map(d => d.label)).range([medalColors.gold, medalColors.silver, medalColors.bronze, '#FFFFFF']);
             drawPieChartAndLegend("#pie-chart-gate2-second-full", "#pie-legend-gate2-second-full", gate2SecondPieData, gate2SecondColorScale);
+
+            updateRaceVideoPanel('#race-video-full', '#race-video-trigger-full', masterDataFull, selected);
         }
 
         // --- UPDATE ALL CHARTS (COMPACT) ---
@@ -3503,6 +3645,7 @@
 
         // --- INITIALIZE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
+            initRaceVideoModal();
             loadInitialData();
         });
     </script>
