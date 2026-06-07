@@ -10661,3 +10661,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,M,QF2,Finish,Y,,Finish,2,4,,,FLT,
 2026,WC2,Prague,M,QF2,Finish,R,,Finish,3,2,,,,
 2026,WC2,Prague,M,QF2,Finish,G,,Finish,4,3,,,,
+2026,WC2,Prague,M,QF3,Ramp,B,1,Assigned,,,,KONRAD M,,
+2026,WC2,Prague,M,QF3,Ramp,Y,2,Assigned,,,,BUTCHER F,,
+2026,WC2,Prague,M,QF3,Ramp,G,3,Assigned,,,,LONG M,,
+2026,WC2,Prague,M,QF3,Ramp,R,4,Assigned,,,,HOCEVAR Z,,
