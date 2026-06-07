@@ -10709,3 +10709,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,M,QF4,Finish,Y,,Finish,2,2,,,,
 2026,WC2,Prague,M,QF4,Finish,G,,Finish,3,3,,,,
 2026,WC2,Prague,M,QF4,Finish,B,,Finish,4,4,,,,
+2026,WC2,Prague,W,SF1,Ramp,B,1,Assigned,,,,PRIGENT C,,
+2026,WC2,Prague,W,SF1,Ramp,Y,2,Assigned,,,,ZWOLINSKA K,,
+2026,WC2,Prague,W,SF1,Ramp,G,3,Assigned,,,,MARX A,,
+2026,WC2,Prague,W,SF1,Ramp,R,4,Assigned,,,,LAZKANO M,,
