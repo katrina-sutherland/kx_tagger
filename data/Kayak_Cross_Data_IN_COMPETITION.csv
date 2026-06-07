@@ -10545,3 +10545,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,W,QF1,Finish,B,,Finish,2,2,,,,
 2026,WC2,Prague,W,QF1,Finish,Y,,Finish,3,4,,,FLT,
 2026,WC2,Prague,W,QF1,Finish,R,,Finish,4,3,,,,
+2026,WC2,Prague,W,QF2,Ramp,B,1,Assigned,,,,CHOURRAUT M,,
+2026,WC2,Prague,W,QF2,Ramp,Y,2,Assigned,,,,LAZKANO M,,
+2026,WC2,Prague,W,QF2,Ramp,G,3,Assigned,,,,KNEBLOVA T,,
+2026,WC2,Prague,W,QF2,Ramp,R,4,Assigned,,,,PRIGENT C,,
