@@ -10781,3 +10781,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,M,SF1,Finish,R,,Finish,2,2,,,,
 2026,WC2,Prague,M,SF1,Finish,G,,Finish,3,3,,,,
 2026,WC2,Prague,M,SF1,Finish,Y,,Finish,4,4,,,,
+2026,WC2,Prague,M,SF2,Ramp,G,1,Assigned,,,,KREJCI J,,
+2026,WC2,Prague,M,SF2,Ramp,Y,2,Assigned,,,,LONG M,,
+2026,WC2,Prague,M,SF2,Ramp,B,3,Assigned,,,,ROHRER J,,
+2026,WC2,Prague,M,SF2,Ramp,R,4,Assigned,,,,HOCEVAR Z,,
