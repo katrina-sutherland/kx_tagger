@@ -10589,3 +10589,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,W,QF3,2nd Up,B,,Left-Up,2,,FOLLOW,,,
 2026,WC2,Prague,W,QF3,2nd Up,G,,Left-Up,3,,FOLLOW,,,
 2026,WC2,Prague,W,QF3,2nd Up,Y,,Right-Up,4,,SPLIT,,,
+2026,WC2,Prague,W,QF4,Ramp,B,1,Assigned,,,,SETCHELL N,,
+2026,WC2,Prague,W,QF4,Ramp,Y,2,Assigned,,,,PLOCHMANN A,,
+2026,WC2,Prague,W,QF4,Ramp,G,3,Assigned,,,,WOODS K,,
+2026,WC2,Prague,W,QF4,Ramp,R,4,Assigned,,,,FUNK R,,
