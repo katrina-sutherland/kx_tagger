@@ -10637,3 +10637,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,M,QF1,Finish,R,,Finish,2,4,,,FLT,
 2026,WC2,Prague,M,QF1,Finish,B,,Finish,3,2,,,,
 2026,WC2,Prague,M,QF1,Finish,Y,,Finish,4,3,,,,
+2026,WC2,Prague,M,QF2,Ramp,B,1,Assigned,,,,MADORE M,,
+2026,WC2,Prague,M,QF2,Ramp,Y,2,Assigned,,,,ANDERSON T,,
+2026,WC2,Prague,M,QF2,Ramp,G,3,Assigned,,,,COLLIER N,,
+2026,WC2,Prague,M,QF2,Ramp,R,4,Assigned,,,,PRINDIS V,,
