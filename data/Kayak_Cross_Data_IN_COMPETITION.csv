@@ -10829,3 +10829,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,W,Final,Finish,G,,Finish,2,2,,,,
 2026,WC2,Prague,W,Final,Finish,R,,Finish,3,3,,,,
 2026,WC2,Prague,W,Final,Finish,Y,,Finish,4,4,,,,
+2026,WC2,Prague,M,Final,Ramp,B,1,Assigned,,,,MADORE M,,
+2026,WC2,Prague,M,Final,Ramp,Y,2,Assigned,,,,HOCEVAR Z,,
+2026,WC2,Prague,M,Final,Ramp,G,3,Assigned,,,,KREJCI J,,
+2026,WC2,Prague,M,Final,Ramp,R,4,Assigned,,,,PRINDIS V,,
