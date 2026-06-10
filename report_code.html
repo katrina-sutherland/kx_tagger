@@ -105,9 +105,15 @@
             max-height: min(90vh, 720px);
         }
 
-        #race-video-player {
+        #race-video-player,
+        #race-video-iframe {
             max-height: min(80vh, 640px);
             background: #000;
+        }
+
+        #race-video-iframe {
+            min-height: min(60vh, 480px);
+            aspect-ratio: 16 / 9;
         }
     </style>
 </head>
@@ -124,8 +130,15 @@
                     class="text-slate-400 hover:text-slate-100 text-2xl leading-none px-2"
                     aria-label="Close video">&times;</button>
             </div>
-            <div class="p-4 bg-black flex items-center justify-center min-h-[200px]">
-                <video id="race-video-player" class="w-full rounded-md" controls playsinline></video>
+            <div id="race-video-modal-body" class="p-4 bg-black flex flex-col items-center justify-center min-h-[200px]">
+                <video id="race-video-player" class="w-full rounded-md hidden" controls playsinline></video>
+                <iframe id="race-video-iframe" class="w-full rounded-md border-0 hidden" title="Race video player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                    allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+                <p id="race-video-error" class="hidden text-sm text-slate-400 text-center px-4 py-6">
+                    This video could not be embedded. Check that the Video Link in the CSV is a public share URL
+                    (Dropbox, YouTube, Vimeo, or an MP4 hosted in this repo under <code class="text-slate-300">data/</code>).
+                </p>
             </div>
         </div>
     </div>
@@ -440,7 +453,7 @@
                 <div id="tt-splits-table-wrapper" class="hidden mb-8">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                         <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Split breakdown</h3>
-                        <p class="text-slate-400 text-sm mb-2 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different). Gold boxes mark the fastest time in each sector.</p>
+                        <p class="text-slate-400 text-sm mb-2 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different) within the <strong>selected competition, location, and gender</strong>. Gold boxes mark the fastest time in each sector.</p>
                         <p id="tt-splits-sector-legend" class="hidden text-slate-400 text-xs mb-4 text-center">— USDR = Upside Down Roll</p>
                         <div id="tt-splits-table-container" class="overflow-x-auto rounded-xl border border-slate-700"></div>
                     </div>
@@ -1145,39 +1158,170 @@
             return '';
         }
 
+        /** Base URL for data/ and repo-hosted video paths (GitHub Pages project sites). */
+        function getReportDataBaseUrl() {
+            const path = window.location.pathname || '/';
+            if (/\.html?$/i.test(path)) {
+                return path.slice(0, path.lastIndexOf('/') + 1);
+            }
+            return path.endsWith('/') ? path : `${path}/`;
+        }
+
+        function resolveReportAssetUrl(url) {
+            const trimmed = (url || '').trim();
+            if (!trimmed) return '';
+            if (/^https?:\/\//i.test(trimmed)) return trimmed;
+            if (trimmed.startsWith('//')) return `${window.location.protocol}${trimmed}`;
+            const base = getReportDataBaseUrl();
+            if (trimmed.startsWith('/')) {
+                const origin = window.location.origin || '';
+                return origin ? `${origin}${trimmed}` : trimmed;
+            }
+            return `${base}${trimmed.replace(/^\.\//, '')}`;
+        }
+
         function isSafeVideoUrl(url) {
+            const resolved = resolveReportAssetUrl(url);
+            if (!resolved) return false;
+            if (!/^https?:\/\//i.test(resolved)) return false;
             try {
-                const parsed = new URL(url);
+                const parsed = new URL(resolved);
                 return parsed.protocol === 'http:' || parsed.protocol === 'https:';
             } catch {
                 return false;
             }
         }
 
+        /**
+         * Pick embed strategy for GitHub Pages: iframe for cross-origin hosts (Dropbox, YouTube, …);
+         * HTML5 video only for same-origin files (e.g. data/videos/heat.mp4 in the repo).
+         */
+        function getRaceVideoEmbed(url) {
+            const resolved = resolveReportAssetUrl(url);
+            if (!isSafeVideoUrl(resolved)) return null;
+
+            let embedSrc = resolved.replace(/#+$/, '');
+            const pageHost = (window.location.hostname || '').toLowerCase();
+
+            const yt = embedSrc.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/i);
+            if (yt) {
+                return {
+                    mode: 'iframe',
+                    src: `https://www.youtube.com/embed/${yt[1]}?autoplay=1&rel=0`,
+                    allow: 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen'
+                };
+            }
+
+            const vimeo = embedSrc.match(/(?:vimeo\.com\/)(\d+)/i);
+            if (vimeo) {
+                return {
+                    mode: 'iframe',
+                    src: `https://player.vimeo.com/video/${vimeo[1]}?autoplay=1`,
+                    allow: 'autoplay; fullscreen; picture-in-picture'
+                };
+            }
+
+            if (/dropbox\.com/i.test(embedSrc)) {
+                embedSrc = embedSrc.replace(/[?&]dl=0\b/, '?raw=1').replace(/[?&]dl=1\b/, '?raw=1');
+                if (!/[?&]raw=1\b/i.test(embedSrc)) {
+                    embedSrc += (embedSrc.includes('?') ? '&' : '?') + 'raw=1';
+                }
+            }
+
+            if (/dropboxusercontent\.com/i.test(embedSrc) || /dropbox\.com/i.test(embedSrc)) {
+                return {
+                    mode: 'iframe',
+                    src: embedSrc,
+                    allow: 'autoplay; fullscreen'
+                };
+            }
+
+            try {
+                const host = new URL(embedSrc).hostname.toLowerCase();
+                const sameOrigin = host === pageHost;
+                const isRepoVideo = sameOrigin && /\/data\//i.test(embedSrc);
+                if (sameOrigin && (isRepoVideo || /\.(mp4|webm|ogg|mov)(\?|#|$)/i.test(embedSrc))) {
+                    return { mode: 'video', src: embedSrc };
+                }
+            } catch { /* fall through to iframe */ }
+
+            if (/\.(mp4|webm|ogg|mov)(\?|#|$)/i.test(embedSrc)) {
+                return {
+                    mode: 'iframe',
+                    src: embedSrc,
+                    allow: 'autoplay; fullscreen'
+                };
+            }
+
+            return {
+                mode: 'iframe',
+                src: embedSrc,
+                allow: 'autoplay; fullscreen'
+            };
+        }
+
         let raceVideoModalInitialized = false;
+
+        function setRaceVideoModalVisible(mode) {
+            const player = document.getElementById('race-video-player');
+            const iframe = document.getElementById('race-video-iframe');
+            const err = document.getElementById('race-video-error');
+            player?.classList.toggle('hidden', mode !== 'video');
+            iframe?.classList.toggle('hidden', mode !== 'iframe');
+            err?.classList.toggle('hidden', mode !== 'error');
+        }
 
         function closeRaceVideoModal() {
             const modal = document.getElementById('race-video-modal');
             const player = document.getElementById('race-video-player');
-            if (!modal || !player) return;
-            player.pause();
-            player.removeAttribute('src');
-            player.load();
+            const iframe = document.getElementById('race-video-iframe');
+            if (!modal) return;
+            if (player) {
+                player.pause();
+                player.removeAttribute('src');
+                player.load();
+            }
+            if (iframe) {
+                iframe.removeAttribute('src');
+                iframe.removeAttribute('allow');
+            }
+            setRaceVideoModalVisible(null);
             modal.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
 
         function openRaceVideoModal(url) {
-            if (!isSafeVideoUrl(url)) return;
+            const embed = getRaceVideoEmbed(url);
             const modal = document.getElementById('race-video-modal');
             const player = document.getElementById('race-video-player');
-            if (!modal || !player) return;
+            const iframe = document.getElementById('race-video-iframe');
+            if (!embed || !modal || !player || !iframe) {
+                setRaceVideoModalVisible('error');
+                modal?.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+                return;
+            }
+
             player.pause();
-            player.src = url;
-            player.load();
+            player.removeAttribute('src');
+            iframe.removeAttribute('src');
+            iframe.removeAttribute('allow');
+
+            if (embed.mode === 'video') {
+                setRaceVideoModalVisible('video');
+                player.src = embed.src;
+                player.load();
+                modal.classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+                player.play().catch(() => { });
+                return;
+            }
+
+            setRaceVideoModalVisible('iframe');
+            iframe.src = embed.src;
+            if (embed.allow) iframe.setAttribute('allow', embed.allow);
             modal.classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
-            player.play().catch(() => { /* autoplay may be blocked until user interacts */ });
         }
 
         function initRaceVideoModal() {
@@ -1550,26 +1694,33 @@
 
             try {
                 const persistedUi = readReportUiState();
-                // Full Report: kx_race_analysis_git.csv (columns: Year, Competition, Location, Gender, Phase, Gate, BIB, ...)
-                const urlFull = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
+                const dataBase = getReportDataBaseUrl();
+                const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+                const isGitHubPages = /\.github\.io$/i.test(window.location.hostname || '');
+                // Full Report: on GitHub Pages / localhost use repo data/ (same deploy as HTML); else raw GitHub.
+                const urlFullRelative = `${dataBase}data/kx_race_analysis_git.csv?t=${cacheBuster}`;
+                const urlFullGitHub = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kx_race_analysis_git.csv?t=${cacheBuster}`;
                 const urlCompactGitHub = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
-                const urlCompactLocal = `data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
+                const urlCompactLocal = `${dataBase}data/Kayak_Cross_Data_IN_COMPETITION.csv?t=${cacheBuster}`;
                 // Individual Time Trial: prefer GitHub raw (contains 2025+), fallback to local `data/` next to report.
-                const urlTTLocal = `data/kayak_timetrial.csv?t=${cacheBuster}`;
+                const urlTTLocal = `${dataBase}data/kayak_timetrial.csv?t=${cacheBuster}`;
                 const urlTTGitHub = `https://raw.githubusercontent.com/katrina-sutherland/kx_tagger/main/data/kayak_timetrial.csv?t=${cacheBuster}`;
 
-                const responseFull = await fetch(urlFull);
-                const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-                const compactPrimary = isLocalHost ? urlCompactLocal : urlCompactGitHub;
-                const compactFallback = isLocalHost ? urlCompactGitHub : urlCompactLocal;
+                const useRelativeDataFirst = isLocalHost || isGitHubPages;
+                let responseFull = await fetch(useRelativeDataFirst ? urlFullRelative : urlFullGitHub).catch(() => ({ ok: false }));
+                if (!responseFull.ok) {
+                    responseFull = await fetch(useRelativeDataFirst ? urlFullGitHub : urlFullRelative).catch(() => ({ ok: false }));
+                }
+                const compactPrimary = (isLocalHost || isGitHubPages) ? urlCompactLocal : urlCompactGitHub;
+                const compactFallback = (isLocalHost || isGitHubPages) ? urlCompactGitHub : urlCompactLocal;
                 let responseCompact = await fetch(compactPrimary).catch(() => ({ ok: false }));
                 if (!responseCompact.ok) {
                     responseCompact = await fetch(compactFallback).catch(() => ({ ok: false }));
                 }
 
-                let responseTT = await fetch(urlTTGitHub).catch(() => ({ ok: false }));
+                let responseTT = await fetch((isLocalHost || isGitHubPages) ? urlTTLocal : urlTTGitHub).catch(() => ({ ok: false }));
                 if (!responseTT.ok) {
-                    responseTT = await fetch(urlTTLocal).catch(() => ({ ok: false }));
+                    responseTT = await fetch((isLocalHost || isGitHubPages) ? urlTTGitHub : urlTTLocal).catch(() => ({ ok: false }));
                 }
 
                 if (!responseFull.ok) throw new Error(`Failed to load Full Report CSV`);
@@ -1862,6 +2013,16 @@
             7: "Gate 7 to Gate 8"
         };
 
+        /** Split sector labels under Split 1–6 headers (2026 WC2 Prague time trial only). */
+        const TT_PRAGUE_2026_WC2_SPLIT_SECTORS = {
+            1: "Start to Gate 2",
+            2: "Gate 2 to Exit Gate 4",
+            3: "Exit Gate 4 to Gate 6",
+            4: "Gate 6 to USDR",
+            5: "USDR to Exit Gate 8",
+            6: "Exit Gate 8 to Finish"
+        };
+
         function isTT2025WC5Augsburg(year, competition, location) {
             if (+year !== 2025) return false;
             if (String(competition || '').trim().toUpperCase() !== 'WC5') return false;
@@ -1892,13 +2053,57 @@
             return normalizeCourseLocationKey(location) === 'tacen';
         }
 
+        function isTT2026WC2Prague(year, competition, location) {
+            if (+year !== 2026) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WC2') return false;
+            return normalizeCourseLocationKey(location) === 'prague';
+        }
+
         function getTTSectorLabelsForSelection(year, competition, location) {
+            if (isTT2026WC2Prague(year, competition, location)) return TT_PRAGUE_2026_WC2_SPLIT_SECTORS;
             if (isTT2026WC1Tacen(year, competition, location)) return TT_TACEN_2026_WC1_SPLIT_SECTORS;
             if (isTT2025WC5Augsburg(year, competition, location)) return TT_AUGSBURG_2025_WC5_SPLIT_SECTORS;
             if (isTT2025WC4Tacen(year, competition, location)) return TT_TACEN_2025_WC4_SPLIT_SECTORS;
             if (isTT2025WC3Prague(year, competition, location)) return TT_PRAGUE_2025_WC3_SPLIT_SECTORS;
             if (isTT2025WC1LaSeu(year, competition, location)) return TT_LA_SEU_2025_WC1_SPLIT_SECTORS;
             return null;
+        }
+
+        /** True when competition, location, and gender are narrowed to one event (not All). */
+        function isTimeTrialSplitCohortSelected(selected) {
+            return selected &&
+                selected.year &&
+                selected.competition && selected.competition !== SELECT_PLACEHOLDER && selected.competition !== 'All' &&
+                selected.location && selected.location !== SELECT_PLACEHOLDER && selected.location !== 'All' &&
+                selected.gender && selected.gender !== SELECT_PLACEHOLDER && selected.gender !== 'All';
+        }
+
+        /** Athletes in exactly one time trial cohort: same year, competition, location, and gender. */
+        function filterTimeTrialSplitCohort(selected) {
+            if (!isTimeTrialSplitCohortSelected(selected)) return [];
+            return masterDataTT.filter(d =>
+                isTimeTrialAthleteRow(d) &&
+                d.Year === selected.year &&
+                d.Competition === selected.competition &&
+                d.Location === selected.location &&
+                d.Gender === selected.gender
+            );
+        }
+
+        /** 1st / 3rd / 5th place rows within a single cohort (CSV Rank first, else total-time order). */
+        function getTimeTrialRankRowsInCohort(cohortRows, splitNames) {
+            const lastCol = splitNames.length ? splitNames[splitNames.length - 1] : null;
+            const rankedByTotal = cohortRows.slice()
+                .filter(d => typeof d.TotalTime === 'number' && !isNaN(d.TotalTime) && d.TotalTime > 0)
+                .sort((a, b) => a.TotalTime - b.TotalTime);
+            const rankedByLastSplit = lastCol ? cohortRows.slice()
+                .filter(d => typeof d[lastCol] === 'number' && !isNaN(d[lastCol]) && d[lastCol] > 0)
+                .sort((a, b) => a[lastCol] - b[lastCol]) : [];
+            const pick = (rank) => cohortRows.find(d => d.Rank === rank)
+                || rankedByTotal[rank - 1]
+                || rankedByLastSplit[rank - 1]
+                || null;
+            return { rank1: pick(1), rank3: pick(3), rank5: pick(5) };
         }
 
         function updateTTAthleteOptions() {
@@ -2352,54 +2557,32 @@
                 ttCourseYOffset = isParis ? -6 : 0;
                 ttParisFirstSplitRotationDelta = isParis ? -90 : 0;
             }
-            const dataForVB = masterDataTT.filter(d =>
-                isTimeTrialAthleteRow(d) &&
-                d.Year === selected.year &&
-                (selected.competition === 'All' || d.Competition === selected.competition) &&
-                (selected.location === 'All' || d.Location === selected.location) &&
-                (selected.gender === 'All' || d.Gender === selected.gender)
-            );
-            let data = masterDataTT.filter(d =>
-                isTimeTrialAthleteRow(d) &&
-                d.Year === selected.year &&
-                (selected.competition === 'All' || d.Competition === selected.competition) &&
-                (selected.location === 'All' || d.Location === selected.location) &&
-                (selected.gender === 'All' || d.Gender === selected.gender) &&
-                (selected.athlete === 'All' || formatAthleteName(d.AthleteName) === selected.athlete)
-            );
+            const splitCohortReady = isTimeTrialSplitCohortSelected(selected);
+            const splitCohort = splitCohortReady ? filterTimeTrialSplitCohort(selected) : [];
+            const athleteRow = splitCohortReady && selected.athlete !== 'All'
+                ? splitCohort.find(d => formatAthleteName(d.AthleteName) === selected.athlete)
+                : null;
 
-            const firstRowWithSplits = dataForVB.find(r => getSplitColumns(r).length > 0);
+            const firstRowWithSplits = splitCohort.find(r => getSplitColumns(r).length > 0);
             const allSplitNames = firstRowWithSplits ? getSplitColumns(firstRowWithSplits) : [];
-            // Only include splits that this course has: at least one valid (> 0, non-NaN) value in the data
+            // Only include splits that this cohort has: at least one valid (> 0, non-NaN) value in the data
             const splitNames = allSplitNames.filter(col =>
-                dataForVB.some(d => {
+                splitCohort.some(d => {
                     const v = d[col];
                     return typeof v === 'number' && !isNaN(v) && v > 0;
                 })
             );
-            const hasSplits = splitNames.length > 0;
+            const hasSplits = splitCohortReady && splitNames.length > 0;
 
             if (hasSplits) {
-                const virtualBestTimes = splitNames.map(col => {
-                    const vals = dataForVB.map(d => d[col]).filter(v => typeof v === 'number' && !isNaN(v));
-                    return vals.length ? Math.min(...vals) : NaN;
-                });
                 const chartContainer = d3.select("#tt-chart-container");
                 const diffEl = d3.select("#tt-chart-diff");
                 const legendEl = d3.select("#tt-chart-legend");
 
-                if (selected.athlete !== 'All' && data.length > 0) {
-                    const athleteRow = data[0];
+                if (selected.athlete !== 'All' && athleteRow) {
                     const athleteTimes = splitNames.map(col => athleteRow[col]);
                     const athleteName = formatAthleteName(athleteRow.AthleteName) || selected.athlete;
-                    const lastCol = splitNames[splitNames.length - 1];
-                    let rank1Row = dataForVB.find(d => d.Rank === 1);
-                    let rank3Row = dataForVB.find(d => d.Rank === 3);
-                    if (!rank1Row || !rank3Row) {
-                        const ranked = dataForVB.slice().filter(d => typeof d[lastCol] === 'number' && !isNaN(d[lastCol])).sort((a, b) => a[lastCol] - b[lastCol]);
-                        if (!rank1Row) rank1Row = ranked.length >= 1 ? ranked[0] : null;
-                        if (!rank3Row) rank3Row = ranked.length >= 3 ? ranked[2] : null;
-                    }
+                    const { rank1: rank1Row, rank3: rank3Row, rank5: rank5Row } = getTimeTrialRankRowsInCohort(splitCohort, splitNames);
                     const rank1Name = rank1Row ? (formatAthleteName(rank1Row.AthleteName) || '—') : '—';
                     const rank3Name = rank3Row ? (formatAthleteName(rank3Row.AthleteName) || '—') : '—';
                     const rank1Times = rank1Row ? splitNames.map(col => rank1Row[col]) : splitNames.map(() => NaN);
@@ -2407,13 +2590,6 @@
                     const athleteTotal = (athleteRow.TotalTime != null && !isNaN(athleteRow.TotalTime)) ? athleteRow.TotalTime : athleteTimes.filter(t => !isNaN(t)).pop();
                     const rank1Total = rank1Row && (rank1Row.TotalTime != null && !isNaN(rank1Row.TotalTime)) ? rank1Row.TotalTime : rank1Times.filter(t => !isNaN(t)).pop();
                     const rank3Total = rank3Row && (rank3Row.TotalTime != null && !isNaN(rank3Row.TotalTime)) ? rank3Row.TotalTime : rank3Times.filter(t => !isNaN(t)).pop();
-                    // Rank 5 (optional, for split breakdown only)
-                    let rank5Row = dataForVB.find(d => d.Rank === 5);
-                    if (!rank5Row) {
-                        const rankedByTotal = dataForVB.slice().filter(d => typeof d.TotalTime === 'number' && !isNaN(d.TotalTime))
-                            .sort((a, b) => a.TotalTime - b.TotalTime);
-                        rank5Row = rankedByTotal.length >= 5 ? rankedByTotal[4] : null;
-                    }
                     const rank5Name = rank5Row ? (formatAthleteName(rank5Row.AthleteName) || '—') : '—';
                     const rank5Times = rank5Row ? splitNames.map(col => rank5Row[col]) : splitNames.map(() => NaN);
                     const rank5Total = rank5Row && (rank5Row.TotalTime != null && !isNaN(rank5Row.TotalTime)) ? rank5Row.TotalTime : rank5Times.filter(t => !isNaN(t)).pop();
@@ -2462,10 +2638,11 @@
                 }
             } else {
                 d3.select("#tt-chart-container").classed("hidden", true);
+                d3.select("#tt-splits-table-wrapper").classed("hidden", true);
                 d3.select("#tt-splits-sector-legend").classed("hidden", true);
             }
 
-            if (hasSplits && selected.athlete !== 'All' && data.length > 0) {
+            if (hasSplits && selected.athlete !== 'All' && athleteRow) {
                 d3.select("#tt-content-area").classed("hidden", true);
             } else {
                 d3.select("#tt-content-area").classed("hidden", false);
