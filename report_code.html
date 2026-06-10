@@ -2458,21 +2458,27 @@
                 if (Math.abs(pct) < 0.005) return '0.00%';
                 return `${pct.toFixed(2)}%`;
             };
-            const numCols = splitNames.length + 2;
+            const formatRank = (rank) => {
+                if (typeof rank === 'number' && !isNaN(rank) && rank > 0) return String(rank);
+                return '—';
+            };
+            const splitColOffset = 2; // Rank, then Name
+            const totalColIdx = splitNames.length + splitColOffset;
             const minPerCol = [];
-            for (let j = 0; j < numCols; j++) {
-                if (j === 0) continue;
+            for (let j = splitColOffset; j <= totalColIdx; j++) {
                 const vals = rowData.map(d => {
-                    if (j <= splitNames.length) return d.times[j - 1];
+                    if (j < totalColIdx) return d.times[j - splitColOffset];
                     return (typeof d.total === 'number' && !isNaN(d.total)) ? d.total : (d.times.length ? d.times[d.times.length - 1] : NaN);
                 }).filter(v => typeof v === 'number' && !isNaN(v));
                 minPerCol[j] = vals.length ? Math.min(...vals) : NaN;
             }
             const table = container.append("table").attr("class", "min-w-full divide-y divide-slate-700");
             const thead = table.append("thead").attr("class", "bg-slate-800");
-            thead.append("tr").selectAll("th").data(['', ...splitNames, 'Total', '% Behind Winner']).join("th")
-                .attr("class", "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300")
-                .text((d, i) => i === 0 ? '' : d);
+            thead.append("tr").selectAll("th").data(['Rank', '', ...splitNames, 'Total', '% Behind Winner']).join("th")
+                .attr("class", (d, i) => i === 0
+                    ? "px-2 py-3 text-center text-xs font-semibold uppercase tracking-wider text-slate-300 w-12"
+                    : "px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-300")
+                .text((d, i) => i === 1 ? '' : d);
 
             if (sectorDescriptions) {
                 const splitDescriptionColumns = splitNames.map(col => {
@@ -2481,7 +2487,7 @@
                     return sectorDescriptions[n] || '';
                 });
 
-                thead.append("tr").selectAll("th").data(['', ...splitDescriptionColumns, '', '']).join("th")
+                thead.append("tr").selectAll("th").data(['', '', ...splitDescriptionColumns, '', '']).join("th")
                     .attr("class", "px-4 py-2 text-left text-[11px] font-medium text-slate-400 whitespace-normal leading-tight")
                     .text(d => d);
             }
@@ -2490,20 +2496,22 @@
             rows.selectAll("td").data((d) => {
                 const total = (typeof d.total === 'number' && !isNaN(d.total)) ? d.total : (d.times.length ? d.times[d.times.length - 1] : NaN);
                 return [
+                    { text: formatRank(d.rank), isRank: true },
                     { text: d.label, color: d.color, isLabel: true },
-                    ...d.times.map((t, i) => ({ text: formatT(t), value: t, colIdx: i + 1 })),
-                    { text: formatT(total), value: total, colIdx: splitNames.length + 1 },
+                    ...d.times.map((t, i) => ({ text: formatT(t), value: t, colIdx: i + splitColOffset })),
+                    { text: formatT(total), value: total, colIdx: totalColIdx },
                     { text: formatPctBehindWinner(total), isPctBehind: true }
                 ];
             }).join("td")
                 .attr("class", (d, j) => {
-                    const base = j === 0 ? "px-4 py-3 text-sm font-medium" : "px-4 py-3 text-sm text-slate-400";
+                    const base = (j === 0 || j === 1) ? "px-4 py-3 text-sm font-medium" : "px-4 py-3 text-sm text-slate-400";
                     const minVal = minPerCol[d.colIdx];
-                    const isFastest = !d.isLabel && !d.isPctBehind && typeof d.value === 'number' && !isNaN(d.value) && typeof minVal === 'number' && !isNaN(minVal) && Math.abs(d.value - minVal) < 0.005;
+                    const isFastest = !d.isLabel && !d.isRank && !d.isPctBehind && typeof d.value === 'number' && !isNaN(d.value) && typeof minVal === 'number' && !isNaN(minVal) && Math.abs(d.value - minVal) < 0.005;
+                    if (j === 0) return "px-2 py-3 text-xs text-center text-slate-400 w-12";
                     if (isFastest) return base + " rounded bg-amber-500/25 border border-amber-400/60";
                     return base;
                 })
-                .style("color", (d, j) => j === 0 ? d.color : null)
+                .style("color", (d, j) => j === 1 ? d.color : null)
                 .text(d => d.text);
         }
 
@@ -2598,15 +2606,15 @@
                     drawTTSplitChart(splitNames, athleteTimes, rank1Times, athleteName);
                     // Build rows in order: 1st, 3rd, 5th, selected (if distinct from rank5)
                     const rows = [];
-                    rows.push({ label: rank1Name, color: ttTableColors.rank1, times: rank1Times, total: rank1Total });
-                    rows.push({ label: rank3Name, color: ttTableColors.rank3, times: rank3Times, total: rank3Total });
+                    rows.push({ label: rank1Name, color: ttTableColors.rank1, times: rank1Times, total: rank1Total, rank: rank1Row?.Rank });
+                    rows.push({ label: rank3Name, color: ttTableColors.rank3, times: rank3Times, total: rank3Total, rank: rank3Row?.Rank });
                     const rank5IsDistinct = rank5Name && rank5Name !== '—' && rank5Name !== athleteName;
                     if (rank5IsDistinct) {
-                        rows.push({ label: rank5Name, color: ttTableColors.rank5, times: rank5Times, total: rank5Total });
+                        rows.push({ label: rank5Name, color: ttTableColors.rank5, times: rank5Times, total: rank5Total, rank: rank5Row?.Rank });
                     }
                     const athleteIsDistinctFrom5 = !rank5IsDistinct || athleteName !== rank5Name;
                     if (athleteIsDistinctFrom5) {
-                        rows.push({ label: athleteName, color: ttTableColors.athlete, times: athleteTimes, total: athleteTotal });
+                        rows.push({ label: athleteName, color: ttTableColors.athlete, times: athleteTimes, total: athleteTotal, rank: athleteRow.Rank });
                     }
                     const sectorLabels = getTTSectorLabelsForSelection(selected.year, selected.competition, selected.location);
                     drawTTSplitsTable(
