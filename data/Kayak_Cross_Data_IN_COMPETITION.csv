@@ -11057,3 +11057,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC3,Augsburg,M,H2,Finish,R,,Finish,2,2,,,,
 2026,WC3,Augsburg,M,H2,Finish,Y,,Finish,3,3,,,,
 2026,WC3,Augsburg,M,H2,Finish,B,,Finish,4,4,,,,
+2026,WC3,Augsburg,M,H3,Ramp,G,4,Assigned,,,,LEAVER Sam,,
+2026,WC3,Augsburg,M,H3,Ramp,R,3,Assigned,,,,ROHRER Jan,,
+2026,WC3,Augsburg,M,H3,Ramp,B,2,Assigned,,,,OSCHMAUTZ Felix,,
+2026,WC3,Augsburg,M,H3,Ramp,Y,1,Assigned,,,,RUDORFER Martin,,
