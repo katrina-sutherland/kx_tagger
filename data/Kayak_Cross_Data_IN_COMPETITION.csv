@@ -11521,3 +11521,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC3,Augsburg,M,Final,Ramp,G,3,Assigned,,,,CLARKE Joseph,,
 2026,WC3,Augsburg,M,Final,Ramp,Y,2,Assigned,,,,DE COSTER Gabriel,,
 2026,WC3,Augsburg,M,Final,Ramp,B,1,Assigned,,,,LLORENTE David,,
+2026,WC3,Augsburg,M,Final,1,R,,Down-Left,1,,,,,
+2026,WC3,Augsburg,M,Final,1,G,,Down-Left,2,,,,,
+2026,WC3,Augsburg,M,Final,1,B,,Down-Left,3,,,,,
+2026,WC3,Augsburg,M,Final,1,Y,,Down-Left,4,,,,,
