@@ -11397,3 +11397,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC3,Augsburg,M,QF4,Finish,Y,,Finish-Left-Up,2,2,FOLLOW,,,
 2026,WC3,Augsburg,M,QF4,Finish,R,,Finish-Left-Up,3,3,FOLLOW,,,
 2026,WC3,Augsburg,M,QF4,Finish,G,,Finish-Left-Up,4,4,FOLLOW,,,
+2026,WC3,Augsburg,W,SF1,Ramp,G,4,Assigned,,,,HUG Angele,,
+2026,WC3,Augsburg,W,SF1,Ramp,R,3,Assigned,,,,MARX Alena,,
+2026,WC3,Augsburg,W,SF1,Ramp,Y,2,Assigned,,,,LEAVER Lois,,
+2026,WC3,Augsburg,W,SF1,Ramp,B,1,Assigned,,,,FUNK Ricarda,,
