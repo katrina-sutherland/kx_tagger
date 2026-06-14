@@ -11370,3 +11370,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC3,Augsburg,M,QF3,2nd Up,Y,,Left-Up,2,,FOLLOW,,,
 2026,WC3,Augsburg,M,QF3,2nd Up,B,,Left-Up,3,,FOLLOW,,,
 2026,WC3,Augsburg,M,QF3,2nd Up,R,,Right-Up,4,,SPLIT,,,
+2026,WC3,Augsburg,M,QF3,Finish,G,,Finish,1,1,,,,
+2026,WC3,Augsburg,M,QF3,Finish,B,,Finish,2,2,,,,
+2026,WC3,Augsburg,M,QF3,Finish,Y,,Finish,3,3,,,,
+2026,WC3,Augsburg,M,QF3,Finish,R,,Finish,4,4,,,,
