@@ -1511,15 +1511,48 @@
             return `${String(competition || '').trim()}\0${String(location || '').trim()}`;
         }
 
+        function isSmallFinalPhase(phase) {
+            return /^small\s*final$/i.test(String(phase || '').trim());
+        }
+
+        function normalizeBracketPhaseKind(phase) {
+            const p = String(phase || '').trim();
+            if (p === 'Final') return 'Final';
+            if (isSmallFinalPhase(p)) return 'SmallFinal';
+            if (/^SF/i.test(p)) return 'SF';
+            if (/^QF/i.test(p)) return 'QF';
+            if (/^H/i.test(p)) return 'H';
+            if (/^Rep/i.test(p)) return 'Rep';
+            if (/^R/i.test(p)) return 'R';
+            if (/^TT/i.test(p)) return 'TT';
+            return 'Other';
+        }
+
         function compareSeasonPhases(phaseA, phaseB) {
-            const phaseSortOrder = { 'TT': 0, 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Final': 6 };
+            const phaseSortOrder = { 'TT': 0, 'R': 1, 'Rep': 2, 'H': 3, 'QF': 4, 'SF': 5, 'Small Final': 6, 'Final': 7 };
             const regex = /^([A-Za-z]+)(\d*)$/;
-            const matchA = (phaseA || '').match(regex) || [phaseA, phaseA, ''];
-            const matchB = (phaseB || '').match(regex) || [phaseB, phaseB, ''];
-            const orderA = phaseSortOrder[matchA[1] === 'Final' ? 'Final' : matchA[1]] || 99;
-            const orderB = phaseSortOrder[matchB[1] === 'Final' ? 'Final' : matchB[1]] || 99;
+
+            function phaseSortKey(phase) {
+                const p = String(phase || '').trim();
+                if (p === 'Final') return 'Final';
+                if (isSmallFinalPhase(p)) return 'Small Final';
+                const match = p.match(regex);
+                return match ? match[1] : p;
+            }
+
+            function phaseNumber(phase) {
+                const p = String(phase || '').trim();
+                if (p === 'Final' || isSmallFinalPhase(p)) return 0;
+                const match = p.match(regex);
+                return parseInt((match && match[2]) || '0', 10);
+            }
+
+            const keyA = phaseSortKey(phaseA);
+            const keyB = phaseSortKey(phaseB);
+            const orderA = phaseSortOrder[keyA] ?? 99;
+            const orderB = phaseSortOrder[keyB] ?? 99;
             if (orderA !== orderB) return orderA - orderB;
-            return parseInt(matchA[2] || '0', 10) - parseInt(matchB[2] || '0', 10);
+            return phaseNumber(phaseA) - phaseNumber(phaseB);
         }
 
         /** Unique Competition + Location events for a year, in season order (includes WRR, AO, etc.). */
@@ -3215,8 +3248,8 @@
          * Compute overall "Final Rank" for all athletes in a single event (competition + location + gender + year).
          *
          * Official ICF final results rank athletes primarily by the furthest round reached:
-         * Final (1–4), then Semifinal losers (5–8), then Quarterfinal losers (9–16), then Heat losers (17–32),
-         * then Time Trial only.
+         * Final (1–4), Small Final (5–8), then Semifinal losers without a Small Final (5–8),
+         * then Quarterfinal losers (9–16), then Heat losers (17–32), then Time Trial only.
          *
          * The official tie-breaker within the same round uses race time; our current Full Report CSV does not
          * include cross run times, so we fall back to per-phase placing (via getCalculatedRaceResults) and then
@@ -3280,19 +3313,6 @@
                 return { finalRankByAthlete: finishRankByAthlete, lastPhaseByAthlete: lastPhaseByAthlete };
             }
 
-            // Helper: phase "level" for grouping (Final > SF > QF > H > Rep > R > TT > other).
-            function phaseLevel(phase) {
-                const p = String(phase || '').trim();
-                if (p === 'Final') return 6;
-                if (/^SF/i.test(p)) return 5;
-                if (/^QF/i.test(p)) return 4;
-                if (/^H/i.test(p)) return 3;
-                if (/^Rep/i.test(p)) return 2;
-                if (/^R/i.test(p)) return 1;
-                if (/^TT/i.test(p)) return 0;
-                return -1;
-            }
-
             // For each athlete, compute their placing in their last phase using our existing race result calculator.
             const placingInLastPhase = new Map(); // athleteKey -> placing number
             const structure = scanCompetitionStructure(year, competition, data);
@@ -3307,30 +3327,69 @@
                 if (res) placingInLastPhase.set(athleteKey, res.calculatedRank);
             });
 
-            // Sort athletes into overall final rank order.
-            const orderedAthletes = [...athletes].sort((a, b) => {
-                const pa = lastPhaseByAthlete.get(a) || '';
-                const pb = lastPhaseByAthlete.get(b) || '';
-                const la = phaseLevel(pa);
-                const lb = phaseLevel(pb);
-                if (la !== lb) return lb - la; // deeper round first
+            function sortWithinBracketBand(items) {
+                return items.sort((a, b) => {
+                    const pa = typeof a.placing === 'number' ? a.placing : 99;
+                    const pb = typeof b.placing === 'number' ? b.placing : 99;
+                    if (pa !== pb) return pa - pb;
+                    const phaseCmp = compareSeasonPhases(a.lastPhase, b.lastPhase);
+                    if (phaseCmp !== 0) return phaseCmp;
+                    return String(a.athleteKey).localeCompare(String(b.athleteKey));
+                });
+            }
 
-                // Within same round: smaller placing (1,2,3,...) is better.
-                const ra = placingInLastPhase.get(a);
-                const rb = placingInLastPhase.get(b);
-                const ha = typeof ra === 'number' && !isNaN(ra);
-                const hb = typeof rb === 'number' && !isNaN(rb);
-                if (ha && hb && ra !== rb) return ra - rb;
-                if (ha !== hb) return ha ? -1 : 1;
+            function assignBandRanks(items, bandStart, overall) {
+                sortWithinBracketBand(items).forEach((item, idx) => {
+                    overall.set(item.athleteKey, bandStart + idx);
+                });
+            }
 
-                // Deterministic fallback: phase code then bib.
-                const phaseCmp = compareSeasonPhases(pa, pb);
-                if (phaseCmp !== 0) return phaseCmp;
-                return String(a).localeCompare(String(b));
+            // Assign fixed bracket bands (ICF-style), not a single global sort across all athletes.
+            const overall = new Map();
+            const sfBand = [];
+            const qfBand = [];
+            const heatBand = [];
+            const ttBand = [];
+            const otherBand = [];
+
+            athletes.forEach(athleteKey => {
+                const lastPhase = lastPhaseByAthlete.get(athleteKey) || '';
+                const placing = placingInLastPhase.get(athleteKey);
+                const kind = normalizeBracketPhaseKind(lastPhase);
+
+                if (kind === 'Final' && placing >= 1 && placing <= 4) {
+                    overall.set(athleteKey, placing);
+                    return;
+                }
+                if (kind === 'SmallFinal' && placing >= 1 && placing <= 4) {
+                    overall.set(athleteKey, 4 + placing); // 5–8
+                    return;
+                }
+                if (kind === 'SF' && placing >= 3) {
+                    sfBand.push({ athleteKey, lastPhase, placing });
+                    return;
+                }
+                if (kind === 'QF' && placing >= 3) {
+                    qfBand.push({ athleteKey, lastPhase, placing });
+                    return;
+                }
+                if (kind === 'H' && placing >= 3) {
+                    heatBand.push({ athleteKey, lastPhase, placing });
+                    return;
+                }
+                if (kind === 'TT') {
+                    ttBand.push({ athleteKey, lastPhase, placing: placing || 99 });
+                    return;
+                }
+                otherBand.push({ athleteKey, lastPhase, placing: placing || 99 });
             });
 
-            const overall = new Map();
-            orderedAthletes.forEach((athleteKey, idx) => overall.set(athleteKey, idx + 1));
+            assignBandRanks(sfBand, 5, overall);    // 5–8 when no Small Final race
+            assignBandRanks(qfBand, 9, overall);    // 9–16
+            assignBandRanks(heatBand, 17, overall); // 17–32
+            assignBandRanks(ttBand, 33, overall);   // 33+
+            assignBandRanks(otherBand, 33 + ttBand.length, overall);
+
             return { finalRankByAthlete: overall, lastPhaseByAthlete: lastPhaseByAthlete };
         }
 
@@ -3563,6 +3622,8 @@
                             finalRank = rankMap.get(selectedAthleteName);
                         } else if (!hasExplicitFinalRank && race.phase === 'Final') {
                             finalRank = phaseRank;
+                        } else if (!hasExplicitFinalRank && isSmallFinalPhase(race.phase)) {
+                            finalRank = 4 + phaseRank; // Small Final places 5–8
                         } else if (!hasExplicitFinalRank) {
                             finalRank = '-';
                         }
