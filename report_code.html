@@ -3211,6 +3211,129 @@
         }
 
         // --- SEASON SUMMARY LOGIC ---
+        /**
+         * Compute overall "Final Rank" for all athletes in a single event (competition + location + gender + year).
+         *
+         * Official ICF final results rank athletes primarily by the furthest round reached:
+         * Final (1–4), then Semifinal losers (5–8), then Quarterfinal losers (9–16), then Heat losers (17–32),
+         * then Time Trial only.
+         *
+         * The official tie-breaker within the same round uses race time; our current Full Report CSV does not
+         * include cross run times, so we fall back to per-phase placing (via getCalculatedRaceResults) and then
+         * phase code (e.g. SF1 before SF2) to keep the ordering deterministic.
+         */
+        function computeEventFinalRankBundle(data, year, competition, location, gender) {
+            const eventRows = data.filter(d =>
+                d.Year === year &&
+                d.Competition === competition &&
+                (d.Location || '').trim() === (location || '').trim() &&
+                d.Gender === gender
+            );
+            // IMPORTANT: BIB is only a lane color (R/G/B/Y) and is reused across every race.
+            // Athlete identity must therefore come from AthleteName within each phase.
+            const athleteKeys = new Set();
+            const phasesByAthlete = new Map(); // athleteKey -> Set(phase)
+            const bibByAthletePhase = new Map(); // athleteKey -> Map(phase -> bib)
+
+            eventRows.forEach(r => {
+                const phase = String(r.Phase || '').trim();
+                const bib = String(r.BIB || '').trim();
+                const nameRaw = String(r.AthleteName || '').trim();
+                if (!phase || !bib || !nameRaw) return;
+                // Only trust AthleteName rows (typically Ramp rows) to associate name<->bib for that phase.
+                if (String(r.Gate || '').trim() !== 'Ramp') return;
+                const athleteKey = formatAthleteName(nameRaw);
+                if (!athleteKey) return;
+                athleteKeys.add(athleteKey);
+                if (!phasesByAthlete.has(athleteKey)) phasesByAthlete.set(athleteKey, new Set());
+                phasesByAthlete.get(athleteKey).add(phase);
+                if (!bibByAthletePhase.has(athleteKey)) bibByAthletePhase.set(athleteKey, new Map());
+                bibByAthletePhase.get(athleteKey).set(phase, bib);
+            });
+
+            const athletes = [...athleteKeys];
+            if (!athletes.length) return { finalRankByAthlete: new Map(), lastPhaseByAthlete: new Map() };
+
+            // If FinishRank exists for *all* athletes (common when official results were backfilled),
+            // prefer that as the authoritative overall placing.
+            // NOTE: current kx_race_analysis_git.csv does not include FinishRank; keep logic for future-proofing.
+            const finishRankByAthlete = new Map();
+            athletes.forEach(athleteKey => {
+                const rowWithRank = eventRows.find(r =>
+                    formatAthleteName(r.AthleteName || '') === athleteKey &&
+                    r.FinishRank != null &&
+                    String(r.FinishRank).trim() !== ''
+                );
+                const n = rowWithRank ? parseInt(String(rowWithRank.FinishRank).trim(), 10) : NaN;
+                if (!isNaN(n) && n > 0) finishRankByAthlete.set(athleteKey, n);
+            });
+            // Determine furthest phase reached per bib (by compareSeasonPhases ordering).
+            const lastPhaseByAthlete = new Map();
+            athletes.forEach(athleteKey => {
+                const phases = [...(phasesByAthlete.get(athleteKey) || [])];
+                if (!phases.length) return;
+                phases.sort((a, b) => compareSeasonPhases(a, b));
+                lastPhaseByAthlete.set(athleteKey, phases[phases.length - 1]);
+            });
+
+            if (finishRankByAthlete.size === athletes.length) {
+                return { finalRankByAthlete: finishRankByAthlete, lastPhaseByAthlete: lastPhaseByAthlete };
+            }
+
+            // Helper: phase "level" for grouping (Final > SF > QF > H > Rep > R > TT > other).
+            function phaseLevel(phase) {
+                const p = String(phase || '').trim();
+                if (p === 'Final') return 6;
+                if (/^SF/i.test(p)) return 5;
+                if (/^QF/i.test(p)) return 4;
+                if (/^H/i.test(p)) return 3;
+                if (/^Rep/i.test(p)) return 2;
+                if (/^R/i.test(p)) return 1;
+                if (/^TT/i.test(p)) return 0;
+                return -1;
+            }
+
+            // For each athlete, compute their placing in their last phase using our existing race result calculator.
+            const placingInLastPhase = new Map(); // athleteKey -> placing number
+            const structure = scanCompetitionStructure(year, competition, data);
+            athletes.forEach(athleteKey => {
+                const lastPhase = lastPhaseByAthlete.get(athleteKey);
+                if (!lastPhase) return;
+                const phaseRows = eventRows.filter(r => (r.Phase || '').trim() === lastPhase);
+                if (!phaseRows.length) return;
+                const ranked = getCalculatedRaceResults(phaseRows, structure.orderedGates);
+                const bib = bibByAthletePhase.get(athleteKey) ? bibByAthletePhase.get(athleteKey).get(lastPhase) : null;
+                const res = bib ? ranked.find(x => x.bib === bib) : null;
+                if (res) placingInLastPhase.set(athleteKey, res.calculatedRank);
+            });
+
+            // Sort athletes into overall final rank order.
+            const orderedAthletes = [...athletes].sort((a, b) => {
+                const pa = lastPhaseByAthlete.get(a) || '';
+                const pb = lastPhaseByAthlete.get(b) || '';
+                const la = phaseLevel(pa);
+                const lb = phaseLevel(pb);
+                if (la !== lb) return lb - la; // deeper round first
+
+                // Within same round: smaller placing (1,2,3,...) is better.
+                const ra = placingInLastPhase.get(a);
+                const rb = placingInLastPhase.get(b);
+                const ha = typeof ra === 'number' && !isNaN(ra);
+                const hb = typeof rb === 'number' && !isNaN(rb);
+                if (ha && hb && ra !== rb) return ra - rb;
+                if (ha !== hb) return ha ? -1 : 1;
+
+                // Deterministic fallback: phase code then bib.
+                const phaseCmp = compareSeasonPhases(pa, pb);
+                if (phaseCmp !== 0) return phaseCmp;
+                return String(a).localeCompare(String(b));
+            });
+
+            const overall = new Map();
+            orderedAthletes.forEach((athleteKey, idx) => overall.set(athleteKey, idx + 1));
+            return { finalRankByAthlete: overall, lastPhaseByAthlete: lastPhaseByAthlete };
+        }
+
         function setupSeasonSummaryTab(persistedSummary) {
             const ps = persistedSummary || {};
             // Populate Year
@@ -3331,8 +3454,9 @@
                 return (a.gender || '').localeCompare(b.gender || '');
             });
 
-            // --- PRE-CALCULATE FINISH RANKS FOR EVENTS (COMP + LOCATION) WITH FINALS ---
+            // --- PRE-CALCULATE FINAL RANK + LAST PHASE FOR EVENTS (COMP + LOCATION + GENDER) ---
             const competitionFinalRankMap = {};
+            const competitionLastPhaseMap = {};
             const racesByEvent = {};
             races.forEach(r => {
                 const ek = seasonEventKey(r.competition, r.location);
@@ -3342,31 +3466,15 @@
 
             Object.keys(racesByEvent).forEach(eventKey => {
                 const eventRaces = racesByEvent[eventKey];
-                const finalRace = eventRaces.find(r => r.phase === 'Final');
-                if (!finalRace) return;
+                // Determine gender for this athlete/event from the races list (Season Summary rows are single-gender).
+                const gender = (eventRaces[0] && eventRaces[0].gender) ? eventRaces[0].gender : '';
+                if (!gender) return;
 
-                const fullRaceData = masterDataFull.filter(d =>
-                    d.Year === selectedYear &&
-                    d.Competition === finalRace.competition &&
-                    (d.Location || '').trim() === finalRace.location &&
-                    d.Phase === 'Final' &&
-                    d.Gender === finalRace.gender
-                );
-                const structure = scanCompetitionStructure(selectedYear, finalRace.competition, masterDataFull);
-                const rankedResults = getCalculatedRaceResults(fullRaceData, structure.orderedGates);
-                const finalContext = athleteYearData.find(d =>
-                    d.Competition === finalRace.competition &&
-                    (d.Location || '').trim() === finalRace.location &&
-                    d.Phase === 'Final' &&
-                    d.Gender === finalRace.gender
-                );
-                const athleteResult = finalContext
-                    ? rankedResults.find(r => r.bib === finalContext.BIB)
-                    : rankedResults.find(r => r.name === selectedAthleteName);
-
-                if (athleteResult) {
-                    competitionFinalRankMap[eventKey] = athleteResult.calculatedRank;
-                }
+                const [competition, location] = String(eventKey).split('\0');
+                const bundle = computeEventFinalRankBundle(masterDataFull, selectedYear, competition, location, gender);
+                const ekg = `${eventKey}\0${gender}`;
+                competitionFinalRankMap[ekg] = bundle.finalRankByAthlete;
+                competitionLastPhaseMap[ekg] = bundle.lastPhaseByAthlete;
             });
 
             // Render Table
@@ -3375,7 +3483,7 @@
 
             const thead = table.append("thead").attr("class", "bg-slate-700/50 uppercase text-xs font-semibold text-slate-400");
             const headerRow = thead.append("tr");
-            ["Competition", "Location", "Phase", "Bib", "Ramp", "Phase Rank", "Finish Rank", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
+            ["Competition", "Location", "Phase", "Bib", "Ramp", "Phase Rank", "Final Rank", "Notes"].forEach(h => headerRow.append("th").attr("class", "p-3").text(h));
 
             const tbody = table.append("tbody");
 
@@ -3437,30 +3545,42 @@
                     const resCell = tr.append("td").attr("class", "p-3 font-mono font-bold text-white");
                     resCell.text(phaseRank);
 
-                    // Finish Rank (Overall)
-                    let finalFinishRank = athleteResult.finishRank;
+                    // Final Rank (Overall competition placing)
+                    // Prefer explicit CSV FinishRank when available. Otherwise, use bracket-based inference
+                    // (furthest phase reached), with phase placing as fallback tie-breaker.
+                    const ekg = `${eventKey}\0${race.gender}`;
+                    const lastPhaseMap = competitionLastPhaseMap[ekg];
+                    const rankMap = competitionFinalRankMap[ekg];
+                    const lastPhaseForAthlete = lastPhaseMap ? lastPhaseMap.get(selectedAthleteName) : null;
+                    const shouldDisplayFinalRankHere = !!lastPhaseForAthlete && String(lastPhaseForAthlete) === String(race.phase);
 
-                    // APPLY OVERRIDE: If we found a rank from the Final phase for this event, use it.
-                    if (competitionFinalRankMap[eventKey] !== undefined) {
-                        finalFinishRank = competitionFinalRankMap[eventKey];
-                    } else if (race.phase === 'Final') {
-                        // Just in case map logic missed it but we are in final now
-                        finalFinishRank = phaseRank;
+                    let finalRank = '-';
+                    if (shouldDisplayFinalRankHere) {
+                        // Prefer explicit CSV FinishRank when present on this row's athleteResult.
+                        finalRank = athleteResult.finishRank;
+                        const hasExplicitFinalRank = finalRank != null && String(finalRank).trim() !== '' && String(finalRank).trim() !== '-';
+                        if (!hasExplicitFinalRank && rankMap && rankMap.has(selectedAthleteName)) {
+                            finalRank = rankMap.get(selectedAthleteName);
+                        } else if (!hasExplicitFinalRank && race.phase === 'Final') {
+                            finalRank = phaseRank;
+                        } else if (!hasExplicitFinalRank) {
+                            finalRank = '-';
+                        }
                     }
 
-                    const finishRankVal = parseInt(finalFinishRank, 10);
+                    const finalRankVal = parseInt(finalRank, 10);
                     const finishCell = tr.append("td").attr("class", "p-3 font-mono font-bold");
 
-                    if (!isNaN(finishRankVal)) {
-                        if (finishRankVal === 1) finishCell.classed("text-yellow-400", true);
-                        else if (finishRankVal === 2) finishCell.classed("text-gray-300", true);
-                        else if (finishRankVal === 3) finishCell.classed("text-amber-600", true);
+                    if (!isNaN(finalRankVal)) {
+                        if (finalRankVal === 1) finishCell.classed("text-yellow-400", true);
+                        else if (finalRankVal === 2) finishCell.classed("text-gray-300", true);
+                        else if (finalRankVal === 3) finishCell.classed("text-amber-600", true);
                         else finishCell.classed("text-white", true);
                     } else {
                         finishCell.classed("text-white", true);
                     }
                     // Display value
-                    finishCell.text((!finalFinishRank || finalFinishRank === '-') ? '-' : finalFinishRank);
+                    finishCell.text((!finalRank || finalRank === '-') ? '-' : finalRank);
 
                     // Notes
                     let note = "-";
