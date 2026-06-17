@@ -17331,7 +17331,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC2,Prague,M,H8,Ramp,R,4,Assigned,,2,,CLARKE Joseph,,,https://www.dropbox.com/scl/fi/xopmd9s9r3gx9rxxqnuo4/Heat-8.mp4?rlkey=npxdvnk1awttdlyoy4x04en9f&raw=1
 2026,WC2,Prague,M,H8,Ramp,Y,3,Assigned,,3,,QUAN Xin,,,
 2026,WC2,Prague,M,H8,Ramp,B,2,Assigned,,4,,LEITNER Mario,,,
-2026,WC2,Prague,M,H8,Ramp,G,1,Assigned,,1,,KRECJI Jakub,,,
+2026,WC2,Prague,M,H8,Ramp,G,1,Assigned,,1,,KREJCI Jakub,,,
 2026,WC2,Prague,M,H8,Special,R,,Down-Left,1,2,Down-Left,,,,
 2026,WC2,Prague,M,H8,Special,Y,,Down-Left,2,3,FOLLOW,,,,
 2026,WC2,Prague,M,H8,Special,G,,Down-Right,3,1,SPLIT,,,,
@@ -18088,10 +18088,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC3,Augsburg,W,QF4,Finish,B,,Finish,2,4,,,,,
 2026,WC3,Augsburg,W,QF4,Finish,G,,Finish,3,2,,,,,
 2026,WC3,Augsburg,W,QF4,Finish,Y,,Finish,4,3,,,,,
-2026,WC3,Augsburg,W,SF1,Ramp,B,4,Assigned,,1,,FUNK Ricarda,,,https://www.dropbox.com/scl/fi/xb8ncvxubqk2l0xcipq6y/Semifinal-1.mp4?rlkey=mot3oyue875hex9wkhngzv6vp&raw=1
-2026,WC3,Augsburg,W,SF1,Ramp,R,3,Assigned,,2,,MARX Alena,,,
-2026,WC3,Augsburg,W,SF1,Ramp,Y,2,Assigned,,3,,LEAVER Lois,,,
-2026,WC3,Augsburg,W,SF1,Ramp,G,4,Assigned,,4,,HUG Angele,,,
+2026,WC3,Augsburg,W,SF1,Ramp,G,4,Assigned,,4,,HUG Angele,,,https://www.dropbox.com/scl/fi/xb8ncvxubqk2l0xcipq6y/Semifinal-1.mp4?rlkey=mot3oyue875hex9wkhngzv6vp&raw=1
 2026,WC3,Augsburg,W,SF1,Ramp,R,3,Assigned,,2,,MARX Alena,,,
 2026,WC3,Augsburg,W,SF1,Ramp,Y,2,Assigned,,3,,LEAVER Lois,,,
 2026,WC3,Augsburg,W,SF1,Ramp,B,1,Assigned,,1,,FUNK Ricarda,,,
@@ -18127,8 +18124,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC3,Augsburg,W,SF1,Finish,G,,Finish,2,4,,,,,
 2026,WC3,Augsburg,W,SF1,Finish,R,,Finish,3,2,,,,,
 2026,WC3,Augsburg,W,SF1,Finish,Y,,Finish,4,3,,,,,
-2026,WC3,Augsburg,W,SF2,Ramp,Y,4,Assigned,,,,ESTACIA NETA Omira,,,https://www.dropbox.com/scl/fi/lsqngeg34kfpol5skbgt1/Semifinal-2.mp4?rlkey=782ocv7jurjw5np4szpkbtgn7&raw=1
-2026,WC3,Augsburg,W,SF2,Ramp,R,4,Assigned,,,,KNEBLOVA Tereza,,,
+2026,WC3,Augsburg,W,SF2,Ramp,R,4,Assigned,,,,KNEBLOVA Tereza,,,https://www.dropbox.com/scl/fi/lsqngeg34kfpol5skbgt1/Semifinal-2.mp4?rlkey=782ocv7jurjw5np4szpkbtgn7&raw=1
 2026,WC3,Augsburg,W,SF2,Ramp,B,3,Assigned,,,,ZWOLINSKA Klaudia,,,
 2026,WC3,Augsburg,W,SF2,Ramp,Y,2,Assigned,,,,ESTACIA NETA Omira,,,
 2026,WC3,Augsburg,W,SF2,Ramp,G,1,Assigned,,,,LEIBFARTH Evy,,,
