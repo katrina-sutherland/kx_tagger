@@ -85,7 +85,7 @@
         }
 
         .report-btn-inactive:hover {
-            background-color: #141414;
+            background-color: var(--report-surface-hover);
             color: #e8eaed;
         }
 
@@ -113,9 +113,9 @@
             text-align: left;
             padding: 8px;
             font: 12px sans-serif;
-            background: #141414;
+            background: var(--report-surface-raised);
             color: #ffffff;
-            border: 1px solid #2a2a2a;
+            border: 1px solid var(--report-border);
             border-radius: 8px;
             pointer-events: none;
             opacity: 0;
@@ -169,9 +169,9 @@
         }
 
         .indepth-report-sheet {
-            background: #000;
+            background: var(--report-surface-muted);
             color: #e8eaed;
-            border: 1px solid #2a2a2a;
+            border: 1px solid var(--report-border);
             border-radius: 8px;
             padding: 18px 20px;
             max-width: 720px;
@@ -213,7 +213,7 @@
         }
 
         .indepth-report-sheet th.pos-h {
-            background: #141414;
+            background: var(--report-surface-raised);
         }
 
         .indepth-report-sheet td {
@@ -223,7 +223,7 @@
         }
 
         .indepth-report-sheet td.heat {
-            background: #141414;
+            background: var(--report-surface-raised);
             color: #e8eaed;
             font-weight: 500;
             text-align: left;
@@ -270,14 +270,14 @@
         }
 
         .indepth-report-sheet td.phase-col {
-            background: #141414;
+            background: var(--report-surface-raised);
             color: #e8eaed;
             font-weight: 500;
             text-align: left;
         }
 
         .indepth-report-sheet td.pos-col {
-            background: #141414;
+            background: var(--report-surface-raised);
             color: #e8eaed;
             font-weight: 600;
             text-align: left;
@@ -313,8 +313,8 @@
         }
 
         #report-indepth .indepth-controls {
-            background: #0a0a0a;
-            border-color: #2a2a2a;
+            background: var(--report-surface);
+            border-color: var(--report-border);
         }
 
         #indepth-generate-btn {
@@ -329,8 +329,17 @@
         }
 
         /* Global black + white colorway */
+        :root {
+            --report-page-bg: #000000;
+            --report-surface: #222222;
+            --report-surface-raised: #2c2c2c;
+            --report-surface-muted: #1a1a1a;
+            --report-surface-hover: #333333;
+            --report-border: #3a3a3a;
+        }
+
         body {
-            background: #000 !important;
+            background: var(--report-page-bg) !important;
             color: #e8eaed;
         }
 
@@ -339,42 +348,42 @@
         }
 
         .indepth-tab-nav {
-            border-color: #2a2a2a !important;
+            border-color: var(--report-border) !important;
         }
 
         .bg-slate-900 {
-            background-color: #000 !important;
+            background-color: var(--report-page-bg) !important;
         }
 
         .bg-slate-800 {
-            background-color: #0a0a0a !important;
+            background-color: var(--report-surface) !important;
         }
 
         .bg-slate-800\/50 {
-            background-color: rgba(10, 10, 10, 0.5) !important;
+            background-color: color-mix(in srgb, var(--report-surface) 85%, transparent) !important;
         }
 
         .bg-slate-900\/50 {
-            background-color: rgba(0, 0, 0, 0.5) !important;
+            background-color: color-mix(in srgb, var(--report-surface-raised) 90%, transparent) !important;
         }
 
         .bg-slate-700 {
-            background-color: #141414 !important;
+            background-color: var(--report-surface-raised) !important;
         }
 
         .bg-slate-700\/50 {
-            background-color: rgba(20, 20, 20, 0.5) !important;
+            background-color: color-mix(in srgb, var(--report-surface-raised) 80%, transparent) !important;
         }
 
         .border-slate-700,
         .border-slate-600,
         .border-slate-500,
         .border-slate-800 {
-            border-color: #2a2a2a !important;
+            border-color: var(--report-border) !important;
         }
 
         .divide-slate-700 > :not([hidden]) ~ :not([hidden]) {
-            border-color: #2a2a2a !important;
+            border-color: var(--report-border) !important;
         }
 
         label,
@@ -398,7 +407,11 @@
         .hover\:bg-slate-700:hover,
         .hover\:bg-slate-700\/30:hover,
         .hover\:bg-slate-700\/50:hover {
-            background-color: #1a1a1a !important;
+            background-color: var(--report-surface-hover) !important;
+        }
+
+        .tt-course-dim {
+            background-color: rgba(0, 0, 0, 0.5) !important;
         }
 
         nav[aria-label="Tabs"] button:not(.text-white):hover {
@@ -723,7 +736,7 @@
                         </div>
                         <div id="tt-course-view-wrapper" class="hidden w-full" style="max-width: 800px; margin: 0 auto;">
                             <div id="tt-course-view" class="w-full rounded overflow-hidden border border-slate-600 relative" style="aspect-ratio: 1.2; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('whitewater_course.png'); filter: brightness(0.72) saturate(0.85) contrast(1.05);">
-                                <div class="absolute inset-0 bg-slate-900/50" aria-hidden="true"></div>
+                                <div class="absolute inset-0 tt-course-dim" aria-hidden="true"></div>
                                 <svg id="tt-course-overlay" class="absolute inset-0 w-full h-full" style="pointer-events: none;"></svg>
                             </div>
                             <div id="tt-course-legend" class="flex justify-center gap-6 mt-4 text-sm items-center">
@@ -3484,7 +3497,7 @@
             const g = svg.append("g").attr("transform", "translate(125, 125)");
             const pie = d3.pie().value(d => d.value).sort(null);
             const arc = d3.arc().innerRadius(0).outerRadius(110);
-            g.selectAll("path").data(pie(dataForPie)).join("path").attr("d", arc).attr("fill", d => colorScale(d.data.label)).attr("stroke", "#0a0a0a").style("stroke-width", "3px")
+            g.selectAll("path").data(pie(dataForPie)).join("path").attr("d", arc).attr("fill", d => colorScale(d.data.label)).attr("stroke", "#222222").style("stroke-width", "3px")
                 .on("mouseover", (event, d) => {
                     tooltip.transition().duration(200).style("opacity", .9);
                     const percent = ((d.data.value / totalValue) * 100).toFixed(2);
@@ -3897,7 +3910,7 @@
 
         function indepthDirCell(dir, theme) {
             if (!dir || dir === '—') {
-                return `<td class="dir" style="background:#1f1f1f;color:#64748b">—</td>`;
+                return `<td class="dir" style="background:#333333;color:#64748b">—</td>`;
             }
             const isLeft = dir === 'Left';
             const bg = isLeft ? theme.leftColor : theme.rightColor;
@@ -3956,7 +3969,7 @@
                 <h3 class="indepth-section-title ${themeClass}">Summary by position at Gate ${report.firstUpGate}</h3>
                 <table>
                     <thead><tr>
-                        <th style="background:#141414;text-align:left">Position</th>
+                        <th style="background:#2c2c2c;text-align:left">Position</th>
                         <th style="background:${theme.headerBg}">Left</th>
                         <th style="background:${theme.headerBg}">Right</th>
                         <th style="background:${theme.headerBg}">Total</th>
@@ -3968,7 +3981,7 @@
                 <h3 class="indepth-section-title ${themeClass}">Every phase — direction by position</h3>
                 <table>
                     <thead><tr>
-                        <th style="background:#141414;text-align:left">Phase</th>
+                        <th style="background:#2c2c2c;text-align:left">Phase</th>
                         <th style="background:${theme.headerBg}">P1</th>
                         <th style="background:${theme.headerBg}">P2</th>
                         <th style="background:${theme.headerBg}">P3</th>
@@ -4075,7 +4088,7 @@
                 <p class="indepth-sub">${subtitle}</p>
                 <table>
                     <thead><tr>
-                        <th class="pos-h" style="background:#141414">Phase</th>
+                        <th class="pos-h" style="background:#2c2c2c">Phase</th>
                         <th style="background:${theme.headerBg}">Leader (P1 at Gate ${report.firstUpGate})</th>
                         <th style="background:${theme.headerBg}">BIB</th>
                         <th style="background:${theme.headerBg}">1st Up direction</th>
