@@ -307,6 +307,17 @@
             height: 100%;
         }
 
+        .indepth-report-sheet .indepth-caption {
+            font-size: 10px;
+            color: #9aa0a8;
+            margin: 6px 0 0;
+        }
+
+        .indepth-report-sheet .indepth-contest-block table td.num,
+        .indepth-report-sheet .indepth-contest-block table th.num {
+            text-align: right;
+        }
+
         #report-indepth {
             padding: 1.5rem 1rem 2.5rem;
             border-radius: 0.75rem;
@@ -867,6 +878,7 @@
                                 class="dark-select w-full rounded-md shadow-sm">
                                 <option value="p1-first-up">P1 &amp; First Up Report</option>
                                 <option value="first-up-by-position">First Up-Stream by Position</option>
+                                <option value="contest-stats">Contest Statistics</option>
                             </select>
                         </div>
                         <div>
@@ -1008,6 +1020,8 @@
                 leftFg: '#0a1a12',
                 rightColor: '#5c4d85',
                 rightFg: '#f0f2f5',
+                mutedColor: '#3a3350',
+                sectionColor: '#d4c8f0',
                 label: 'Women'
             },
             M: {
@@ -1018,6 +1032,8 @@
                 leftFg: '#0a1a12',
                 rightColor: '#1e6b4a',
                 rightFg: '#f0f2f5',
+                mutedColor: '#1a3328',
+                sectionColor: '#8fd4a8',
                 label: 'Men'
             }
         };
@@ -1599,6 +1615,7 @@
                 const location = (d.Location || '').trim();
                 const notesComments = (d['NOTES & COMMENTS'] || d['Notes & Comments'] || '').trim();
                 const videoLink = (d['Video Link'] || d['VideoLink'] || d['video link'] || '').trim();
+                const contestStatistics = (d['Contest Statistics'] || d['ContestStatistics'] || '').trim();
 
                 return {
                     Year: year,
@@ -1617,7 +1634,8 @@
                     FaultVal: faultVal,
                     FinishRank: finishRank,
                     NotesComments: notesComments,
-                    VideoLink: videoLink
+                    VideoLink: videoLink,
+                    ContestStatistics: contestStatistics
                 };
             });
         }
@@ -2575,6 +2593,16 @@
             6: "Exit Gate 8 to Finish"
         };
 
+        /** Split sector labels under Split 1–6 headers (2026 WCh Krakow MU23 / WU23 time trial only). */
+        const TT_KRAKOW_2026_WCH_SPLIT_SECTORS = {
+            1: "Start - Exit 1",
+            2: "Exit 1 - 3 Gate Line",
+            3: "Gate Line 3 - USDR",
+            4: "USDR - Hole @ 4",
+            5: "Hole @ 4 to Exit 6",
+            6: "Exit 6 to Finish"
+        };
+
         function isTT2025WC5Augsburg(year, competition, location) {
             if (+year !== 2025) return false;
             if (String(competition || '').trim().toUpperCase() !== 'WC5') return false;
@@ -2611,7 +2639,14 @@
             return normalizeCourseLocationKey(location) === 'prague';
         }
 
+        function isTT2026WChKrakow(year, competition, location) {
+            if (+year !== 2026) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WCH') return false;
+            return normalizeCourseLocationKey(location) === 'krakow';
+        }
+
         function getTTSectorLabelsForSelection(year, competition, location) {
+            if (isTT2026WChKrakow(year, competition, location)) return TT_KRAKOW_2026_WCH_SPLIT_SECTORS;
             if (isTT2026WC2Prague(year, competition, location)) return TT_PRAGUE_2026_WC2_SPLIT_SECTORS;
             if (isTT2026WC1Tacen(year, competition, location)) return TT_TACEN_2026_WC1_SPLIT_SECTORS;
             if (isTT2025WC5Augsburg(year, competition, location)) return TT_AUGSBURG_2025_WC5_SPLIT_SECTORS;
@@ -3780,6 +3815,370 @@
             return null;
         }
 
+        function getSecondUpstreamGate(compStructure) {
+            const upstreamSet = new Set(withoutSpecialGateFromUpstreamList(compStructure.upstreamGates || []));
+            const ordered = [];
+            (compStructure.orderedGates || []).forEach(gate => {
+                if (upstreamSet.has(gate)) ordered.push(gate);
+            });
+            upstreamSet.forEach(gate => {
+                if (!ordered.includes(gate)) ordered.push(gate);
+            });
+            return ordered.length >= 2 ? ordered[1] : null;
+        }
+
+        const CONTEST_STAT_CODES = [
+            { key: 'UHR', name: 'Unopposed Held Rank' },
+            { key: 'UGR', name: 'Unopposed Gain Rank' },
+            { key: 'SDHR', name: 'Successful Defend Held Rank' },
+            { key: 'SA', name: 'Successful Attack' },
+            { key: 'UAHR', name: 'Unsuccessful Attack Held Rank' },
+            { key: 'LP', name: 'Loss of Position' }
+        ];
+
+        function indepthHasReportData(report) {
+            if (!report || report.error) return false;
+            if (report.hasData) return true;
+            if (report.rows?.length) return true;
+            if (report.phaseRows?.length) return true;
+            return false;
+        }
+
+        function buildContestStatsReport(data, year, competition, location, gender) {
+            const eventRows = data.filter(d =>
+                d.Year === year &&
+                d.Competition === competition &&
+                (d.Location || '').trim() === (location || '').trim() &&
+                d.Gender === gender
+            );
+            if (!eventRows.length) return null;
+
+            const structure = scanCompetitionStructure(year, competition, data);
+            const firstUpGate = getFirstUpstreamGate(structure);
+            const secondUpGate = getSecondUpstreamGate(structure);
+            if (!firstUpGate || !secondUpGate) {
+                return { error: 'Could not detect both upstream gates for this competition.' };
+            }
+
+            const phases = [...new Set(eventRows.map(d => d.Phase).filter(Boolean))]
+                .sort(compareSeasonPhases);
+
+            const gateCounts = {
+                [firstUpGate]: Object.fromEntries(CONTEST_STAT_CODES.map(c => [c.key, 0])),
+                [secondUpGate]: Object.fromEntries(CONTEST_STAT_CODES.map(c => [c.key, 0]))
+            };
+            const leaderUhr = {
+                [firstUpGate]: { uhr: 0, total: 0 },
+                [secondUpGate]: { uhr: 0, total: 0 }
+            };
+            let leftRightOverall = { left: 0, right: 0 };
+            let p1UhrLeftRight = { left: 0, right: 0 };
+            let p2to4UnopposedLeftRight = { left: 0, right: 0 };
+            let leaderCarry = { heats: 0, sameLeader: 0, sameLeaderWon: 0 };
+
+            phases.forEach(phase => {
+                const phaseRows = eventRows.filter(d => d.Phase === phase);
+                const rowsAtFirst = phaseRows.filter(d => d.Gate === firstUpGate && isLiveRaceTagRow(d));
+                const rowsAtSecond = phaseRows.filter(d => d.Gate === secondUpGate && isLiveRaceTagRow(d));
+
+                [firstUpGate, secondUpGate].forEach(gate => {
+                    const gateRows = gate === firstUpGate ? rowsAtFirst : rowsAtSecond;
+                    gateRows.forEach(row => {
+                        const code = String(row.ContestStatistics || '').trim().toUpperCase();
+                        if (code && gateCounts[gate][code] != null) {
+                            gateCounts[gate][code] += 1;
+                        }
+                    });
+
+                    const leader = gateRows.find(r => liveTagOrder(r) === 1);
+                    if (leader) {
+                        leaderUhr[gate].total += 1;
+                        if (String(leader.ContestStatistics || '').trim().toUpperCase() === 'UHR') {
+                            leaderUhr[gate].uhr += 1;
+                        }
+                    }
+                });
+
+                [firstUpGate, secondUpGate].forEach(gate => {
+                    const gateRows = gate === firstUpGate ? rowsAtFirst : rowsAtSecond;
+                    gateRows.forEach(row => {
+                        const dir = parseUpstreamDirection(row);
+                        if (!dir) return;
+                        if (dir === 'Left') leftRightOverall.left += 1;
+                        else if (dir === 'Right') leftRightOverall.right += 1;
+
+                        const order = liveTagOrder(row);
+                        const code = String(row.ContestStatistics || '').trim().toUpperCase();
+                        if (order === 1 && code === 'UHR') {
+                            if (dir === 'Left') p1UhrLeftRight.left += 1;
+                            else if (dir === 'Right') p1UhrLeftRight.right += 1;
+                        }
+                        if (order >= 2 && order <= 4 && (code === 'UHR' || code === 'UGR')) {
+                            if (dir === 'Left') p2to4UnopposedLeftRight.left += 1;
+                            else if (dir === 'Right') p2to4UnopposedLeftRight.right += 1;
+                        }
+                    });
+                });
+
+                if (rowsAtFirst.length >= 4 && rowsAtSecond.length >= 4) {
+                    const leaderFirst = rowsAtFirst.find(r => liveTagOrder(r) === 1);
+                    const leaderSecond = rowsAtSecond.find(r => liveTagOrder(r) === 1);
+                    if (leaderFirst && leaderSecond) {
+                        leaderCarry.heats += 1;
+                        if (leaderFirst.BIB === leaderSecond.BIB) {
+                            leaderCarry.sameLeader += 1;
+                            const finishRow = phaseRows.find(r =>
+                                r.Gate === 'Finish' && r.BIB === leaderFirst.BIB
+                            );
+                            if (finishRow && finishRow.FinalPosition === 1) {
+                                leaderCarry.sameLeaderWon += 1;
+                            }
+                        }
+                    }
+                }
+            });
+
+            const perGateFirst = Object.values(gateCounts[firstUpGate]).reduce((a, b) => a + b, 0);
+            const perGateSecond = Object.values(gateCounts[secondUpGate]).reduce((a, b) => a + b, 0);
+            const hasData = perGateFirst > 0 || perGateSecond > 0;
+
+            return {
+                year,
+                competition,
+                location,
+                gender,
+                firstUpGate,
+                secondUpGate,
+                phaseCount: phases.length,
+                gateCounts,
+                perGateFirst,
+                perGateSecond,
+                leaderUhr,
+                leftRightOverall,
+                p1UhrLeftRight,
+                p2to4UnopposedLeftRight,
+                leaderCarry,
+                hasData
+            };
+        }
+
+        function renderContestStatsFreqChart(report, theme) {
+            const w = 600;
+            const padL = 74;
+            const padR = 54;
+            const padTop = 28;
+            const padBottom = 34;
+            const groupH = 48;
+            const barH = 15;
+            const h = padTop + CONTEST_STAT_CODES.length * groupH + padBottom;
+            const plotW = w - padL - padR;
+            const allPcts = CONTEST_STAT_CODES.flatMap(c => [
+                report.perGateFirst ? (100 * report.gateCounts[report.firstUpGate][c.key]) / report.perGateFirst : 0,
+                report.perGateSecond ? (100 * report.gateCounts[report.secondUpGate][c.key]) / report.perGateSecond : 0
+            ]);
+            const xMax = Math.max(40, Math.ceil(Math.max(...allPcts, 0) / 10) * 10);
+            const xScale = v => padL + (v / xMax) * plotW;
+
+            let ticks = '';
+            for (let v = 0; v <= xMax; v += 10) {
+                ticks += `<line x1="${xScale(v)}" y1="${padTop - 6}" x2="${xScale(v)}" y2="${h - padBottom}" stroke="#2a2a2a"/>`;
+                ticks += `<text x="${xScale(v)}" y="${h - padBottom + 14}" text-anchor="middle" font-size="9" fill="#666">${v}%</text>`;
+            }
+
+            let groups = '';
+            CONTEST_STAT_CODES.forEach((c, i) => {
+                const top = padTop + i * groupH;
+                const g1 = report.perGateFirst
+                    ? (100 * report.gateCounts[report.firstUpGate][c.key]) / report.perGateFirst
+                    : 0;
+                const g2 = report.perGateSecond
+                    ? (100 * report.gateCounts[report.secondUpGate][c.key]) / report.perGateSecond
+                    : 0;
+                const y4 = top + 4;
+                const y8 = top + 4 + barH + 5;
+                groups += `<text x="${padL - 8}" y="${top + groupH / 2}" text-anchor="end" font-size="11" fill="#c8cdd3" font-weight="600">${c.key}</text>`;
+                groups += `<rect x="${padL}" y="${y4}" width="${Math.max(0, xScale(g1) - padL)}" height="${barH}" fill="${theme.leftColor}" rx="2"/>`;
+                groups += `<text x="${xScale(g1) + 5}" y="${y4 + barH - 3}" font-size="9" fill="#e8eaed">${g1.toFixed(1)}%</text>`;
+                groups += `<rect x="${padL}" y="${y8}" width="${Math.max(0, xScale(g2) - padL)}" height="${barH}" fill="${theme.rightColor}" rx="2"/>`;
+                groups += `<text x="${xScale(g2) + 5}" y="${y8 + barH - 3}" font-size="9" fill="#e8eaed">${g2.toFixed(1)}%</text>`;
+            });
+
+            return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" class="max-w-full">
+                ${ticks}${groups}
+                <text x="${padL + plotW / 2}" y="${h - 4}" text-anchor="middle" font-size="10" fill="#9aa0a8">% of events at the gate</text>
+            </svg>`;
+        }
+
+        function renderContestStatsStackedBar(label, sub, leftVal, rightVal, theme, options = {}) {
+            const n = leftVal + rightVal;
+            const w = 460;
+            const barH = 34;
+            const y = 26;
+            const leftPct = n ? (100 * leftVal) / n : 0;
+            const rightPct = 100 - leftPct;
+            const leftW = (w * leftPct) / 100;
+            const leftFill = options.leftFill || theme.leftColor;
+            const rightFill = options.rightFill || theme.rightColor;
+            const leftFg = options.leftFg || theme.leftFg;
+            const rightFg = options.rightFg || theme.rightFg;
+            let svg = `<text x="0" y="14" font-size="10" fill="#9aa0a8">${sub}</text>`;
+            svg += `<rect x="0" y="${y}" width="${leftW}" height="${barH}" fill="${leftFill}"/>`;
+            svg += `<rect x="${leftW}" y="${y}" width="${w - leftW}" height="${barH}" fill="${rightFill}"/>`;
+            svg += `<rect x="0" y="${y}" width="${w}" height="${barH}" fill="none" stroke="#3a3a3a" stroke-width="1" rx="4"/>`;
+            if (leftPct >= 12) {
+                svg += `<text x="${leftW / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${leftFg}" font-weight="600">Left ${leftPct.toFixed(1)}%</text>`;
+            }
+            if (rightPct >= 12) {
+                svg += `<text x="${leftW + (w - leftW) / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${rightFg}" font-weight="600">Right ${rightPct.toFixed(1)}%</text>`;
+            }
+            const caption = n
+                ? `Left ${leftVal} / ${n} · Right ${rightVal} / ${n}`
+                : 'No tagged events';
+            return `<div style="margin-bottom:14px">
+                <div style="font-size:12px;color:#c8cdd3;font-weight:600;margin-bottom:4px">${label}</div>
+                <svg width="${w}" height="62" viewBox="0 0 ${w} 62" role="img" class="max-w-full">${svg}</svg>
+                <p class="indepth-caption">${caption}</p>
+            </div>`;
+        }
+
+        function renderContestStatsLeaderBar(gateLabel, uhr, total, theme) {
+            const w = 460;
+            const barH = 34;
+            const y = 26;
+            const uhrPct = total ? (100 * uhr) / total : 0;
+            const otherPct = 100 - uhrPct;
+            const uhrW = (w * uhrPct) / 100;
+            let svg = `<text x="0" y="14" font-size="10" fill="#9aa0a8">Leader (Order 1): UHR vs other code — 100% stacked</text>`;
+            svg += `<rect x="0" y="${y}" width="${uhrW}" height="${barH}" fill="${theme.rightColor}"/>`;
+            svg += `<rect x="${uhrW}" y="${y}" width="${w - uhrW}" height="${barH}" fill="${theme.mutedColor}"/>`;
+            svg += `<rect x="0" y="${y}" width="${w}" height="${barH}" fill="none" stroke="#3a3a3a" stroke-width="1" rx="4"/>`;
+            if (uhrPct >= 12) {
+                svg += `<text x="${uhrW / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${theme.rightFg}" font-weight="600">UHR ${uhrPct.toFixed(1)}%</text>`;
+            }
+            if (otherPct >= 12) {
+                svg += `<text x="${uhrW + (w - uhrW) / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${theme.sectionColor}" font-weight="600">Other ${otherPct.toFixed(1)}%</text>`;
+            }
+            const caption = total
+                ? `UHR ${uhr} / ${total} heats · other code ${total - uhr} / ${total}`
+                : 'No heats with a tagged leader';
+            return `<div style="margin-bottom:14px">
+                <div style="font-size:12px;color:#c8cdd3;font-weight:600;margin-bottom:4px">${gateLabel}</div>
+                <svg width="${w}" height="62" viewBox="0 0 ${w} 62" role="img" class="max-w-full">${svg}</svg>
+                <p class="indepth-caption">${caption}</p>
+            </div>`;
+        }
+
+        function renderContestStatsReportHtml(report) {
+            if (!report) return '';
+            if (report.error) {
+                return `<div class="indepth-report-sheet"><p class="text-red-400">${report.error}</p></div>`;
+            }
+            if (!report.hasData) {
+                return `<div class="indepth-report-sheet"><p class="text-slate-400">No contest statistics found for this selection.</p></div>`;
+            }
+
+            const theme = getIndepthGenderTheme(report.gender);
+            const themeClass = (report.gender === 'W' || report.gender === 'Women') ? 'theme-women' : 'theme-men';
+            const title = `${report.year} ${report.competition} ${report.location} — ${theme.label} · Contest Statistics`;
+            const totalUpstreamEvents = report.leftRightOverall.left + report.leftRightOverall.right;
+            const subtitle = `Tactical outcome codes at Gate ${report.firstUpGate} (1st Up-Stream) and Gate ${report.secondUpGate} (2nd Up-Stream) across ${report.phaseCount} phases · Source: Contest Statistics column`;
+
+            const summaryRows = CONTEST_STAT_CODES.map(c => {
+                const g1 = report.gateCounts[report.firstUpGate][c.key];
+                const g2 = report.gateCounts[report.secondUpGate][c.key];
+                return `<tr>
+                    <td class="code" style="color:${theme.sectionColor}">${c.key}</td>
+                    <td class="num">${g1} (${indepthPct(g1, report.perGateFirst)})</td>
+                    <td class="num">${g2} (${indepthPct(g2, report.perGateSecond)})</td>
+                </tr>`;
+            }).join('');
+
+            const carry = report.leaderCarry;
+            const carryRows = [
+                { label: 'Leader at 1st Up-Stream also leads at 2nd Up-Stream', num: carry.sameLeader, den: carry.heats },
+                { label: '→ Converted to a phase win', num: carry.sameLeaderWon, den: carry.sameLeader }
+            ].map(r => `<tr>
+                <td>${r.label}</td>
+                <td class="num">${r.den ? `${r.num} / ${r.den}` : '—'}</td>
+                <td class="num">${indepthPct(r.num, r.den)}</td>
+            </tr>`).join('');
+
+            const legendRows = CONTEST_STAT_CODES.map(c =>
+                `<div class="legend-row" style="display:flex;gap:12px;align-items:baseline;font-size:12px">
+                    <span style="color:${theme.sectionColor};font-weight:600;min-width:56px">${c.key}</span>
+                    <span style="color:#c8cdd3">${c.name}</span>
+                </div>`
+            ).join('');
+
+            const gate1Label = `Gate ${report.firstUpGate} (1st Up-Stream)`;
+            const gate2Label = `Gate ${report.secondUpGate} (2nd Up-Stream)`;
+            const leaderFirst = report.leaderUhr[report.firstUpGate];
+            const leaderSecond = report.leaderUhr[report.secondUpGate];
+
+            return `<div class="indepth-report-sheet">
+                <h2>${title}</h2>
+                <p class="indepth-sub">${subtitle}</p>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">% of times each contest statistic occurred</h3>
+                    <p class="indepth-sub" style="margin-bottom:8px">Share of all ${report.perGateFirst} events at each up-stream gate.</p>
+                    ${renderContestStatsFreqChart(report, theme)}
+                    <div class="indepth-legend">
+                        <span><i style="background:${theme.leftColor}"></i> ${gate1Label}</span>
+                        <span><i style="background:${theme.rightColor}"></i> ${gate2Label}</span>
+                    </div>
+                </div>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">Leader was Unopposed Held Rank (UHR)?</h3>
+                    <p class="indepth-sub" style="margin-bottom:8px">% of heats where the athlete in 1st (Order 1) at the gate was tagged UHR vs any other code.</p>
+                    ${renderContestStatsLeaderBar(gate1Label, leaderFirst.uhr, leaderFirst.total, theme)}
+                    ${renderContestStatsLeaderBar(gate2Label, leaderSecond.uhr, leaderSecond.total, theme)}
+                </div>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">Left vs Right at the up-stream gates</h3>
+                    <p class="indepth-sub" style="margin-bottom:8px">Side completed at the up-stream gate (Left-Up vs Right-Up), across both up-stream gates (${gate1Label} + ${gate2Label} = ${totalUpstreamEvents} events).</p>
+                    ${renderContestStatsStackedBar('Overall — all up-stream events', 'Left vs Right — 100% stacked', report.leftRightOverall.left, report.leftRightOverall.right, theme)}
+                    ${renderContestStatsStackedBar('P1 & UHR', 'Left vs Right when 1st (Order 1) and Unopposed Held Rank', report.p1UhrLeftRight.left, report.p1UhrLeftRight.right, theme)}
+                    ${renderContestStatsStackedBar('P2, P3, P4 & (UHR or UGR)', 'Left vs Right when 2nd–4th and Unopposed (Held or Gain Rank)', report.p2to4UnopposedLeftRight.left, report.p2to4UnopposedLeftRight.right, theme)}
+                </div>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">Summary — count of each code (out of ${report.perGateFirst})</h3>
+                    <table>
+                        <thead><tr>
+                            <th style="background:${theme.headerBg}">Code</th>
+                            <th class="num" style="background:${theme.headerBg}">${gate1Label} (/${report.perGateFirst})</th>
+                            <th class="num" style="background:${theme.headerBg}">${gate2Label} (/${report.perGateSecond})</th>
+                        </tr></thead>
+                        <tbody>${summaryRows}
+                            <tr><td style="font-weight:600">Σ Total</td><td class="num" style="font-weight:600">${report.perGateFirst}</td><td class="num" style="font-weight:600">${report.perGateSecond}</td></tr>
+                        </tbody>
+                    </table>
+                    <table style="margin-top:12px">
+                        <thead><tr>
+                            <th style="background:${theme.headerBg}">Leader carry-over &amp; win conversion</th>
+                            <th class="num" style="background:${theme.headerBg}">Count</th>
+                            <th class="num" style="background:${theme.headerBg}">%</th>
+                        </tr></thead>
+                        <tbody>${carryRows}</tbody>
+                    </table>
+                </div>
+
+                <div class="indepth-contest-block">
+                    <h3 class="indepth-section-title ${themeClass}">Legend — what the abbreviations stand for</h3>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${legendRows}</div>
+                </div>
+            </div>`;
+        }
+
+        function getIndepthReportBuilder(reportType) {
+            if (reportType === 'first-up-by-position') return buildFirstUpByPositionReport;
+            if (reportType === 'contest-stats') return buildContestStatsReport;
+            return buildP1FirstUpReport;
+        }
+
         function buildP1FirstUpReport(data, year, competition, location, gender) {
             const eventRows = data.filter(d =>
                 d.Year === year &&
@@ -3998,6 +4397,7 @@
 
         function renderIndepthReportHtml(report, reportType) {
             if (reportType === 'first-up-by-position') return renderFirstUpByPositionReportHtml(report);
+            if (reportType === 'contest-stats') return renderContestStatsReportHtml(report);
             return renderP1FirstUpReportHtml(report);
         }
 
@@ -4010,22 +4410,18 @@
                 if (!year || !competition || competition === SELECT_PLACEHOLDER || !location || location === SELECT_PLACEHOLDER) {
                     return { error: 'Select year, competition, and location.' };
                 }
-                const builder = reportType === 'first-up-by-position'
-                    ? buildFirstUpByPositionReport
-                    : buildP1FirstUpReport;
+                const builder = getIndepthReportBuilder(reportType);
                 const report = builder(masterDataFull, year, competition, location, gender);
-                if (report) reports.push(report);
+                if (indepthHasReportData(report)) reports.push(report);
             } else {
                 const location = selectorsIndepth.location.property('value');
                 if (!location || location === SELECT_PLACEHOLDER) {
                     return { error: 'Select a location.' };
                 }
-                const builder = reportType === 'first-up-by-position'
-                    ? buildFirstUpByPositionReport
-                    : buildP1FirstUpReport;
+                const builder = getIndepthReportBuilder(reportType);
                 getIndepthEventsAtLocation(masterDataFull, location, gender).forEach(evt => {
                     const report = builder(masterDataFull, evt.year, evt.competition, evt.location, gender);
-                    if (report && !report.error && (report.rows?.length || report.phaseRows?.length)) {
+                    if (indepthHasReportData(report)) {
                         reports.push(report);
                     }
                 });
@@ -4151,7 +4547,7 @@
             container.html('');
 
             const reportType = selectorsIndepth.report.property('value');
-            if (!['p1-first-up', 'first-up-by-position'].includes(reportType)) {
+            if (!['p1-first-up', 'first-up-by-position', 'contest-stats'].includes(reportType)) {
                 container.html('<p class="text-slate-400">Report type not available.</p>');
                 return;
             }
