@@ -12211,3 +12211,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WCh,Krakow,M,SF2,2nd Up,B,,Left-Up,1,,Left-Up,,,
 2026,WCh,Krakow,M,SF2,2nd Up,Y,,Left-Up,2,,FOLLOW,,,
 2026,WCh,Krakow,M,SF2,2nd Up,R,,Left-Up,3,,FOLLOW,,,
+2026,WCh,Krakow,M,SF2,2nd Up,G,,Left-Up,4,,FOLLOW,,,
+2026,WCh,Krakow,M,SF2,Finish,B,,Finish,1,1,,,,
+2026,WCh,Krakow,M,SF2,Finish,Y,,Finish,2,2,,,,
+2026,WCh,Krakow,M,SF2,Finish,R,,Finish,3,3,,,,
+2026,WCh,Krakow,M,SF2,Finish,G,,Finish,4,4,,,,
