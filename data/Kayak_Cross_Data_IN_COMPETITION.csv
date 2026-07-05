@@ -12100,3 +12100,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WCh,Krakow,M,QF4,Ramp,R,2,Assigned,,,,NOVAK M,,
 2026,WCh,Krakow,M,QF4,Ramp,Y,3,Assigned,,,,COLLIER N,,
 2026,WCh,Krakow,M,QF4,Ramp,B,4,Assigned,,,,BALDONI A,,
+2026,WCh,Krakow,M,QF4,1st Up,R,,Right-Up,1,,Right-Up,,,
+2026,WCh,Krakow,M,QF4,1st Up,G,,Right-Up,2,,FOLLOW,,,
+2026,WCh,Krakow,M,QF4,1st Up,B,,Left-Up,3,,SPLIT,,,
+2026,WCh,Krakow,M,QF4,1st Up,Y,,Left-Up,4,,FOLLOW,,,
