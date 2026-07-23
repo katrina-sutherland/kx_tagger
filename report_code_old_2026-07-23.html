@@ -20,18 +20,18 @@
 
         .x-axis .tick line,
         .y-axis .tick line {
-            stroke: #334155;
+            stroke: #2a2a2a;
             stroke-dasharray: 2, 2;
         }
 
         .x-axis .tick text {
-            fill: #94a3b8;
+            fill: #9aa0a8;
             font-size: 12px;
             font-weight: 600;
         }
 
         .y-axis .tick text {
-            fill: #94a3b8;
+            fill: #9aa0a8;
             font-size: 14px;
             font-weight: 700;
         }
@@ -41,7 +41,7 @@
         }
 
         .y-axis-minor .tick line {
-            stroke: #475569;
+            stroke: #3a3a3a;
             stroke-dasharray: none;
         }
 
@@ -55,9 +55,57 @@
 
         .dark-select,
         .dark-input {
-            background-color: #1e293b;
-            border-color: #475569;
-            color: #e2e8f0;
+            background-color: #1c1c1c;
+            border-color: #3a3a3a;
+            color: #ffffff;
+        }
+
+        .dark-select:focus,
+        .dark-input:focus {
+            border-color: #525252;
+            outline: none;
+            box-shadow: 0 0 0 1px #525252;
+        }
+
+        .dark-select option {
+            background-color: #1c1c1c;
+            color: #ffffff;
+        }
+
+        .report-btn-active {
+            background-color: #ffffff;
+            color: #000000;
+            border-color: #ffffff;
+        }
+
+        .report-btn-inactive {
+            background-color: transparent;
+            color: #9aa0a8;
+            border-color: #3a3a3a;
+        }
+
+        .report-btn-inactive:hover {
+            background-color: var(--report-surface-hover);
+            color: #e8eaed;
+        }
+
+        .report-link {
+            color: #ffffff;
+        }
+
+        .report-link:hover {
+            color: #d1d5db;
+        }
+
+        .report-primary-btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #ffffff;
+        }
+
+        .report-primary-btn:hover {
+            background-color: #e5e5e5;
+            border-color: #e5e5e5;
         }
 
         .tooltip {
@@ -65,9 +113,9 @@
             text-align: left;
             padding: 8px;
             font: 12px sans-serif;
-            background: #1e293b;
-            color: white;
-            border: 1px solid #334155;
+            background: var(--report-surface-raised);
+            color: #ffffff;
+            border: 1px solid var(--report-border);
             border-radius: 8px;
             pointer-events: none;
             opacity: 0;
@@ -115,10 +163,276 @@
             min-height: min(60vh, 480px);
             aspect-ratio: 16 / 9;
         }
+
+        #indepth-password-modal:not(.hidden) {
+            display: flex;
+        }
+
+        .indepth-report-sheet {
+            background: var(--report-surface-muted);
+            color: #e8eaed;
+            border: 1px solid var(--report-border);
+            border-radius: 8px;
+            padding: 18px 20px;
+            max-width: 720px;
+        }
+
+        .indepth-report-sheet h2 {
+            font-size: 17px;
+            font-weight: 600;
+            margin: 0 0 4px;
+            color: #f0f2f5;
+        }
+
+        .indepth-report-sheet .indepth-sub {
+            font-size: 11px;
+            color: #9aa0a8;
+            margin: 0 0 14px;
+            line-height: 1.4;
+        }
+
+        .indepth-report-sheet table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            border: 1px solid #2a2a2a;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .indepth-report-sheet th {
+            padding: 7px 9px;
+            font-weight: 600;
+            color: #f0f2f5;
+            text-align: center;
+        }
+
+        .indepth-report-sheet th:first-child,
+        .indepth-report-sheet th:nth-child(2) {
+            text-align: left;
+        }
+
+        .indepth-report-sheet th.pos-h {
+            background: var(--report-surface-raised);
+        }
+
+        .indepth-report-sheet td {
+            padding: 6px 9px;
+            border-top: 1px solid #1f1f1f;
+            text-align: center;
+        }
+
+        .indepth-report-sheet td.heat {
+            background: var(--report-surface-raised);
+            color: #e8eaed;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .indepth-report-sheet td.dir {
+            font-weight: 600;
+        }
+
+        .indepth-report-sheet .indepth-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 10px;
+            color: #9aa0a8;
+        }
+
+        .indepth-report-sheet .indepth-legend span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .indepth-report-sheet .indepth-legend i {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        .indepth-report-sheet h3.indepth-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin: 18px 0 8px;
+        }
+
+        .indepth-report-sheet h3.indepth-section-title.theme-men {
+            color: #8fd4a8;
+        }
+
+        .indepth-report-sheet h3.indepth-section-title.theme-women {
+            color: #d4c8f0;
+        }
+
+        .indepth-report-sheet td.phase-col {
+            background: var(--report-surface-raised);
+            color: #e8eaed;
+            font-weight: 500;
+            text-align: left;
+        }
+
+        .indepth-report-sheet td.pos-col {
+            background: var(--report-surface-raised);
+            color: #e8eaed;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .indepth-report-sheet td.meta-col {
+            font-weight: 500;
+        }
+
+        .indepth-report-sheet .indepth-bar-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .indepth-report-sheet .indepth-bar {
+            width: 120px;
+            height: 12px;
+            border: 1px solid #3a3a3a;
+            border-radius: 2px;
+            overflow: hidden;
+            display: flex;
+        }
+
+        .indepth-report-sheet .indepth-bar-l,
+        .indepth-report-sheet .indepth-bar-r {
+            height: 100%;
+        }
+
+        .indepth-report-sheet .indepth-caption {
+            font-size: 10px;
+            color: #9aa0a8;
+            margin: 6px 0 0;
+        }
+
+        .indepth-report-sheet .indepth-contest-block table td.num,
+        .indepth-report-sheet .indepth-contest-block table th.num {
+            text-align: right;
+        }
+
+        #report-indepth {
+            padding: 1.5rem 1rem 2.5rem;
+            border-radius: 0.75rem;
+        }
+
+        #report-indepth .indepth-controls {
+            background: var(--report-surface);
+            border-color: var(--report-border);
+        }
+
+        #indepth-generate-btn {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #ffffff;
+        }
+
+        #indepth-generate-btn:hover {
+            background-color: #e5e5e5;
+            border-color: #e5e5e5;
+        }
+
+        /* Global black + white colorway */
+        :root {
+            --report-page-bg: #000000;
+            --report-surface: #222222;
+            --report-surface-raised: #2c2c2c;
+            --report-surface-muted: #1a1a1a;
+            --report-surface-hover: #333333;
+            --report-border: #3a3a3a;
+        }
+
+        body {
+            background: var(--report-page-bg) !important;
+            color: #e8eaed;
+        }
+
+        header h1 {
+            color: #f0f2f5;
+        }
+
+        .indepth-tab-nav {
+            border-color: var(--report-border) !important;
+        }
+
+        .bg-slate-900 {
+            background-color: var(--report-page-bg) !important;
+        }
+
+        .bg-slate-800 {
+            background-color: var(--report-surface) !important;
+        }
+
+        .bg-slate-800\/50 {
+            background-color: color-mix(in srgb, var(--report-surface) 85%, transparent) !important;
+        }
+
+        .bg-slate-900\/50 {
+            background-color: color-mix(in srgb, var(--report-surface-raised) 90%, transparent) !important;
+        }
+
+        .bg-slate-700 {
+            background-color: var(--report-surface-raised) !important;
+        }
+
+        .bg-slate-700\/50 {
+            background-color: color-mix(in srgb, var(--report-surface-raised) 80%, transparent) !important;
+        }
+
+        .border-slate-700,
+        .border-slate-600,
+        .border-slate-500,
+        .border-slate-800 {
+            border-color: var(--report-border) !important;
+        }
+
+        .divide-slate-700 > :not([hidden]) ~ :not([hidden]) {
+            border-color: var(--report-border) !important;
+        }
+
+        label,
+        .text-slate-300 {
+            color: #ffffff !important;
+        }
+
+        .text-slate-100,
+        .text-slate-200 {
+            color: #f0f2f5 !important;
+        }
+
+        .text-slate-400 {
+            color: #9aa0a8 !important;
+        }
+
+        .text-slate-500 {
+            color: #6b7280 !important;
+        }
+
+        .hover\:bg-slate-700:hover,
+        .hover\:bg-slate-700\/30:hover,
+        .hover\:bg-slate-700\/50:hover {
+            background-color: var(--report-surface-hover) !important;
+        }
+
+        .tt-course-dim {
+            background-color: rgba(0, 0, 0, 0.5) !important;
+        }
+
+        nav[aria-label="Tabs"] button:not(.text-white):hover {
+            color: #ffffff !important;
+            border-color: #525252 !important;
+        }
     </style>
 </head>
 
-<body class="bg-slate-900 text-slate-200 antialiased">
+<body class="antialiased">
     <div id="race-video-modal"
         class="hidden fixed inset-0 z-[100] items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm"
         role="dialog" aria-modal="true" aria-labelledby="race-video-modal-title">
@@ -154,27 +468,31 @@
             </div>
         </header>
 
-        <div class="max-w-7xl mx-auto mb-8 border-b border-slate-700">
+        <div class="max-w-7xl mx-auto mb-8 border-b border-slate-700 indepth-tab-nav">
             <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                 <button id="tab-full"
-                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-indigo-400 border-indigo-500">
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-white border-white">
                     Full Report
                 </button>
                 <button id="tab-compact"
-                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-white hover:border-neutral-600">
                     In-Competition Report
                 </button>
                 <button id="tab-tt"
-                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-white hover:border-neutral-600">
                     Individual Time Trial
                 </button>
                 <button id="tab-athlete"
-                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-white hover:border-neutral-600">
                     Athlete Profile
                 </button>
                 <button id="tab-summary"
-                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-slate-300 hover:border-slate-500">
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-white hover:border-neutral-600">
                     Season Summary
+                </button>
+                <button id="tab-indepth"
+                    class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm text-slate-400 border-transparent hover:text-white hover:border-neutral-600">
+                    In-Depth Analysis
                 </button>
             </nav>
         </div>
@@ -189,31 +507,31 @@
                             <label for="year-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
                             <select id="year-select-full"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
                             <select id="competition-select-full"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div id="location-wrapper-full">
                             <label for="location-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
                             <select id="location-select-full"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div class="max-w-[6.5rem]">
                             <label for="gender-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
                             <select id="gender-select-full"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="phase-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
                             <select id="phase-select-full"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
@@ -267,7 +585,7 @@
                         class="hidden bg-slate-800 p-4 sm:p-5 rounded-xl shadow-md border border-slate-700 chart-card">
                         <h3 class="text-sm font-semibold text-slate-100 mb-3 uppercase tracking-wider">Race Video</h3>
                         <button type="button" id="race-video-trigger-full"
-                            class="text-sm font-medium text-indigo-400 hover:text-indigo-300 underline underline-offset-2 text-left">
+                            class="text-sm font-medium report-link underline underline-offset-2 text-left">
                             Watch race video
                         </button>
                     </div>
@@ -285,31 +603,31 @@
                             <label for="year-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
                             <select id="year-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
                             <select id="competition-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div id="location-wrapper-compact">
                             <label for="location-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
                             <select id="location-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div class="max-w-[6.5rem]">
                             <label for="gender-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
                             <select id="gender-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="phase-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
                             <select id="phase-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
@@ -384,31 +702,31 @@
                             <label for="year-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
                             <select id="year-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
                             <select id="competition-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div id="location-wrapper-tt">
                             <label for="location-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
                             <select id="location-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div class="max-w-[6.5rem]">
                             <label for="gender-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
                             <select id="gender-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="athlete-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Athlete</label>
                             <select id="athlete-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
@@ -418,8 +736,8 @@
                         <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Time Trial Sector Comparison v 1st:</h3>
                         <div id="tt-chart-diff" class="text-center text-slate-400 text-sm mb-4"></div>
                         <div id="tt-view-toggle" class="flex justify-center gap-2 mb-4 hidden">
-                            <button type="button" id="tt-view-line" class="px-3 py-1.5 rounded text-sm font-medium bg-slate-600 text-slate-200 border border-slate-500">Line graph</button>
-                            <button type="button" id="tt-view-course" class="px-3 py-1.5 rounded text-sm font-medium text-slate-400 border border-slate-600 hover:bg-slate-700">Course view</button>
+                            <button type="button" id="tt-view-line" class="px-3 py-1.5 rounded text-sm font-medium border report-btn-active">Line graph</button>
+                            <button type="button" id="tt-view-course" class="px-3 py-1.5 rounded text-sm font-medium border report-btn-inactive">Course view</button>
                         </div>
                         <div id="tt-line-chart-wrapper">
                             <div id="tt-chart" class="w-full h-[400px]">
@@ -429,7 +747,7 @@
                         </div>
                         <div id="tt-course-view-wrapper" class="hidden w-full" style="max-width: 800px; margin: 0 auto;">
                             <div id="tt-course-view" class="w-full rounded overflow-hidden border border-slate-600 relative" style="aspect-ratio: 1.2; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('whitewater_course.png'); filter: brightness(0.72) saturate(0.85) contrast(1.05);">
-                                <div class="absolute inset-0 bg-slate-900/50" aria-hidden="true"></div>
+                                <div class="absolute inset-0 tt-course-dim" aria-hidden="true"></div>
                                 <svg id="tt-course-overlay" class="absolute inset-0 w-full h-full" style="pointer-events: none;"></svg>
                             </div>
                             <div id="tt-course-legend" class="flex justify-center gap-6 mt-4 text-sm items-center">
@@ -474,19 +792,19 @@
                             <label for="year-select-athlete"
                                 class="block text-sm font-medium text-slate-300 mb-2">Year</label>
                             <select id="year-select-athlete"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-athlete"
                                 class="block text-sm font-medium text-slate-300 mb-2">Competition</label>
                             <select id="competition-select-athlete"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="gender-select-athlete"
                                 class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
                             <select id="gender-select-athlete"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700 pt-6">
@@ -494,19 +812,19 @@
                             <label for="athlete-select-1" class="block text-sm font-medium text-slate-300 mb-2">Athlete
                                 1</label>
                             <select id="athlete-select-1"
-                                class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="athlete-select dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="athlete-select-2" class="block text-sm font-medium text-slate-300 mb-2">Athlete
                                 2</label>
                             <select id="athlete-select-2"
-                                class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="athlete-select dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="athlete-select-3" class="block text-sm font-medium text-slate-300 mb-2">Athlete
                                 3</label>
                             <select id="athlete-select-3"
-                                class="athlete-select dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="athlete-select dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
@@ -525,19 +843,19 @@
                             <label for="year-select-summary"
                                 class="block text-sm font-medium text-slate-300 mb-2">Year</label>
                             <select id="year-select-summary"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="gender-select-summary"
                                 class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
                             <select id="gender-select-summary"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="athlete-select-summary"
                                 class="block text-sm font-medium text-slate-300 mb-2">Athlete</label>
                             <select id="athlete-select-summary"
-                                class="dark-select w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></select>
+                                class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
@@ -545,6 +863,89 @@
                 <div id="summary-content-area" class="mt-8">
                     <!-- Summary Table will be injected here -->
                 </div>
+            </div>
+        </div>
+
+        <!-- IN-DEPTH ANALYSIS CONTAINER -->
+        <div id="report-indepth" class="hidden">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <div class="indepth-controls bg-slate-800 p-6 rounded-xl shadow-md border border-slate-700">
+                    <h2 class="text-lg font-semibold text-slate-100 mb-4">In-Depth Analysis</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label for="indepth-report-select" class="block text-sm font-medium text-slate-300 mb-2">Report</label>
+                            <select id="indepth-report-select"
+                                class="dark-select w-full rounded-md shadow-sm">
+                                <option value="p1-first-up">P1 &amp; First Up Report</option>
+                                <option value="first-up-by-position">First Up-Stream by Position</option>
+                                <option value="contest-stats">Contest Statistics</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="indepth-mode-select" class="block text-sm font-medium text-slate-300 mb-2">Filter by</label>
+                            <select id="indepth-mode-select"
+                                class="dark-select w-full rounded-md shadow-sm">
+                                <option value="event">Year + Competition + Gender</option>
+                                <option value="location">Location + Gender</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="indepth-gender-select" class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
+                            <select id="indepth-gender-select"
+                                class="dark-select w-full rounded-md shadow-sm"></select>
+                        </div>
+                    </div>
+                    <div id="indepth-filters-event" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label for="indepth-year-select" class="block text-sm font-medium text-slate-300 mb-2">Year</label>
+                            <select id="indepth-year-select"
+                                class="dark-select w-full rounded-md shadow-sm"></select>
+                        </div>
+                        <div>
+                            <label for="indepth-competition-select" class="block text-sm font-medium text-slate-300 mb-2">Competition</label>
+                            <select id="indepth-competition-select"
+                                class="dark-select w-full rounded-md shadow-sm"></select>
+                        </div>
+                        <div>
+                            <label for="indepth-location-event-select" class="block text-sm font-medium text-slate-300 mb-2">Location</label>
+                            <select id="indepth-location-event-select"
+                                class="dark-select w-full rounded-md shadow-sm"></select>
+                        </div>
+                    </div>
+                    <div id="indepth-filters-location" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="indepth-location-select" class="block text-sm font-medium text-slate-300 mb-2">Location</label>
+                            <select id="indepth-location-select"
+                                class="dark-select w-full rounded-md shadow-sm"></select>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <button type="button" id="indepth-generate-btn"
+                            class="px-4 py-2 rounded-md text-sm font-medium">
+                            Generate Report
+                        </button>
+                    </div>
+                </div>
+                <div id="indepth-content-area" class="space-y-8"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="indepth-password-modal"
+        class="hidden fixed inset-0 z-[110] items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm"
+        role="dialog" aria-modal="true" aria-labelledby="indepth-password-title">
+        <div class="w-full max-w-sm bg-slate-800 border border-slate-600 rounded-xl shadow-2xl p-6">
+            <h2 id="indepth-password-title" class="text-lg font-semibold text-slate-100 mb-2">In-Depth Analysis</h2>
+            <p class="text-sm text-slate-400 mb-4">Enter the password to access this section.</p>
+            <input type="password" id="indepth-password-input" autocomplete="off"
+                class="dark-input w-full rounded-md px-3 py-2 mb-2 border"
+                placeholder="Password" />
+            <p id="indepth-password-error" class="hidden text-sm text-red-400 mb-3">Incorrect password. Please try again.</p>
+            <div class="flex gap-3 justify-end">
+                <button type="button" id="indepth-password-cancel"
+                    class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-slate-700">Cancel</button>
+                <button type="button" id="indepth-password-submit"
+                    class="px-4 py-2 rounded-md report-primary-btn text-sm font-medium">Enter</button>
             </div>
         </div>
     </div>
@@ -604,9 +1005,38 @@
         }
 
         // Declare DOM variables
-        let tooltip, tabFull, tabCompact, tabTT, tabAthlete, tabSummary;
-        let reportFull, reportCompact, reportTT, reportAthlete, reportSummary, lastUpdatedEl;
-        let selectorsFull, filterControlsFull, selectorsCompact, filterControlsCompact, selectorsTT, filterControlsTT, selectorsAthlete, selectorsSummary;
+        let tooltip, tabFull, tabCompact, tabTT, tabAthlete, tabSummary, tabIndepth;
+        let reportFull, reportCompact, reportTT, reportAthlete, reportSummary, reportIndepth, lastUpdatedEl;
+        let selectorsFull, filterControlsFull, selectorsCompact, filterControlsCompact, selectorsTT, filterControlsTT, selectorsAthlete, selectorsSummary, selectorsIndepth;
+        let indepthPasswordPending = false;
+        const INDEPTH_AUTH_KEY = 'kx_indepth_auth_v1';
+        const INDEPTH_PASSWORD = 'admin';
+        const INDEPTH_GENDER_THEMES = {
+            W: {
+                headerBg: '#4a3d68',
+                nameBg: '#4a3d68',
+                nameColor: '#ede8f4',
+                leftColor: '#b8a8e0',
+                leftFg: '#0a1a12',
+                rightColor: '#5c4d85',
+                rightFg: '#f0f2f5',
+                mutedColor: '#3a3350',
+                sectionColor: '#d4c8f0',
+                label: 'Women'
+            },
+            M: {
+                headerBg: '#1a3d2e',
+                nameBg: '#1a3d2e',
+                nameColor: '#e8f5ee',
+                leftColor: '#5cbf8a',
+                leftFg: '#0a1a12',
+                rightColor: '#1e6b4a',
+                rightFg: '#f0f2f5',
+                mutedColor: '#1a3328',
+                sectionColor: '#8fd4a8',
+                label: 'Men'
+            }
+        };
 
         // --- TAB HANDLING ---
         // Map tab elements to URL hash values for persistence across refreshes
@@ -615,22 +1045,79 @@
             'tab-compact': 'in-competition',
             'tab-tt': 'time-trial',
             'tab-athlete': 'athlete-profile',
-            'tab-summary': 'season-summary'
+            'tab-summary': 'season-summary',
+            'tab-indepth': 'in-depth-analysis'
         };
 
+        function isIndepthAuthenticated() {
+            try {
+                return sessionStorage.getItem(INDEPTH_AUTH_KEY) === '1';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function showIndepthPasswordModal() {
+            const modal = document.getElementById('indepth-password-modal');
+            const input = document.getElementById('indepth-password-input');
+            const err = document.getElementById('indepth-password-error');
+            if (!modal || !input) return;
+            err.classList.add('hidden');
+            input.value = '';
+            modal.classList.remove('hidden');
+            setTimeout(() => input.focus(), 50);
+        }
+
+        function hideIndepthPasswordModal() {
+            const modal = document.getElementById('indepth-password-modal');
+            if (modal) modal.classList.add('hidden');
+        }
+
+        function requestIndepthTabAccess() {
+            if (isIndepthAuthenticated()) {
+                setActiveTab(tabIndepth);
+                return;
+            }
+            indepthPasswordPending = true;
+            showIndepthPasswordModal();
+        }
+
+        function submitIndepthPassword() {
+            const input = document.getElementById('indepth-password-input');
+            const err = document.getElementById('indepth-password-error');
+            if (!input) return;
+            if (input.value === INDEPTH_PASSWORD) {
+                try { sessionStorage.setItem(INDEPTH_AUTH_KEY, '1'); } catch (e) { /* ignore */ }
+                hideIndepthPasswordModal();
+                if (indepthPasswordPending) {
+                    indepthPasswordPending = false;
+                    setActiveTab(tabIndepth);
+                }
+                return;
+            }
+            if (err) err.classList.remove('hidden');
+        }
+
         function setActiveTab(activeTab, updateHash = true) {
-            const tabs = [tabFull, tabCompact, tabTT, tabAthlete, tabSummary];
-            const reports = [reportFull, reportCompact, reportTT, reportAthlete, reportSummary];
+            const tabs = [tabFull, tabCompact, tabTT, tabAthlete, tabSummary, tabIndepth];
+            const reports = [reportFull, reportCompact, reportTT, reportAthlete, reportSummary, reportIndepth];
 
             tabs.forEach(tab => {
                 const isActive = tab.node() === activeTab.node();
-                tab.classed("text-indigo-400 border-indigo-500", isActive)
+                tab.classed("text-white border-white", isActive)
                     .classed("text-slate-400 border-transparent", !isActive);
             });
 
             reports.forEach((report, index) => {
                 report.classed("hidden", tabs[index].node() !== activeTab.node());
             });
+
+            const isIndepthTab = tabIndepth && activeTab.node() === tabIndepth.node();
+            if (isIndepthTab) {
+                d3.select('#report-indepth').style('background', 'transparent');
+            } else {
+                d3.select('#report-indepth').style('background', null);
+            }
 
             // Persist active tab in URL hash so refresh returns to the same tab
             if (updateHash) {
@@ -648,7 +1135,8 @@
                 'in-competition': tabCompact,
                 'time-trial': tabTT,
                 'athlete-profile': tabAthlete,
-                'season-summary': tabSummary
+                'season-summary': tabSummary,
+                'in-depth-analysis': tabIndepth
             };
             return hashToTab[hash] || null;
         }
@@ -679,7 +1167,8 @@
                 [reportCompact, 'in-competition'],
                 [reportTT, 'time-trial'],
                 [reportAthlete, 'athlete-profile'],
-                [reportSummary, 'season-summary']
+                [reportSummary, 'season-summary'],
+                [reportIndepth, 'in-depth-analysis']
             ];
             for (const [rep, hash] of pairs) {
                 if (rep && !rep.classed('hidden')) return hash;
@@ -728,6 +1217,15 @@
                     year: selectorsSummary.year.property("value"),
                     gender: selectorsSummary.gender.property("value"),
                     athlete: selectorsSummary.athlete.property("value")
+                } : {},
+                indepth: selectorsIndepth ? {
+                    report: selectorsIndepth.report.property("value"),
+                    mode: selectorsIndepth.mode.property("value"),
+                    gender: selectorsIndepth.gender.property("value"),
+                    year: selectorsIndepth.year.property("value"),
+                    competition: selectorsIndepth.competition.property("value"),
+                    locationEvent: selectorsIndepth.locationEvent.property("value"),
+                    location: selectorsIndepth.location.property("value")
                 } : {}
             };
         }
@@ -806,6 +1304,7 @@
             }
             if (selectorsAthlete) Object.values(selectorsAthlete).forEach(bind);
             if (selectorsSummary) Object.values(selectorsSummary).forEach(bind);
+            if (selectorsIndepth) Object.values(selectorsIndepth).forEach(bind);
             d3.selectAll('#athlete-select-1, #athlete-select-2, #athlete-select-3').on(`change.${ns}`, schedulePersistReportUiState);
         }
 
@@ -1116,6 +1615,7 @@
                 const location = (d.Location || '').trim();
                 const notesComments = (d['NOTES & COMMENTS'] || d['Notes & Comments'] || '').trim();
                 const videoLink = (d['Video Link'] || d['VideoLink'] || d['video link'] || '').trim();
+                const contestStatistics = (d['Contest Statistics'] || d['ContestStatistics'] || '').trim();
 
                 return {
                     Year: year,
@@ -1134,7 +1634,8 @@
                     FaultVal: faultVal,
                     FinishRank: finishRank,
                     NotesComments: notesComments,
-                    VideoLink: videoLink
+                    VideoLink: videoLink,
+                    ContestStatistics: contestStatistics
                 };
             });
         }
@@ -1670,12 +2171,14 @@
             tabTT = d3.select("#tab-tt");
             tabAthlete = d3.select("#tab-athlete");
             tabSummary = d3.select("#tab-summary");
+            tabIndepth = d3.select("#tab-indepth");
 
             reportFull = d3.select("#report-full");
             reportCompact = d3.select("#report-compact");
             reportTT = d3.select("#report-tt");
             reportAthlete = d3.select("#report-athlete");
             reportSummary = d3.select("#report-summary");
+            reportIndepth = d3.select("#report-indepth");
 
             lastUpdatedEl = d3.select("#last-updated");
 
@@ -1709,6 +2212,16 @@
                 year: d3.select("#year-select-summary"),
                 gender: d3.select("#gender-select-summary"),
                 athlete: d3.select("#athlete-select-summary")
+            };
+
+            selectorsIndepth = {
+                report: d3.select("#indepth-report-select"),
+                mode: d3.select("#indepth-mode-select"),
+                gender: d3.select("#indepth-gender-select"),
+                year: d3.select("#indepth-year-select"),
+                competition: d3.select("#indepth-competition-select"),
+                locationEvent: d3.select("#indepth-location-event-select"),
+                location: d3.select("#indepth-location-select")
             };
 
             selectorsTT = {
@@ -1792,6 +2305,7 @@
 
                     // Setup Season Summary (using full data)
                     setupSeasonSummaryTab(persistedUi && persistedUi.summary);
+                    if (masterDataFull.length > 0) setupIndepthTab(persistedUi && persistedUi.indepth);
                 } else {
                     console.warn("Full Report data is empty.");
                 }
@@ -1821,6 +2335,25 @@
                     tabTT.on("click", () => { setActiveTab(tabTT); updateTimeTrialReport(); });
                     tabAthlete.on("click", () => { setActiveTab(tabAthlete); });
                     tabSummary.on("click", () => { setActiveTab(tabSummary); });
+                    tabIndepth.on("click", () => { requestIndepthTabAccess(); });
+                }
+
+                const indepthPwdSubmit = document.getElementById('indepth-password-submit');
+                const indepthPwdCancel = document.getElementById('indepth-password-cancel');
+                const indepthPwdInput = document.getElementById('indepth-password-input');
+                if (indepthPwdSubmit) indepthPwdSubmit.addEventListener('click', submitIndepthPassword);
+                if (indepthPwdCancel) indepthPwdCancel.addEventListener('click', () => {
+                    indepthPasswordPending = false;
+                    hideIndepthPasswordModal();
+                });
+                if (indepthPwdInput) {
+                    indepthPwdInput.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter') submitIndepthPassword();
+                        if (e.key === 'Escape') {
+                            indepthPasswordPending = false;
+                            hideIndepthPasswordModal();
+                        }
+                    });
                 }
 
                 // Restore active tab: URL hash wins when set; otherwise last tab from localStorage
@@ -1831,15 +2364,19 @@
                         'in-competition': tabCompact,
                         'time-trial': tabTT,
                         'athlete-profile': tabAthlete,
-                        'season-summary': tabSummary
+                        'season-summary': tabSummary,
+                        'in-depth-analysis': tabIndepth
                     };
                     savedTab = idToTab[persistedUi.activeTab] || null;
                 }
                 if (savedTab && savedTab.node()) {
-                    setActiveTab(savedTab, true);
-                    if (savedTab.node() === tabCompact.node() && masterDataCompact.length > 0) updateAllChartsCompact();
-                    if (savedTab.node() === tabTT.node()) updateTimeTrialReport();
-                    if (savedTab.node() === tabAthlete.node()) updateAthleteProfiles();
+                    const skipSaved = savedTab.node() === tabIndepth.node() && !isIndepthAuthenticated();
+                    if (!skipSaved) {
+                        setActiveTab(savedTab, true);
+                        if (savedTab.node() === tabCompact.node() && masterDataCompact.length > 0) updateAllChartsCompact();
+                        if (savedTab.node() === tabTT.node()) updateTimeTrialReport();
+                        if (savedTab.node() === tabAthlete.node()) updateAthleteProfiles();
+                    }
                 }
 
                 attachReportUiPersistence();
@@ -2056,6 +2593,16 @@
             6: "Exit Gate 8 to Finish"
         };
 
+        /** Split sector labels under Split 1–6 headers (2026 WCh Krakow MU23 / WU23 time trial only). */
+        const TT_KRAKOW_2026_WCH_SPLIT_SECTORS = {
+            1: "Start - Exit 1",
+            2: "Exit 1 - 3 Gate Line",
+            3: "Gate Line 3 - USDR",
+            4: "USDR - Hole @ 4",
+            5: "Hole @ 4 to Exit 6",
+            6: "Exit 6 to Finish"
+        };
+
         function isTT2025WC5Augsburg(year, competition, location) {
             if (+year !== 2025) return false;
             if (String(competition || '').trim().toUpperCase() !== 'WC5') return false;
@@ -2092,7 +2639,14 @@
             return normalizeCourseLocationKey(location) === 'prague';
         }
 
+        function isTT2026WChKrakow(year, competition, location) {
+            if (+year !== 2026) return false;
+            if (String(competition || '').trim().toUpperCase() !== 'WCH') return false;
+            return normalizeCourseLocationKey(location) === 'krakow';
+        }
+
         function getTTSectorLabelsForSelection(year, competition, location) {
+            if (isTT2026WChKrakow(year, competition, location)) return TT_KRAKOW_2026_WCH_SPLIT_SECTORS;
             if (isTT2026WC2Prague(year, competition, location)) return TT_PRAGUE_2026_WC2_SPLIT_SECTORS;
             if (isTT2026WC1Tacen(year, competition, location)) return TT_TACEN_2026_WC1_SPLIT_SECTORS;
             if (isTT2025WC5Augsburg(year, competition, location)) return TT_AUGSBURG_2025_WC5_SPLIT_SECTORS;
@@ -2460,13 +3014,13 @@
             if (mode === 'line') {
                 lineWrapper.classed("hidden", false);
                 courseWrapper.classed("hidden", true);
-                btnLine.classed("bg-slate-600 text-slate-200 border-slate-500", true).classed("text-slate-400 border-slate-600", false);
-                btnCourse.classed("bg-slate-600 text-slate-200 border-slate-500", false).classed("text-slate-400 border-slate-600", true);
+                btnLine.classed("report-btn-active", true).classed("report-btn-inactive", false);
+                btnCourse.classed("report-btn-active", false).classed("report-btn-inactive", true);
             } else {
                 lineWrapper.classed("hidden", true);
                 courseWrapper.classed("hidden", false);
-                btnLine.classed("bg-slate-600 text-slate-200 border-slate-500", false).classed("text-slate-400 border-slate-600", true);
-                btnCourse.classed("bg-slate-600 text-slate-200 border-slate-500", true).classed("text-slate-400 border-slate-600", false);
+                btnLine.classed("report-btn-active", false).classed("report-btn-inactive", true);
+                btnCourse.classed("report-btn-active", true).classed("report-btn-inactive", false);
                 if (lastTTChartData) drawTTCourseView(lastTTChartData.splitNames, lastTTChartData.athleteTimes, lastTTChartData.firstPlaceTimes);
             }
             schedulePersistReportUiState();
@@ -2978,7 +3532,7 @@
             const g = svg.append("g").attr("transform", "translate(125, 125)");
             const pie = d3.pie().value(d => d.value).sort(null);
             const arc = d3.arc().innerRadius(0).outerRadius(110);
-            g.selectAll("path").data(pie(dataForPie)).join("path").attr("d", arc).attr("fill", d => colorScale(d.data.label)).attr("stroke", "#1e293b").style("stroke-width", "3px")
+            g.selectAll("path").data(pie(dataForPie)).join("path").attr("d", arc).attr("fill", d => colorScale(d.data.label)).attr("stroke", "#222222").style("stroke-width", "3px")
                 .on("mouseover", (event, d) => {
                     tooltip.transition().duration(200).style("opacity", .9);
                     const percent = ((d.data.value / totalValue) * 100).toFixed(2);
@@ -3241,6 +3795,865 @@
                 }
                 row.append("span").attr("class", "text-xs text-slate-500 italic text-right whitespace-nowrap").text(reason);
             });
+        }
+
+        // --- IN-DEPTH ANALYSIS ---
+        function getIndepthGenderTheme(gender) {
+            const g = String(gender || '').trim();
+            if (g === 'W' || g === 'Women') return INDEPTH_GENDER_THEMES.W;
+            return INDEPTH_GENDER_THEMES.M;
+        }
+
+        function parseUpstreamDirection(row) {
+            if (!row) return null;
+            const action = String(row.Action || row.UpstreamTactic || '').trim();
+            const lower = action.toLowerCase();
+            if (lower.includes('left') && (lower.includes('up') || lower.includes('-'))) return 'Left';
+            if (lower.includes('right') && (lower.includes('up') || lower.includes('-'))) return 'Right';
+            if (/left/i.test(action)) return 'Left';
+            if (/right/i.test(action)) return 'Right';
+            return null;
+        }
+
+        function getSecondUpstreamGate(compStructure) {
+            const upstreamSet = new Set(withoutSpecialGateFromUpstreamList(compStructure.upstreamGates || []));
+            const ordered = [];
+            (compStructure.orderedGates || []).forEach(gate => {
+                if (upstreamSet.has(gate)) ordered.push(gate);
+            });
+            upstreamSet.forEach(gate => {
+                if (!ordered.includes(gate)) ordered.push(gate);
+            });
+            return ordered.length >= 2 ? ordered[1] : null;
+        }
+
+        const CONTEST_STAT_CODES = [
+            { key: 'UHR', name: 'Unopposed Held Rank' },
+            { key: 'UGR', name: 'Unopposed Gain Rank' },
+            { key: 'SDHR', name: 'Successful Defend Held Rank' },
+            { key: 'SA', name: 'Successful Attack' },
+            { key: 'UAHR', name: 'Unsuccessful Attack Held Rank' },
+            { key: 'LP', name: 'Loss of Position' }
+        ];
+
+        function indepthHasReportData(report) {
+            if (!report || report.error) return false;
+            if (report.hasData) return true;
+            if (report.rows?.length) return true;
+            if (report.phaseRows?.length) return true;
+            return false;
+        }
+
+        function buildContestStatsReport(data, year, competition, location, gender) {
+            const eventRows = data.filter(d =>
+                d.Year === year &&
+                d.Competition === competition &&
+                (d.Location || '').trim() === (location || '').trim() &&
+                d.Gender === gender
+            );
+            if (!eventRows.length) return null;
+
+            const structure = scanCompetitionStructure(year, competition, data);
+            const firstUpGate = getFirstUpstreamGate(structure);
+            const secondUpGate = getSecondUpstreamGate(structure);
+            if (!firstUpGate || !secondUpGate) {
+                return { error: 'Could not detect both upstream gates for this competition.' };
+            }
+
+            const phases = [...new Set(eventRows.map(d => d.Phase).filter(Boolean))]
+                .sort(compareSeasonPhases);
+
+            const gateCounts = {
+                [firstUpGate]: Object.fromEntries(CONTEST_STAT_CODES.map(c => [c.key, 0])),
+                [secondUpGate]: Object.fromEntries(CONTEST_STAT_CODES.map(c => [c.key, 0]))
+            };
+            const leaderUhr = {
+                [firstUpGate]: { uhr: 0, total: 0 },
+                [secondUpGate]: { uhr: 0, total: 0 }
+            };
+            let leftRightOverall = { left: 0, right: 0 };
+            let p1UhrLeftRight = { left: 0, right: 0 };
+            let p2to4UnopposedLeftRight = { left: 0, right: 0 };
+            let leaderCarry = { heats: 0, sameLeader: 0, sameLeaderWon: 0 };
+
+            phases.forEach(phase => {
+                const phaseRows = eventRows.filter(d => d.Phase === phase);
+                const rowsAtFirst = phaseRows.filter(d => d.Gate === firstUpGate && isLiveRaceTagRow(d));
+                const rowsAtSecond = phaseRows.filter(d => d.Gate === secondUpGate && isLiveRaceTagRow(d));
+
+                [firstUpGate, secondUpGate].forEach(gate => {
+                    const gateRows = gate === firstUpGate ? rowsAtFirst : rowsAtSecond;
+                    gateRows.forEach(row => {
+                        const code = String(row.ContestStatistics || '').trim().toUpperCase();
+                        if (code && gateCounts[gate][code] != null) {
+                            gateCounts[gate][code] += 1;
+                        }
+                    });
+
+                    const leader = gateRows.find(r => liveTagOrder(r) === 1);
+                    if (leader) {
+                        leaderUhr[gate].total += 1;
+                        if (String(leader.ContestStatistics || '').trim().toUpperCase() === 'UHR') {
+                            leaderUhr[gate].uhr += 1;
+                        }
+                    }
+                });
+
+                [firstUpGate, secondUpGate].forEach(gate => {
+                    const gateRows = gate === firstUpGate ? rowsAtFirst : rowsAtSecond;
+                    gateRows.forEach(row => {
+                        const dir = parseUpstreamDirection(row);
+                        if (!dir) return;
+                        if (dir === 'Left') leftRightOverall.left += 1;
+                        else if (dir === 'Right') leftRightOverall.right += 1;
+
+                        const order = liveTagOrder(row);
+                        const code = String(row.ContestStatistics || '').trim().toUpperCase();
+                        if (order === 1 && code === 'UHR') {
+                            if (dir === 'Left') p1UhrLeftRight.left += 1;
+                            else if (dir === 'Right') p1UhrLeftRight.right += 1;
+                        }
+                        if (order >= 2 && order <= 4 && (code === 'UHR' || code === 'UGR')) {
+                            if (dir === 'Left') p2to4UnopposedLeftRight.left += 1;
+                            else if (dir === 'Right') p2to4UnopposedLeftRight.right += 1;
+                        }
+                    });
+                });
+
+                if (rowsAtFirst.length >= 4 && rowsAtSecond.length >= 4) {
+                    const leaderFirst = rowsAtFirst.find(r => liveTagOrder(r) === 1);
+                    const leaderSecond = rowsAtSecond.find(r => liveTagOrder(r) === 1);
+                    if (leaderFirst && leaderSecond) {
+                        leaderCarry.heats += 1;
+                        if (leaderFirst.BIB === leaderSecond.BIB) {
+                            leaderCarry.sameLeader += 1;
+                            const finishRow = phaseRows.find(r =>
+                                r.Gate === 'Finish' && r.BIB === leaderFirst.BIB
+                            );
+                            if (finishRow && finishRow.FinalPosition === 1) {
+                                leaderCarry.sameLeaderWon += 1;
+                            }
+                        }
+                    }
+                }
+            });
+
+            const perGateFirst = Object.values(gateCounts[firstUpGate]).reduce((a, b) => a + b, 0);
+            const perGateSecond = Object.values(gateCounts[secondUpGate]).reduce((a, b) => a + b, 0);
+            const hasData = perGateFirst > 0 || perGateSecond > 0;
+
+            return {
+                year,
+                competition,
+                location,
+                gender,
+                firstUpGate,
+                secondUpGate,
+                phaseCount: phases.length,
+                gateCounts,
+                perGateFirst,
+                perGateSecond,
+                leaderUhr,
+                leftRightOverall,
+                p1UhrLeftRight,
+                p2to4UnopposedLeftRight,
+                leaderCarry,
+                hasData
+            };
+        }
+
+        function renderContestStatsFreqChart(report, theme) {
+            const w = 600;
+            const padL = 74;
+            const padR = 54;
+            const padTop = 28;
+            const padBottom = 34;
+            const groupH = 48;
+            const barH = 15;
+            const h = padTop + CONTEST_STAT_CODES.length * groupH + padBottom;
+            const plotW = w - padL - padR;
+            const allPcts = CONTEST_STAT_CODES.flatMap(c => [
+                report.perGateFirst ? (100 * report.gateCounts[report.firstUpGate][c.key]) / report.perGateFirst : 0,
+                report.perGateSecond ? (100 * report.gateCounts[report.secondUpGate][c.key]) / report.perGateSecond : 0
+            ]);
+            const xMax = Math.max(40, Math.ceil(Math.max(...allPcts, 0) / 10) * 10);
+            const xScale = v => padL + (v / xMax) * plotW;
+
+            let ticks = '';
+            for (let v = 0; v <= xMax; v += 10) {
+                ticks += `<line x1="${xScale(v)}" y1="${padTop - 6}" x2="${xScale(v)}" y2="${h - padBottom}" stroke="#2a2a2a"/>`;
+                ticks += `<text x="${xScale(v)}" y="${h - padBottom + 14}" text-anchor="middle" font-size="9" fill="#666">${v}%</text>`;
+            }
+
+            let groups = '';
+            CONTEST_STAT_CODES.forEach((c, i) => {
+                const top = padTop + i * groupH;
+                const g1 = report.perGateFirst
+                    ? (100 * report.gateCounts[report.firstUpGate][c.key]) / report.perGateFirst
+                    : 0;
+                const g2 = report.perGateSecond
+                    ? (100 * report.gateCounts[report.secondUpGate][c.key]) / report.perGateSecond
+                    : 0;
+                const y4 = top + 4;
+                const y8 = top + 4 + barH + 5;
+                groups += `<text x="${padL - 8}" y="${top + groupH / 2}" text-anchor="end" font-size="11" fill="#c8cdd3" font-weight="600">${c.key}</text>`;
+                groups += `<rect x="${padL}" y="${y4}" width="${Math.max(0, xScale(g1) - padL)}" height="${barH}" fill="${theme.leftColor}" rx="2"/>`;
+                groups += `<text x="${xScale(g1) + 5}" y="${y4 + barH - 3}" font-size="9" fill="#e8eaed">${g1.toFixed(1)}%</text>`;
+                groups += `<rect x="${padL}" y="${y8}" width="${Math.max(0, xScale(g2) - padL)}" height="${barH}" fill="${theme.rightColor}" rx="2"/>`;
+                groups += `<text x="${xScale(g2) + 5}" y="${y8 + barH - 3}" font-size="9" fill="#e8eaed">${g2.toFixed(1)}%</text>`;
+            });
+
+            return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" class="max-w-full">
+                ${ticks}${groups}
+                <text x="${padL + plotW / 2}" y="${h - 4}" text-anchor="middle" font-size="10" fill="#9aa0a8">% of events at the gate</text>
+            </svg>`;
+        }
+
+        function renderContestStatsStackedBar(label, sub, leftVal, rightVal, theme, options = {}) {
+            const n = leftVal + rightVal;
+            const w = 460;
+            const barH = 34;
+            const y = 26;
+            const leftPct = n ? (100 * leftVal) / n : 0;
+            const rightPct = 100 - leftPct;
+            const leftW = (w * leftPct) / 100;
+            const leftFill = options.leftFill || theme.leftColor;
+            const rightFill = options.rightFill || theme.rightColor;
+            const leftFg = options.leftFg || theme.leftFg;
+            const rightFg = options.rightFg || theme.rightFg;
+            let svg = `<text x="0" y="14" font-size="10" fill="#9aa0a8">${sub}</text>`;
+            svg += `<rect x="0" y="${y}" width="${leftW}" height="${barH}" fill="${leftFill}"/>`;
+            svg += `<rect x="${leftW}" y="${y}" width="${w - leftW}" height="${barH}" fill="${rightFill}"/>`;
+            svg += `<rect x="0" y="${y}" width="${w}" height="${barH}" fill="none" stroke="#3a3a3a" stroke-width="1" rx="4"/>`;
+            if (leftPct >= 12) {
+                svg += `<text x="${leftW / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${leftFg}" font-weight="600">Left ${leftPct.toFixed(1)}%</text>`;
+            }
+            if (rightPct >= 12) {
+                svg += `<text x="${leftW + (w - leftW) / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${rightFg}" font-weight="600">Right ${rightPct.toFixed(1)}%</text>`;
+            }
+            const caption = n
+                ? `Left ${leftVal} / ${n} · Right ${rightVal} / ${n}`
+                : 'No tagged events';
+            return `<div style="margin-bottom:14px">
+                <div style="font-size:12px;color:#c8cdd3;font-weight:600;margin-bottom:4px">${label}</div>
+                <svg width="${w}" height="62" viewBox="0 0 ${w} 62" role="img" class="max-w-full">${svg}</svg>
+                <p class="indepth-caption">${caption}</p>
+            </div>`;
+        }
+
+        function renderContestStatsLeaderBar(gateLabel, uhr, total, theme) {
+            const w = 460;
+            const barH = 34;
+            const y = 26;
+            const uhrPct = total ? (100 * uhr) / total : 0;
+            const otherPct = 100 - uhrPct;
+            const uhrW = (w * uhrPct) / 100;
+            let svg = `<text x="0" y="14" font-size="10" fill="#9aa0a8">Leader (Order 1): UHR vs other code — 100% stacked</text>`;
+            svg += `<rect x="0" y="${y}" width="${uhrW}" height="${barH}" fill="${theme.rightColor}"/>`;
+            svg += `<rect x="${uhrW}" y="${y}" width="${w - uhrW}" height="${barH}" fill="${theme.mutedColor}"/>`;
+            svg += `<rect x="0" y="${y}" width="${w}" height="${barH}" fill="none" stroke="#3a3a3a" stroke-width="1" rx="4"/>`;
+            if (uhrPct >= 12) {
+                svg += `<text x="${uhrW / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${theme.rightFg}" font-weight="600">UHR ${uhrPct.toFixed(1)}%</text>`;
+            }
+            if (otherPct >= 12) {
+                svg += `<text x="${uhrW + (w - uhrW) / 2}" y="${y + barH / 2 + 4}" text-anchor="middle" font-size="11" fill="${theme.sectionColor}" font-weight="600">Other ${otherPct.toFixed(1)}%</text>`;
+            }
+            const caption = total
+                ? `UHR ${uhr} / ${total} heats · other code ${total - uhr} / ${total}`
+                : 'No heats with a tagged leader';
+            return `<div style="margin-bottom:14px">
+                <div style="font-size:12px;color:#c8cdd3;font-weight:600;margin-bottom:4px">${gateLabel}</div>
+                <svg width="${w}" height="62" viewBox="0 0 ${w} 62" role="img" class="max-w-full">${svg}</svg>
+                <p class="indepth-caption">${caption}</p>
+            </div>`;
+        }
+
+        function renderContestStatsReportHtml(report) {
+            if (!report) return '';
+            if (report.error) {
+                return `<div class="indepth-report-sheet"><p class="text-red-400">${report.error}</p></div>`;
+            }
+            if (!report.hasData) {
+                return `<div class="indepth-report-sheet"><p class="text-slate-400">No contest statistics found for this selection.</p></div>`;
+            }
+
+            const theme = getIndepthGenderTheme(report.gender);
+            const themeClass = (report.gender === 'W' || report.gender === 'Women') ? 'theme-women' : 'theme-men';
+            const title = `${report.year} ${report.competition} ${report.location} — ${theme.label} · Contest Statistics`;
+            const totalUpstreamEvents = report.leftRightOverall.left + report.leftRightOverall.right;
+            const subtitle = `Tactical outcome codes at Gate ${report.firstUpGate} (1st Up-Stream) and Gate ${report.secondUpGate} (2nd Up-Stream) across ${report.phaseCount} phases · Source: Contest Statistics column`;
+
+            const summaryRows = CONTEST_STAT_CODES.map(c => {
+                const g1 = report.gateCounts[report.firstUpGate][c.key];
+                const g2 = report.gateCounts[report.secondUpGate][c.key];
+                return `<tr>
+                    <td class="code" style="color:${theme.sectionColor}">${c.key}</td>
+                    <td class="num">${g1} (${indepthPct(g1, report.perGateFirst)})</td>
+                    <td class="num">${g2} (${indepthPct(g2, report.perGateSecond)})</td>
+                </tr>`;
+            }).join('');
+
+            const carry = report.leaderCarry;
+            const carryRows = [
+                { label: 'Leader at 1st Up-Stream also leads at 2nd Up-Stream', num: carry.sameLeader, den: carry.heats },
+                { label: '→ Converted to a phase win', num: carry.sameLeaderWon, den: carry.sameLeader }
+            ].map(r => `<tr>
+                <td>${r.label}</td>
+                <td class="num">${r.den ? `${r.num} / ${r.den}` : '—'}</td>
+                <td class="num">${indepthPct(r.num, r.den)}</td>
+            </tr>`).join('');
+
+            const legendRows = CONTEST_STAT_CODES.map(c =>
+                `<div class="legend-row" style="display:flex;gap:12px;align-items:baseline;font-size:12px">
+                    <span style="color:${theme.sectionColor};font-weight:600;min-width:56px">${c.key}</span>
+                    <span style="color:#c8cdd3">${c.name}</span>
+                </div>`
+            ).join('');
+
+            const gate1Label = `Gate ${report.firstUpGate} (1st Up-Stream)`;
+            const gate2Label = `Gate ${report.secondUpGate} (2nd Up-Stream)`;
+            const leaderFirst = report.leaderUhr[report.firstUpGate];
+            const leaderSecond = report.leaderUhr[report.secondUpGate];
+
+            return `<div class="indepth-report-sheet">
+                <h2>${title}</h2>
+                <p class="indepth-sub">${subtitle}</p>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">% of times each contest statistic occurred</h3>
+                    <p class="indepth-sub" style="margin-bottom:8px">Share of all ${report.perGateFirst} events at each up-stream gate.</p>
+                    ${renderContestStatsFreqChart(report, theme)}
+                    <div class="indepth-legend">
+                        <span><i style="background:${theme.leftColor}"></i> ${gate1Label}</span>
+                        <span><i style="background:${theme.rightColor}"></i> ${gate2Label}</span>
+                    </div>
+                </div>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">Leader was Unopposed Held Rank (UHR)?</h3>
+                    <p class="indepth-sub" style="margin-bottom:8px">% of heats where the athlete in 1st (Order 1) at the gate was tagged UHR vs any other code.</p>
+                    ${renderContestStatsLeaderBar(gate1Label, leaderFirst.uhr, leaderFirst.total, theme)}
+                    ${renderContestStatsLeaderBar(gate2Label, leaderSecond.uhr, leaderSecond.total, theme)}
+                </div>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">Left vs Right at the up-stream gates</h3>
+                    <p class="indepth-sub" style="margin-bottom:8px">Side completed at the up-stream gate (Left-Up vs Right-Up), across both up-stream gates (${gate1Label} + ${gate2Label} = ${totalUpstreamEvents} events).</p>
+                    ${renderContestStatsStackedBar('Overall — all up-stream events', 'Left vs Right — 100% stacked', report.leftRightOverall.left, report.leftRightOverall.right, theme)}
+                    ${renderContestStatsStackedBar('P1 & UHR', 'Left vs Right when 1st (Order 1) and Unopposed Held Rank', report.p1UhrLeftRight.left, report.p1UhrLeftRight.right, theme)}
+                    ${renderContestStatsStackedBar('P2, P3, P4 & (UHR or UGR)', 'Left vs Right when 2nd–4th and Unopposed (Held or Gain Rank)', report.p2to4UnopposedLeftRight.left, report.p2to4UnopposedLeftRight.right, theme)}
+                </div>
+
+                <div class="indepth-contest-block" style="margin-bottom:26px">
+                    <h3 class="indepth-section-title ${themeClass}">Summary — count of each code (out of ${report.perGateFirst})</h3>
+                    <table>
+                        <thead><tr>
+                            <th style="background:${theme.headerBg}">Code</th>
+                            <th class="num" style="background:${theme.headerBg}">${gate1Label} (/${report.perGateFirst})</th>
+                            <th class="num" style="background:${theme.headerBg}">${gate2Label} (/${report.perGateSecond})</th>
+                        </tr></thead>
+                        <tbody>${summaryRows}
+                            <tr><td style="font-weight:600">Σ Total</td><td class="num" style="font-weight:600">${report.perGateFirst}</td><td class="num" style="font-weight:600">${report.perGateSecond}</td></tr>
+                        </tbody>
+                    </table>
+                    <table style="margin-top:12px">
+                        <thead><tr>
+                            <th style="background:${theme.headerBg}">Leader carry-over &amp; win conversion</th>
+                            <th class="num" style="background:${theme.headerBg}">Count</th>
+                            <th class="num" style="background:${theme.headerBg}">%</th>
+                        </tr></thead>
+                        <tbody>${carryRows}</tbody>
+                    </table>
+                </div>
+
+                <div class="indepth-contest-block">
+                    <h3 class="indepth-section-title ${themeClass}">Legend — what the abbreviations stand for</h3>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">${legendRows}</div>
+                </div>
+            </div>`;
+        }
+
+        function getIndepthReportBuilder(reportType) {
+            if (reportType === 'first-up-by-position') return buildFirstUpByPositionReport;
+            if (reportType === 'contest-stats') return buildContestStatsReport;
+            return buildP1FirstUpReport;
+        }
+
+        function buildP1FirstUpReport(data, year, competition, location, gender) {
+            const eventRows = data.filter(d =>
+                d.Year === year &&
+                d.Competition === competition &&
+                (d.Location || '').trim() === (location || '').trim() &&
+                d.Gender === gender
+            );
+            if (!eventRows.length) return null;
+
+            const structure = scanCompetitionStructure(year, competition, data);
+            const firstUpGate = getFirstUpstreamGate(structure);
+            if (!firstUpGate) {
+                return { error: 'Could not detect the first upstream gate for this competition.' };
+            }
+
+            const phases = [...new Set(eventRows.map(d => d.Phase).filter(Boolean))]
+                .sort(compareSeasonPhases);
+
+            const rows = [];
+            phases.forEach(phase => {
+                const phaseRows = eventRows.filter(d => d.Phase === phase);
+                const leaderRows = phaseRows.filter(d =>
+                    d.Gate === firstUpGate &&
+                    isLiveRaceTagRow(d) &&
+                    liveTagOrder(d) === 1
+                );
+                if (!leaderRows.length) return;
+
+                const leaderRow = leaderRows[0];
+                const bib = leaderRow.BIB;
+                const direction = parseUpstreamDirection(leaderRow);
+                const name = athleteNameFromRaceRows(phaseRows, bib) || bibFullNames[bib] || bib;
+
+                rows.push({
+                    phase,
+                    leader: name,
+                    bib,
+                    direction: direction || '—'
+                });
+            });
+
+            const leftCount = rows.filter(r => r.direction === 'Left').length;
+            const rightCount = rows.filter(r => r.direction === 'Right').length;
+
+            return {
+                year,
+                competition,
+                location,
+                gender,
+                firstUpGate,
+                rows,
+                leftCount,
+                rightCount,
+                total: rows.length
+            };
+        }
+
+        function buildFirstUpByPositionReport(data, year, competition, location, gender) {
+            const eventRows = data.filter(d =>
+                d.Year === year &&
+                d.Competition === competition &&
+                (d.Location || '').trim() === (location || '').trim() &&
+                d.Gender === gender
+            );
+            if (!eventRows.length) return null;
+
+            const structure = scanCompetitionStructure(year, competition, data);
+            const firstUpGate = getFirstUpstreamGate(structure);
+            if (!firstUpGate) {
+                return { error: 'Could not detect the first upstream gate for this competition.' };
+            }
+
+            const phases = [...new Set(eventRows.map(d => d.Phase).filter(Boolean))]
+                .sort(compareSeasonPhases);
+
+            const POSITIONS = ['P1', 'P2', 'P3', 'P4'];
+            const summary = Object.fromEntries(POSITIONS.map(p => [p, { left: 0, right: 0 }]));
+            const phaseRows = [];
+
+            phases.forEach(phase => {
+                const phaseData = eventRows.filter(d => d.Phase === phase);
+                const atGate = phaseData.filter(d =>
+                    d.Gate === firstUpGate && isLiveRaceTagRow(d)
+                );
+                if (!atGate.length) return;
+
+                const positions = { P1: null, P2: null, P3: null, P4: null };
+                atGate.forEach(row => {
+                    const order = liveTagOrder(row);
+                    if (order < 1 || order > 4) return;
+                    const posKey = `P${order}`;
+                    const dir = parseUpstreamDirection(row);
+                    if (!dir) return;
+                    positions[posKey] = dir;
+                    if (dir === 'Left') summary[posKey].left += 1;
+                    else if (dir === 'Right') summary[posKey].right += 1;
+                });
+
+                if (POSITIONS.some(p => positions[p])) {
+                    phaseRows.push({ phase, positions });
+                }
+            });
+
+            let totalLeft = 0;
+            let totalRight = 0;
+            POSITIONS.forEach(p => {
+                totalLeft += summary[p].left;
+                totalRight += summary[p].right;
+            });
+
+            return {
+                year,
+                competition,
+                location,
+                gender,
+                firstUpGate,
+                summary,
+                phaseRows,
+                phaseCount: phaseRows.length,
+                totalLeft,
+                totalRight
+            };
+        }
+
+        function indepthPct(n, d) {
+            return d === 0 ? '—' : `${((100 * n) / d).toFixed(1)}%`;
+        }
+
+        function indepthDirCell(dir, theme) {
+            if (!dir || dir === '—') {
+                return `<td class="dir" style="background:#333333;color:#64748b">—</td>`;
+            }
+            const isLeft = dir === 'Left';
+            const bg = isLeft ? theme.leftColor : theme.rightColor;
+            const fg = isLeft ? theme.leftFg : theme.rightFg;
+            return `<td class="dir" style="background:${bg};color:${fg};font-weight:600">${dir}</td>`;
+        }
+
+        function indepthSplitBar(left, right, total, theme) {
+            if (!total) return '<span class="text-slate-500">—</span>';
+            const w = 120;
+            const lW = (w * left) / total;
+            const rW = (w * right) / total;
+            return `<div class="indepth-bar-wrap"><div class="indepth-bar"><div class="indepth-bar-l" style="width:${lW}px;background:${theme.leftColor}"></div><div class="indepth-bar-r" style="width:${rW}px;background:${theme.rightColor}"></div></div></div>`;
+        }
+
+        function renderFirstUpByPositionReportHtml(report) {
+            if (!report) return '';
+            if (report.error) {
+                return `<div class="indepth-report-sheet"><p class="text-red-400">${report.error}</p></div>`;
+            }
+            if (!report.phaseRows.length) {
+                return `<div class="indepth-report-sheet"><p class="text-slate-400">No phase data found for this selection.</p></div>`;
+            }
+
+            const theme = getIndepthGenderTheme(report.gender);
+            const themeClass = (report.gender === 'W' || report.gender === 'Women') ? 'theme-women' : 'theme-men';
+            const title = `${report.year} ${report.competition} ${report.location} — ${theme.label} · 1st Up-Stream by position`;
+            const subtitle = `Left-Up vs Right-Up at Gate ${report.firstUpGate} (1st Up-Stream), grouped by Order (P1–P4) across ${report.phaseCount} phases · Left ${report.totalLeft}/${report.totalLeft + report.totalRight} · Right ${report.totalRight}/${report.totalLeft + report.totalRight}`;
+            const POSITIONS = ['P1', 'P2', 'P3', 'P4'];
+            const n = report.phaseCount;
+
+            const summaryBody = POSITIONS.map(pos => {
+                const left = report.summary[pos].left;
+                const right = report.summary[pos].right;
+                return `<tr>
+                    <td class="pos-col">${pos}</td>
+                    <td class="dir" style="background:${theme.leftColor};color:${theme.leftFg};font-weight:600">${left}/${n}</td>
+                    <td class="dir" style="background:${theme.rightColor};color:${theme.rightFg};font-weight:600">${right}/${n}</td>
+                    <td class="meta-col" style="background:${theme.nameBg};color:${theme.nameColor}">${n}</td>
+                    <td class="meta-col" style="background:${theme.nameBg};color:${theme.nameColor}">${indepthPct(left, n)}</td>
+                    <td>${indepthSplitBar(left, right, n, theme)}</td>
+                </tr>`;
+            }).join('');
+
+            const phaseBody = report.phaseRows.map(r => `<tr>
+                <td class="phase-col">${r.phase}</td>
+                ${indepthDirCell(r.positions.P1, theme)}
+                ${indepthDirCell(r.positions.P2, theme)}
+                ${indepthDirCell(r.positions.P3, theme)}
+                ${indepthDirCell(r.positions.P4, theme)}
+            </tr>`).join('');
+
+            return `<div class="indepth-report-sheet">
+                <h2>${title}</h2>
+                <p class="indepth-sub">${subtitle}</p>
+                <h3 class="indepth-section-title ${themeClass}">Summary by position at Gate ${report.firstUpGate}</h3>
+                <table>
+                    <thead><tr>
+                        <th style="background:#2c2c2c;text-align:left">Position</th>
+                        <th style="background:${theme.headerBg}">Left</th>
+                        <th style="background:${theme.headerBg}">Right</th>
+                        <th style="background:${theme.headerBg}">Total</th>
+                        <th style="background:${theme.headerBg}">Left %</th>
+                        <th style="background:${theme.headerBg}">Split</th>
+                    </tr></thead>
+                    <tbody>${summaryBody}</tbody>
+                </table>
+                <h3 class="indepth-section-title ${themeClass}">Every phase — direction by position</h3>
+                <table>
+                    <thead><tr>
+                        <th style="background:#2c2c2c;text-align:left">Phase</th>
+                        <th style="background:${theme.headerBg}">P1</th>
+                        <th style="background:${theme.headerBg}">P2</th>
+                        <th style="background:${theme.headerBg}">P3</th>
+                        <th style="background:${theme.headerBg}">P4</th>
+                    </tr></thead>
+                    <tbody>${phaseBody}</tbody>
+                </table>
+                <div class="indepth-legend">
+                    <span><i style="background:${theme.leftColor}"></i>Left-Up</span>
+                    <span><i style="background:${theme.rightColor}"></i>Right-Up</span>
+                </div>
+            </div>`;
+        }
+
+        function renderIndepthReportHtml(report, reportType) {
+            if (reportType === 'first-up-by-position') return renderFirstUpByPositionReportHtml(report);
+            if (reportType === 'contest-stats') return renderContestStatsReportHtml(report);
+            return renderP1FirstUpReportHtml(report);
+        }
+
+        function collectIndepthReports(reportType, gender, mode) {
+            const reports = [];
+            if (mode === 'event') {
+                const year = +selectorsIndepth.year.property('value');
+                const competition = selectorsIndepth.competition.property('value');
+                const location = selectorsIndepth.locationEvent.property('value');
+                if (!year || !competition || competition === SELECT_PLACEHOLDER || !location || location === SELECT_PLACEHOLDER) {
+                    return { error: 'Select year, competition, and location.' };
+                }
+                const builder = getIndepthReportBuilder(reportType);
+                const report = builder(masterDataFull, year, competition, location, gender);
+                if (indepthHasReportData(report)) reports.push(report);
+            } else {
+                const location = selectorsIndepth.location.property('value');
+                if (!location || location === SELECT_PLACEHOLDER) {
+                    return { error: 'Select a location.' };
+                }
+                const builder = getIndepthReportBuilder(reportType);
+                getIndepthEventsAtLocation(masterDataFull, location, gender).forEach(evt => {
+                    const report = builder(masterDataFull, evt.year, evt.competition, evt.location, gender);
+                    if (indepthHasReportData(report)) {
+                        reports.push(report);
+                    }
+                });
+            }
+            return { reports };
+        }
+
+        function getIndepthEventsAtLocation(data, location, gender) {
+            const seen = new Set();
+            const events = [];
+            data.forEach(d => {
+                if ((d.Location || '').trim() !== String(location || '').trim()) return;
+                if (d.Gender !== gender) return;
+                const key = `${d.Year}\0${d.Competition}\0${(d.Location || '').trim()}`;
+                if (seen.has(key)) return;
+                seen.add(key);
+                events.push({
+                    year: d.Year,
+                    competition: d.Competition,
+                    location: (d.Location || '').trim()
+                });
+            });
+            events.sort((a, b) => {
+                if (b.year !== a.year) return b.year - a.year;
+                const ia = seasonCompetitionSortIndex(a.competition);
+                const ib = seasonCompetitionSortIndex(b.competition);
+                if (ia !== ib) return ia - ib;
+                return String(a.competition).localeCompare(String(b.competition));
+            });
+            return events;
+        }
+
+        function renderP1FirstUpReportHtml(report) {
+            if (!report) return '';
+            if (report.error) {
+                return `<div class="indepth-report-sheet"><p class="text-red-400">${report.error}</p></div>`;
+            }
+            if (!report.rows.length) {
+                return `<div class="indepth-report-sheet"><p class="text-slate-400">No phase data found for this selection.</p></div>`;
+            }
+
+            const theme = getIndepthGenderTheme(report.gender);
+            const title = `${report.year} ${report.competition} ${report.location} — ${theme.label} · P1 at 1st Up-Stream`;
+            const subtitle = `Direction at Gate ${report.firstUpGate} for the race leader (Order 1) · Left ${report.leftCount}/${report.total} · Right ${report.rightCount}/${report.total}`;
+
+            const body = report.rows.map(r => {
+                const isLeft = r.direction === 'Left';
+                const bg = isLeft ? theme.leftColor : theme.rightColor;
+                const fg = isLeft ? theme.leftFg : theme.rightFg;
+                return `<tr>
+                    <td class="heat">${r.phase}</td>
+                    <td style="background:${theme.nameBg};color:${theme.nameColor};text-align:left">${r.leader}</td>
+                    <td style="background:${theme.nameBg};color:${theme.nameColor}">${r.bib}</td>
+                    <td class="dir" style="background:${bg};color:${fg}">${r.direction}</td>
+                </tr>`;
+            }).join('');
+
+            return `<div class="indepth-report-sheet">
+                <h2>${title}</h2>
+                <p class="indepth-sub">${subtitle}</p>
+                <table>
+                    <thead><tr>
+                        <th class="pos-h" style="background:#2c2c2c">Phase</th>
+                        <th style="background:${theme.headerBg}">Leader (P1 at Gate ${report.firstUpGate})</th>
+                        <th style="background:${theme.headerBg}">BIB</th>
+                        <th style="background:${theme.headerBg}">1st Up direction</th>
+                    </tr></thead>
+                    <tbody>${body}</tbody>
+                </table>
+                <div class="indepth-legend">
+                    <span><i style="background:${theme.leftColor}"></i>Left-Up (${report.leftCount}/${report.total})</span>
+                    <span><i style="background:${theme.rightColor}"></i>Right-Up (${report.rightCount}/${report.total})</span>
+                </div>
+            </div>`;
+        }
+
+        function updateIndepthCompetitionOptions() {
+            const yearVal = selectorsIndepth.year.property('value');
+            const year = yearVal && yearVal !== SELECT_PLACEHOLDER ? +yearVal : null;
+            let comps = [];
+            if (year) {
+                comps = [...new Set(masterDataFull.filter(d => d.Year === year).map(d => d.Competition))].sort();
+            }
+            selectorsIndepth.competition.selectAll('option')
+                .data([SELECT_PLACEHOLDER, ...comps])
+                .join('option')
+                .attr('value', d => d)
+                .text(d => d);
+            updateIndepthEventLocationOptions();
+        }
+
+        function updateIndepthEventLocationOptions() {
+            const yearVal = selectorsIndepth.year.property('value');
+            const comp = selectorsIndepth.competition.property('value');
+            const gender = selectorsIndepth.gender.property('value');
+            const year = yearVal && yearVal !== SELECT_PLACEHOLDER ? +yearVal : null;
+            let locs = [];
+            if (year && comp && comp !== SELECT_PLACEHOLDER && gender && gender !== SELECT_PLACEHOLDER) {
+                locs = [...new Set(
+                    masterDataFull
+                        .filter(d => d.Year === year && d.Competition === comp && d.Gender === gender)
+                        .map(d => (d.Location || '').trim())
+                        .filter(Boolean)
+                )].sort();
+            }
+            selectorsIndepth.locationEvent.selectAll('option')
+                .data(locs.length ? locs : [SELECT_PLACEHOLDER])
+                .join('option')
+                .attr('value', d => d)
+                .text(d => d);
+            if (locs.length === 1) selectorsIndepth.locationEvent.property('value', locs[0]);
+        }
+
+        function updateIndepthFilterVisibility() {
+            const mode = selectorsIndepth.mode.property('value');
+            const isEvent = mode === 'event';
+            d3.select('#indepth-filters-event').classed('hidden', !isEvent);
+            d3.select('#indepth-filters-location').classed('hidden', isEvent);
+        }
+
+        function generateIndepthReport() {
+            const container = d3.select('#indepth-content-area');
+            container.html('');
+
+            const reportType = selectorsIndepth.report.property('value');
+            if (!['p1-first-up', 'first-up-by-position', 'contest-stats'].includes(reportType)) {
+                container.html('<p class="text-slate-400">Report type not available.</p>');
+                return;
+            }
+
+            const gender = selectorsIndepth.gender.property('value');
+            if (!gender || gender === SELECT_PLACEHOLDER) {
+                container.html('<p class="text-slate-400">Select a gender.</p>');
+                return;
+            }
+
+            const mode = selectorsIndepth.mode.property('value');
+            const result = collectIndepthReports(reportType, gender, mode);
+            if (result.error) {
+                container.html(`<p class="text-slate-400">${result.error}</p>`);
+                return;
+            }
+
+            const reports = result.reports || [];
+            if (!reports.length) {
+                container.html('<p class="text-slate-400">No data found for this selection.</p>');
+                return;
+            }
+
+            container.html(reports.map(r => renderIndepthReportHtml(r, reportType)).join(''));
+        }
+
+        function setupIndepthTab(persistedIndepth) {
+            const pi = persistedIndepth || {};
+            const genders = [...new Set(masterDataFull.map(d => d.Gender).filter(Boolean))].sort();
+            const years = [...new Set(masterDataFull.map(d => d.Year))].sort((a, b) => b - a);
+            const locations = [...new Set(masterDataFull.map(d => (d.Location || '').trim()).filter(Boolean))].sort();
+
+            selectorsIndepth.gender.selectAll('option')
+                .data([SELECT_PLACEHOLDER, ...genders])
+                .join('option')
+                .attr('value', d => d)
+                .text(d => d);
+
+            selectorsIndepth.year.selectAll('option')
+                .data([SELECT_PLACEHOLDER, ...years])
+                .join('option')
+                .attr('value', d => d)
+                .text(d => d);
+
+            selectorsIndepth.location.selectAll('option')
+                .data([SELECT_PLACEHOLDER, ...locations])
+                .join('option')
+                .attr('value', d => d)
+                .text(d => d);
+
+            selectorsIndepth.competition.selectAll('option')
+                .data([SELECT_PLACEHOLDER])
+                .join('option')
+                .attr('value', d => d)
+                .text(d => d);
+
+            selectorsIndepth.locationEvent.selectAll('option')
+                .data([SELECT_PLACEHOLDER])
+                .join('option')
+                .attr('value', d => d)
+                .text(d => d);
+
+            if (pi.mode) selectorsIndepth.mode.property('value', pi.mode);
+            updateIndepthFilterVisibility();
+
+            if (pi.gender && selectOptionExists(selectorsIndepth.gender, pi.gender)) {
+                selectorsIndepth.gender.property('value', String(pi.gender));
+            }
+            if (pi.year && selectOptionExists(selectorsIndepth.year, pi.year)) {
+                selectorsIndepth.year.property('value', String(pi.year));
+            }
+            updateIndepthCompetitionOptions();
+            if (pi.competition && selectOptionExists(selectorsIndepth.competition, pi.competition)) {
+                selectorsIndepth.competition.property('value', String(pi.competition));
+            }
+            updateIndepthEventLocationOptions();
+            if (pi.locationEvent && selectOptionExists(selectorsIndepth.locationEvent, pi.locationEvent)) {
+                selectorsIndepth.locationEvent.property('value', String(pi.locationEvent));
+            }
+            if (pi.location && selectOptionExists(selectorsIndepth.location, pi.location)) {
+                selectorsIndepth.location.property('value', String(pi.location));
+            }
+
+            selectorsIndepth.mode.on('change', () => {
+                updateIndepthFilterVisibility();
+                schedulePersistReportUiState();
+            });
+            selectorsIndepth.year.on('change', () => {
+                updateIndepthCompetitionOptions();
+                schedulePersistReportUiState();
+            });
+            selectorsIndepth.competition.on('change', () => {
+                updateIndepthEventLocationOptions();
+                schedulePersistReportUiState();
+            });
+            selectorsIndepth.gender.on('change', () => {
+                updateIndepthEventLocationOptions();
+                schedulePersistReportUiState();
+            });
+            ['report', 'location', 'locationEvent'].forEach(key => {
+                selectorsIndepth[key].on('change', schedulePersistReportUiState);
+            });
+
+            d3.select('#indepth-generate-btn').on('click', generateIndepthReport);
+
+            if (pi.report) selectorsIndepth.report.property('value', pi.report);
         }
 
         // --- SEASON SUMMARY LOGIC ---
@@ -3708,7 +5121,7 @@
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 const pointsData = values.filter(d => d.Gate !== 'Start');
-                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#000000");
                 values.forEach(d => {
                     const showLabel = (upstreamGates.includes(d.Gate) || isSpecialGate(d.Gate)) && d.displayTactic;
                     if (showLabel) {
@@ -3792,7 +5205,7 @@
             groupedData.forEach((values, key) => {
                 chart.append("path").datum(values.sort((a, b) => lineAndScaleDomain.indexOf(a.Gate) - lineAndScaleDomain.indexOf(b.Gate))).attr("fill", "none").attr("stroke", bibColors[key] || '#64748b').attr("stroke-width", 3).attr("d", line);
                 const pointsData = values.filter(d => d.Gate !== 'Start');
-                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#0f172a");
+                chart.selectAll(`.dot-${key}`).data(pointsData).join("circle").attr("cx", d => xScale(d.Gate)).attr("cy", d => yScale(d.Position)).attr("r", 5).attr("fill", bibColors[key] || '#64748b').attr("stroke", "#000000");
                 values.forEach(d => {
                     const showLabel = (upstreamGates.includes(d.Gate) || isSpecialGate(d.Gate)) && d.displayTactic;
                     if (showLabel) {
