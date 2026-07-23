@@ -2809,13 +2809,32 @@
             const dataFirst = splitNames.map((name, i) => ({ split: name, time: firstPlaceTimes[i], type: 'first' }));
 
             const xScale = d3.scalePoint().domain(splitNames).range([0, width]).padding(0.2);
+            // Zoom Y to the plotted athletes' split range so gaps between lines are visible
+            // (do not force domain down to 0).
             const allTimes = [...athleteTimes, ...firstPlaceTimes].filter(t => typeof t === 'number' && !isNaN(t));
-            const yMin = Math.min(...allTimes, 0);
-            const yMax = Math.max(...allTimes);
-            const yPadding = (yMax - yMin) * 0.05 || 1;
-            const yScale = d3.scaleLinear().domain([yMin - yPadding, yMax + yPadding]).range([height, 0]);
+            if (!allTimes.length) return;
+            let yMin = Math.min(...allTimes);
+            let yMax = Math.max(...allTimes);
+            const span = yMax - yMin;
+            // Keep a usable vertical range when athletes are very close, and pad so lines aren't on the edge.
+            const minSpan = Math.max(0.5, span * 0.35);
+            const pad = Math.max(span * 0.12, minSpan * 0.15, 0.15);
+            if (span < minSpan) {
+                const mid = (yMin + yMax) / 2;
+                yMin = mid - minSpan / 2;
+                yMax = mid + minSpan / 2;
+            }
+            yMin -= pad;
+            yMax += pad;
+            // Never go below 0 for time (s); if data is near zero, keep a small floor.
+            if (yMin < 0) yMin = 0;
+            const yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
 
-            const line = d3.line().x(d => xScale(d.split)).y(d => yScale(d.time)).curve(d3.curveMonotoneX);
+            const line = d3.line()
+                .defined(d => typeof d.time === 'number' && !isNaN(d.time))
+                .x(d => xScale(d.split))
+                .y(d => yScale(d.time))
+                .curve(d3.curveMonotoneX);
 
             const g = container.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -2842,16 +2861,16 @@
             g.append("path").datum(dataFirst).attr("fill", "none").attr("stroke", "#E8C020").attr("stroke-width", 2.5).attr("d", line);
             g.append("path").datum(dataAthlete).attr("fill", "none").attr("stroke", "#9B59B6").attr("stroke-width", 2.5).attr("d", line);
 
-            g.selectAll(".dot-first").data(dataFirst).join("circle").attr("class", "dot-first").attr("cx", d => xScale(d.split)).attr("cy", d => yScale(d.time)).attr("r", 4).attr("fill", "#E8C020");
-            g.selectAll(".dot-athlete").data(dataAthlete).join("circle").attr("class", "dot-athlete").attr("cx", d => xScale(d.split)).attr("cy", d => yScale(d.time)).attr("r", 4).attr("fill", "#9B59B6");
+            g.selectAll(".dot-first").data(dataFirst.filter(d => typeof d.time === 'number' && !isNaN(d.time))).join("circle").attr("class", "dot-first").attr("cx", d => xScale(d.split)).attr("cy", d => yScale(d.time)).attr("r", 4).attr("fill", "#E8C020");
+            g.selectAll(".dot-athlete").data(dataAthlete.filter(d => typeof d.time === 'number' && !isNaN(d.time))).join("circle").attr("class", "dot-athlete").attr("cx", d => xScale(d.split)).attr("cy", d => yScale(d.time)).attr("r", 4).attr("fill", "#9B59B6");
         }
 
         const ttTableColors = {
-            athlete: '#ffffff',   // selected athlete
+            athlete: '#9B59B6',   // selected athlete (purple)
             rank1: '#E8C020',     // gold
             rank2: '#C0C0C0',     // silver
             rank3: '#CD7F32',     // bronze
-            vbr: '#38bdf8'        // virtual best run
+            vbr: '#ffffff'        // Virtual Best Run (bold white)
         };
 
         // Default course background; custom maps only when CSV Location matches a file stem (see data/course_maps/README.md).
@@ -3070,7 +3089,7 @@
             const container = d3.select("#tt-splits-table-container");
             container.selectAll("*").remove();
             const formatT = t => (typeof t === 'number' && !isNaN(t)) ? t.toFixed(2) : '—';
-            const winnerRow = rowData[0];
+            const winnerRow = rowData.find(d => !d.isVbr) || rowData[0];
             const winnerTotal = winnerRow
                 ? ((typeof winnerRow.total === 'number' && !isNaN(winnerRow.total))
                     ? winnerRow.total
@@ -3089,9 +3108,11 @@
             };
             const splitColOffset = 2; // Rank, then Name
             const totalColIdx = splitNames.length + splitColOffset;
+            // Fastest highlight among athlete rows only — exclude Virtual Best Run.
+            const athleteRowsForMin = rowData.filter(d => !d.isVbr);
             const minPerCol = [];
             for (let j = splitColOffset; j <= totalColIdx; j++) {
-                const vals = rowData.map(d => {
+                const vals = athleteRowsForMin.map(d => {
                     if (j < totalColIdx) return d.times[j - splitColOffset];
                     return (typeof d.total === 'number' && !isNaN(d.total)) ? d.total : (d.times.length ? d.times[d.times.length - 1] : NaN);
                 }).filter(v => typeof v === 'number' && !isNaN(v));
@@ -3121,22 +3142,23 @@
             rows.selectAll("td").data((d) => {
                 const total = (typeof d.total === 'number' && !isNaN(d.total)) ? d.total : (d.times.length ? d.times[d.times.length - 1] : NaN);
                 return [
-                    { text: formatRank(d.rank), isRank: true },
-                    { text: d.label, color: d.color, isLabel: true },
-                    ...d.times.map((t, i) => ({ text: formatT(t), value: t, colIdx: i + splitColOffset })),
-                    { text: formatT(total), value: total, colIdx: totalColIdx },
-                    { text: formatPctBehindWinner(total), isPctBehind: true }
+                    { text: formatRank(d.rank), isRank: true, isVbr: !!d.isVbr },
+                    { text: d.label, color: d.color, isLabel: true, isVbr: !!d.isVbr },
+                    ...d.times.map((t, i) => ({ text: formatT(t), value: t, colIdx: i + splitColOffset, isVbr: !!d.isVbr })),
+                    { text: formatT(total), value: total, colIdx: totalColIdx, isVbr: !!d.isVbr },
+                    { text: formatPctBehindWinner(total), isPctBehind: true, isVbr: !!d.isVbr }
                 ];
             }).join("td")
                 .attr("class", (d, j) => {
                     const base = (j === 0 || j === 1) ? "px-4 py-3 text-sm font-medium" : "px-4 py-3 text-sm text-slate-400";
                     const minVal = minPerCol[d.colIdx];
-                    const isFastest = !d.isLabel && !d.isRank && !d.isPctBehind && typeof d.value === 'number' && !isNaN(d.value) && typeof minVal === 'number' && !isNaN(minVal) && Math.abs(d.value - minVal) < 0.005;
+                    const isFastest = !d.isVbr && !d.isLabel && !d.isRank && !d.isPctBehind && typeof d.value === 'number' && !isNaN(d.value) && typeof minVal === 'number' && !isNaN(minVal) && Math.abs(d.value - minVal) < 0.005;
                     if (j === 0) return "px-2 py-3 text-xs text-center text-slate-400 w-12";
                     if (isFastest) return base + " rounded bg-amber-500/25 border border-amber-400/60";
                     return base;
                 })
                 .style("color", (d, j) => j === 1 ? d.color : null)
+                .style("font-weight", (d, j) => (j === 1 && d.isVbr) ? "700" : null)
                 .text(d => d.text);
         }
 
@@ -3245,7 +3267,7 @@
                     if (!athleteInTop3) {
                         rows.push({ label: athleteName, color: ttTableColors.athlete, times: athleteTimes, total: athleteTotal, rank: athleteRow.Rank });
                     }
-                    rows.push({ label: 'VBR', color: ttTableColors.vbr, times: vbr.times, total: vbr.total, rank: undefined });
+                    rows.push({ label: 'Virtual Best Run', color: ttTableColors.vbr, times: vbr.times, total: vbr.total, rank: undefined, isVbr: true });
                     const sectorLabels = getTTSectorLabelsForSelection(selected.year, selected.competition, selected.location);
                     drawTTSplitsTable(
                         splitNames,
