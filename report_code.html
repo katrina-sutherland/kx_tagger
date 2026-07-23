@@ -393,7 +393,7 @@
             border-color: var(--report-border) !important;
         }
 
-        .divide-slate-700 > :not([hidden]) ~ :not([hidden]) {
+        .divide-slate-700> :not([hidden])~ :not([hidden]) {
             border-color: var(--report-border) !important;
         }
 
@@ -444,14 +444,16 @@
                     class="text-slate-400 hover:text-slate-100 text-2xl leading-none px-2"
                     aria-label="Close video">&times;</button>
             </div>
-            <div id="race-video-modal-body" class="p-4 bg-black flex flex-col items-center justify-center min-h-[200px]">
+            <div id="race-video-modal-body"
+                class="p-4 bg-black flex flex-col items-center justify-center min-h-[200px]">
                 <video id="race-video-player" class="w-full rounded-md hidden" controls playsinline></video>
                 <iframe id="race-video-iframe" class="w-full rounded-md border-0 hidden" title="Race video player"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                     allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
                 <p id="race-video-error" class="hidden text-sm text-slate-400 text-center px-4 py-6">
                     This video could not be embedded. Check that the Video Link in the CSV is a public share URL
-                    (Dropbox, YouTube, Vimeo, or an MP4 hosted in this repo under <code class="text-slate-300">data/</code>).
+                    (Dropbox, YouTube, Vimeo, or an MP4 hosted in this repo under <code
+                        class="text-slate-300">data/</code>).
                 </p>
             </div>
         </div>
@@ -506,8 +508,7 @@
                         <div>
                             <label for="year-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                            <select id="year-select-full"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="year-select-full" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-full"
@@ -518,20 +519,17 @@
                         <div id="location-wrapper-full">
                             <label for="location-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
-                            <select id="location-select-full"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="location-select-full" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div class="max-w-[6.5rem]">
                             <label for="gender-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                            <select id="gender-select-full"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="gender-select-full" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="phase-select-full"
                                 class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
-                            <select id="phase-select-full"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="phase-select-full" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
@@ -556,7 +554,8 @@
                 <div class="lg:col-span-2 flex flex-col gap-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win % by
+                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall Win
+                                % by
                                 Bib Color</h3>
                             <div id="pie-chart-bib-full" class="w-full h-40 flex items-center justify-center"></div>
                             <div id="pie-legend-bib-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
@@ -564,11 +563,13 @@
                         <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
                             <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Overall 2nd
                                 Place % by Bib Color</h3>
-                            <div id="pie-chart-bib-second-full" class="w-full h-40 flex items-center justify-center"></div>
+                            <div id="pie-chart-bib-second-full" class="w-full h-40 flex items-center justify-center">
+                            </div>
                             <div id="pie-legend-bib-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
                         </div>
                         <div class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card">
-                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish Position
+                            <h3 class="text-sm font-semibold text-slate-100 mb-4 text-center leading-tight">Finish
+                                Position
                                 % when Leading at 1st Upstream</h3>
                             <div id="pie-chart-gate2-full" class="w-full h-40 flex items-center justify-center"></div>
                             <div id="pie-legend-gate2-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
@@ -578,7 +579,8 @@
                                 Upstream When Overall Finish 2nd</h3>
                             <div id="pie-chart-gate2-second-full" class="w-full h-40 flex items-center justify-center">
                             </div>
-                            <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4"></div>
+                            <div id="pie-legend-gate2-second-full" class="flex flex-col items-center gap-y-2 mt-4">
+                            </div>
                         </div>
                     </div>
                     <div id="race-video-full"
@@ -602,8 +604,7 @@
                         <div>
                             <label for="year-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                            <select id="year-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="year-select-compact" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-compact"
@@ -620,14 +621,12 @@
                         <div class="max-w-[6.5rem]">
                             <label for="gender-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                            <select id="gender-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="gender-select-compact" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="phase-select-compact"
                                 class="block text-sm font-medium text-slate-300 mb-1">Phase</label>
-                            <select id="phase-select-compact"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="phase-select-compact" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
@@ -665,11 +664,13 @@
                                 Place %<br>by Bib Color</h3>
                             <div id="pie-chart-bib-second-compact" class="w-full h-32 flex items-center justify-center">
                             </div>
-                            <div id="pie-legend-bib-second-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                            <div id="pie-legend-bib-second-compact" class="flex flex-col items-center gap-y-1 mt-2">
+                            </div>
                         </div>
                         <div
                             class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
-                            <h3 class="text-xs font-semibold text-slate-100 mb-4 text-center leading-tight">Win %<br>by Ramp
+                            <h3 class="text-xs font-semibold text-slate-100 mb-4 text-center leading-tight">Win %<br>by
+                                Ramp
                                 Position</h3>
                             <div id="pie-chart-ramp-compact" class="w-full h-32 flex items-center justify-center"></div>
                             <div id="pie-legend-ramp-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
@@ -678,15 +679,19 @@
                             class="bg-slate-800 p-2 sm:p-4 rounded-xl shadow-md border border-slate-700 chart-card flex flex-col justify-center">
                             <h3 class="text-xs font-semibold text-slate-100 mb-4 text-center leading-tight">2nd Place
                                 %<br>by Ramp Position</h3>
-                            <div id="pie-chart-ramp-second-compact" class="w-full h-32 flex items-center justify-center">
+                            <div id="pie-chart-ramp-second-compact"
+                                class="w-full h-32 flex items-center justify-center">
                             </div>
-                            <div id="pie-legend-ramp-second-compact" class="flex flex-col items-center gap-y-1 mt-2"></div>
+                            <div id="pie-legend-ramp-second-compact" class="flex flex-col items-center gap-y-1 mt-2">
+                            </div>
                         </div>
                     </div>
                     <div id="competition-notes-compact"
                         class="hidden bg-slate-800 p-4 sm:p-5 rounded-xl shadow-md border border-slate-700">
-                        <h3 class="text-sm font-semibold text-slate-100 mb-3 uppercase tracking-wider">Notes &amp; Comments</h3>
-                        <div id="competition-notes-compact-content" class="text-sm text-slate-300 space-y-3 whitespace-pre-wrap"></div>
+                        <h3 class="text-sm font-semibold text-slate-100 mb-3 uppercase tracking-wider">Notes &amp;
+                            Comments</h3>
+                        <div id="competition-notes-compact-content"
+                            class="text-sm text-slate-300 space-y-3 whitespace-pre-wrap"></div>
                     </div>
                 </div>
             </div>
@@ -701,43 +706,45 @@
                         <div>
                             <label for="year-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Year</label>
-                            <select id="year-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="year-select-tt" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Competition</label>
-                            <select id="competition-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="competition-select-tt" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div id="location-wrapper-tt">
                             <label for="location-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Location</label>
-                            <select id="location-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="location-select-tt" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div class="max-w-[6.5rem]">
                             <label for="gender-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Gender</label>
-                            <select id="gender-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="gender-select-tt" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="athlete-select-tt"
                                 class="block text-sm font-medium text-slate-300 mb-1">Athlete</label>
-                            <select id="athlete-select-tt"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="athlete-select-tt" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                 </div>
-                <p class="text-slate-400 text-sm mb-4">View individual time trial runs. Use filters to narrow by year, competition, location, gender, and athlete. Select an athlete to see their split line vs 1st place (gold).</p>
+                <p class="text-slate-400 text-sm mb-4">View individual time trial runs. Use filters to narrow by year,
+                    competition, location, gender, and athlete. Select an athlete to compare their splits with 1st
+                    (gold), 2nd (silver), 3rd (bronze), and the Virtual Best Run (VBR).</p>
                 <div id="tt-chart-container" class="mb-8 hidden">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
-                        <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Time Trial Sector Comparison v 1st:</h3>
+                        <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Time Trial Sector Comparison v
+                            1st:</h3>
                         <div id="tt-chart-diff" class="text-center text-slate-400 text-sm mb-4"></div>
                         <div id="tt-view-toggle" class="flex justify-center gap-2 mb-4 hidden">
-                            <button type="button" id="tt-view-line" class="px-3 py-1.5 rounded text-sm font-medium border report-btn-active">Line graph</button>
-                            <button type="button" id="tt-view-course" class="px-3 py-1.5 rounded text-sm font-medium border report-btn-inactive">Course view</button>
+                            <button type="button" id="tt-view-line"
+                                class="px-3 py-1.5 rounded text-sm font-medium border report-btn-active">Line
+                                graph</button>
+                            <button type="button" id="tt-view-course"
+                                class="px-3 py-1.5 rounded text-sm font-medium border report-btn-inactive">Course
+                                view</button>
                         </div>
                         <div id="tt-line-chart-wrapper">
                             <div id="tt-chart" class="w-full h-[400px]">
@@ -745,18 +752,30 @@
                             </div>
                             <div id="tt-chart-legend" class="flex justify-center gap-6 mt-4 text-sm"></div>
                         </div>
-                        <div id="tt-course-view-wrapper" class="hidden w-full" style="max-width: 800px; margin: 0 auto;">
-                            <div id="tt-course-view" class="w-full rounded overflow-hidden border border-slate-600 relative" style="aspect-ratio: 1.2; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('whitewater_course.png'); filter: brightness(0.72) saturate(0.85) contrast(1.05);">
+                        <div id="tt-course-view-wrapper" class="hidden w-full"
+                            style="max-width: 800px; margin: 0 auto;">
+                            <div id="tt-course-view"
+                                class="w-full rounded overflow-hidden border border-slate-600 relative"
+                                style="aspect-ratio: 1.2; background-size: contain; background-repeat: no-repeat; background-position: center; background-image: url('whitewater_course.png'); filter: brightness(0.72) saturate(0.85) contrast(1.05);">
                                 <div class="absolute inset-0 tt-course-dim" aria-hidden="true"></div>
-                                <svg id="tt-course-overlay" class="absolute inset-0 w-full h-full" style="pointer-events: none;"></svg>
+                                <svg id="tt-course-overlay" class="absolute inset-0 w-full h-full"
+                                    style="pointer-events: none;"></svg>
                             </div>
                             <div id="tt-course-legend" class="flex justify-center gap-6 mt-4 text-sm items-center">
                                 <span class="font-medium inline-flex items-center gap-1.5">
-                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0" aria-hidden="true"><path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#9B59B6" stroke="rgba(0,0,0,0.35)" stroke-width="0.6"/></svg>
+                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0"
+                                        aria-hidden="true">
+                                        <path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#9B59B6" stroke="rgba(0,0,0,0.35)"
+                                            stroke-width="0.6" />
+                                    </svg>
                                     <span id="tt-course-legend-athlete" class="text-[#9B59B6]">Athlete</span>
                                 </span>
                                 <span class="font-medium inline-flex items-center gap-1.5">
-                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0" aria-hidden="true"><path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#E8C020" stroke="rgba(0,0,0,0.35)" stroke-width="0.6"/></svg>
+                                    <svg viewBox="-10 -3 20 6" class="inline-block w-5 h-3 flex-shrink-0"
+                                        aria-hidden="true">
+                                        <path d="M -8,0 L 6,-2 L 8,0 L 6,2 Z" fill="#E8C020" stroke="rgba(0,0,0,0.35)"
+                                            stroke-width="0.6" />
+                                    </svg>
                                     <span id="tt-course-legend-first" class="text-[#E8C020]">Rank 1</span>
                                 </span>
                             </div>
@@ -765,15 +784,22 @@
                 </div>
                 <div id="competition-notes-tt"
                     class="hidden bg-slate-800 p-4 sm:p-5 rounded-xl shadow-md border border-slate-700 mb-8">
-                    <h3 class="text-sm font-semibold text-slate-100 mb-3 uppercase tracking-wider">Notes &amp; Comments</h3>
-                    <div id="competition-notes-tt-content" class="text-sm text-slate-300 space-y-3 whitespace-pre-wrap"></div>
+                    <h3 class="text-sm font-semibold text-slate-100 mb-3 uppercase tracking-wider">Notes &amp; Comments
+                    </h3>
+                    <div id="competition-notes-tt-content" class="text-sm text-slate-300 space-y-3 whitespace-pre-wrap">
+                    </div>
                 </div>
                 <div id="tt-splits-table-wrapper" class="hidden mb-8">
                     <div class="bg-slate-800 p-4 sm:p-6 rounded-xl shadow-md border border-slate-700">
                         <h3 class="text-xl font-semibold text-slate-100 mb-2 text-center">Split breakdown</h3>
-                        <p class="text-slate-400 text-sm mb-2 text-center">Compares split times for <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected athlete</strong> (if different) within the <strong>selected competition, location, and gender</strong>. Gold boxes mark the fastest time in each sector.</p>
-                        <p id="tt-splits-sector-legend" class="hidden text-slate-400 text-xs mb-4 text-center">— USDR = Upside Down Roll</p>
-                        <div id="tt-splits-table-container" class="overflow-x-auto rounded-xl border border-slate-700"></div>
+                        <p class="text-slate-400 text-sm mb-2 text-center">Compares split times for
+                            <strong>1st</strong>, <strong>3rd</strong>, <strong>5th</strong>, and the <strong>selected
+                                athlete</strong> (if different) within the <strong>selected competition, location, and
+                                gender</strong>. Gold boxes mark the fastest time in each sector.</p>
+                        <p id="tt-splits-sector-legend" class="hidden text-slate-400 text-xs mb-4 text-center">— USDR =
+                            Upside Down Roll</p>
+                        <div id="tt-splits-table-container" class="overflow-x-auto rounded-xl border border-slate-700">
+                        </div>
                     </div>
                 </div>
                 <div id="tt-content-area" class="mt-6">
@@ -791,8 +817,7 @@
                         <div>
                             <label for="year-select-athlete"
                                 class="block text-sm font-medium text-slate-300 mb-2">Year</label>
-                            <select id="year-select-athlete"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="year-select-athlete" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="competition-select-athlete"
@@ -803,8 +828,7 @@
                         <div>
                             <label for="gender-select-athlete"
                                 class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
-                            <select id="gender-select-athlete"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="gender-select-athlete" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700 pt-6">
@@ -842,14 +866,12 @@
                         <div>
                             <label for="year-select-summary"
                                 class="block text-sm font-medium text-slate-300 mb-2">Year</label>
-                            <select id="year-select-summary"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="year-select-summary" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="gender-select-summary"
                                 class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
-                            <select id="gender-select-summary"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <select id="gender-select-summary" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
                             <label for="athlete-select-summary"
@@ -873,48 +895,51 @@
                     <h2 class="text-lg font-semibold text-slate-100 mb-4">In-Depth Analysis</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                         <div>
-                            <label for="indepth-report-select" class="block text-sm font-medium text-slate-300 mb-2">Report</label>
-                            <select id="indepth-report-select"
-                                class="dark-select w-full rounded-md shadow-sm">
+                            <label for="indepth-report-select"
+                                class="block text-sm font-medium text-slate-300 mb-2">Report</label>
+                            <select id="indepth-report-select" class="dark-select w-full rounded-md shadow-sm">
                                 <option value="p1-first-up">P1 &amp; First Up Report</option>
                                 <option value="first-up-by-position">First Up-Stream by Position</option>
                                 <option value="contest-stats">Contest Statistics</option>
                             </select>
                         </div>
                         <div>
-                            <label for="indepth-mode-select" class="block text-sm font-medium text-slate-300 mb-2">Filter by</label>
-                            <select id="indepth-mode-select"
-                                class="dark-select w-full rounded-md shadow-sm">
+                            <label for="indepth-mode-select"
+                                class="block text-sm font-medium text-slate-300 mb-2">Filter by</label>
+                            <select id="indepth-mode-select" class="dark-select w-full rounded-md shadow-sm">
                                 <option value="event">Year + Competition + Gender</option>
                                 <option value="location">Location + Gender</option>
                             </select>
                         </div>
                         <div>
-                            <label for="indepth-gender-select" class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
-                            <select id="indepth-gender-select"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <label for="indepth-gender-select"
+                                class="block text-sm font-medium text-slate-300 mb-2">Gender</label>
+                            <select id="indepth-gender-select" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                     <div id="indepth-filters-event" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="indepth-year-select" class="block text-sm font-medium text-slate-300 mb-2">Year</label>
-                            <select id="indepth-year-select"
-                                class="dark-select w-full rounded-md shadow-sm"></select>
+                            <label for="indepth-year-select"
+                                class="block text-sm font-medium text-slate-300 mb-2">Year</label>
+                            <select id="indepth-year-select" class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
-                            <label for="indepth-competition-select" class="block text-sm font-medium text-slate-300 mb-2">Competition</label>
+                            <label for="indepth-competition-select"
+                                class="block text-sm font-medium text-slate-300 mb-2">Competition</label>
                             <select id="indepth-competition-select"
                                 class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                         <div>
-                            <label for="indepth-location-event-select" class="block text-sm font-medium text-slate-300 mb-2">Location</label>
+                            <label for="indepth-location-event-select"
+                                class="block text-sm font-medium text-slate-300 mb-2">Location</label>
                             <select id="indepth-location-event-select"
                                 class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
                     </div>
                     <div id="indepth-filters-location" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="indepth-location-select" class="block text-sm font-medium text-slate-300 mb-2">Location</label>
+                            <label for="indepth-location-select"
+                                class="block text-sm font-medium text-slate-300 mb-2">Location</label>
                             <select id="indepth-location-select"
                                 class="dark-select w-full rounded-md shadow-sm"></select>
                         </div>
@@ -938,9 +963,9 @@
             <h2 id="indepth-password-title" class="text-lg font-semibold text-slate-100 mb-2">In-Depth Analysis</h2>
             <p class="text-sm text-slate-400 mb-4">Enter the password to access this section.</p>
             <input type="password" id="indepth-password-input" autocomplete="off"
-                class="dark-input w-full rounded-md px-3 py-2 mb-2 border"
-                placeholder="Password" />
-            <p id="indepth-password-error" class="hidden text-sm text-red-400 mb-3">Incorrect password. Please try again.</p>
+                class="dark-input w-full rounded-md px-3 py-2 mb-2 border" placeholder="Password" />
+            <p id="indepth-password-error" class="hidden text-sm text-red-400 mb-3">Incorrect password. Please try
+                again.</p>
             <div class="flex gap-3 justify-end">
                 <button type="button" id="indepth-password-cancel"
                     class="px-4 py-2 rounded-md text-sm text-slate-300 hover:bg-slate-700">Cancel</button>
@@ -2677,7 +2702,7 @@
             );
         }
 
-        /** 1st / 3rd / 5th place rows within a single cohort (CSV Rank first, else total-time order). */
+        /** 1st / 2nd / 3rd place rows within a single cohort (CSV Rank first, else total-time order). */
         function getTimeTrialRankRowsInCohort(cohortRows, splitNames) {
             const lastCol = splitNames.length ? splitNames[splitNames.length - 1] : null;
             const rankedByTotal = cohortRows.slice()
@@ -2690,7 +2715,20 @@
                 || rankedByTotal[rank - 1]
                 || rankedByLastSplit[rank - 1]
                 || null;
-            return { rank1: pick(1), rank3: pick(3), rank5: pick(5) };
+            return { rank1: pick(1), rank2: pick(2), rank3: pick(3) };
+        }
+
+        /** Virtual Best Run: best sector time per split across the cohort, plus sum as VBR total. */
+        function getTimeTrialVBR(cohortRows, splitNames) {
+            const times = splitNames.map(col => {
+                const vals = cohortRows
+                    .map(d => d[col])
+                    .filter(v => typeof v === 'number' && !isNaN(v) && v > 0);
+                return vals.length ? Math.min(...vals) : NaN;
+            });
+            const valid = times.filter(t => typeof t === 'number' && !isNaN(t));
+            const total = valid.length ? valid.reduce((a, b) => a + b, 0) : NaN;
+            return { times, total };
         }
 
         function updateTTAthleteOptions() {
@@ -2809,11 +2847,11 @@
         }
 
         const ttTableColors = {
-            athlete: '#9B59B6',
-            firstPlace: '#E8C020',
-            rank3: '#A97142',
-            rank1: '#E8C020',
-            rank5: '#a3e635' // sage green
+            athlete: '#ffffff',   // selected athlete
+            rank1: '#E8C020',     // gold
+            rank2: '#C0C0C0',     // silver
+            rank3: '#CD7F32',     // bronze
+            vbr: '#38bdf8'        // virtual best run
         };
 
         // Default course background; custom maps only when CSV Location matches a file stem (see data/course_maps/README.md).
@@ -3177,32 +3215,37 @@
                 if (selected.athlete !== 'All' && athleteRow) {
                     const athleteTimes = splitNames.map(col => athleteRow[col]);
                     const athleteName = formatAthleteName(athleteRow.AthleteName) || selected.athlete;
-                    const { rank1: rank1Row, rank3: rank3Row, rank5: rank5Row } = getTimeTrialRankRowsInCohort(splitCohort, splitNames);
+                    const { rank1: rank1Row, rank2: rank2Row, rank3: rank3Row } = getTimeTrialRankRowsInCohort(splitCohort, splitNames);
                     const rank1Name = rank1Row ? (formatAthleteName(rank1Row.AthleteName) || '—') : '—';
+                    const rank2Name = rank2Row ? (formatAthleteName(rank2Row.AthleteName) || '—') : '—';
                     const rank3Name = rank3Row ? (formatAthleteName(rank3Row.AthleteName) || '—') : '—';
                     const rank1Times = rank1Row ? splitNames.map(col => rank1Row[col]) : splitNames.map(() => NaN);
+                    const rank2Times = rank2Row ? splitNames.map(col => rank2Row[col]) : splitNames.map(() => NaN);
                     const rank3Times = rank3Row ? splitNames.map(col => rank3Row[col]) : splitNames.map(() => NaN);
-                    const athleteTotal = (athleteRow.TotalTime != null && !isNaN(athleteRow.TotalTime)) ? athleteRow.TotalTime : athleteTimes.filter(t => !isNaN(t)).pop();
-                    const rank1Total = rank1Row && (rank1Row.TotalTime != null && !isNaN(rank1Row.TotalTime)) ? rank1Row.TotalTime : rank1Times.filter(t => !isNaN(t)).pop();
-                    const rank3Total = rank3Row && (rank3Row.TotalTime != null && !isNaN(rank3Row.TotalTime)) ? rank3Row.TotalTime : rank3Times.filter(t => !isNaN(t)).pop();
-                    const rank5Name = rank5Row ? (formatAthleteName(rank5Row.AthleteName) || '—') : '—';
-                    const rank5Times = rank5Row ? splitNames.map(col => rank5Row[col]) : splitNames.map(() => NaN);
-                    const rank5Total = rank5Row && (rank5Row.TotalTime != null && !isNaN(rank5Row.TotalTime)) ? rank5Row.TotalTime : rank5Times.filter(t => !isNaN(t)).pop();
+                    const athleteTotal = (athleteRow.TotalTime != null && !isNaN(athleteRow.TotalTime)) ? athleteRow.TotalTime : athleteTimes.filter(t => !isNaN(t)).reduce((a, b) => a + b, 0);
+                    const rank1Total = rank1Row && (rank1Row.TotalTime != null && !isNaN(rank1Row.TotalTime)) ? rank1Row.TotalTime : rank1Times.filter(t => !isNaN(t)).reduce((a, b) => a + b, 0);
+                    const rank2Total = rank2Row && (rank2Row.TotalTime != null && !isNaN(rank2Row.TotalTime)) ? rank2Row.TotalTime : rank2Times.filter(t => !isNaN(t)).reduce((a, b) => a + b, 0);
+                    const rank3Total = rank3Row && (rank3Row.TotalTime != null && !isNaN(rank3Row.TotalTime)) ? rank3Row.TotalTime : rank3Times.filter(t => !isNaN(t)).reduce((a, b) => a + b, 0);
+                    const vbr = getTimeTrialVBR(splitCohort, splitNames);
                     chartContainer.classed("hidden", false);
                     lastTTChartData = { splitNames, athleteTimes, firstPlaceTimes: rank1Times };
                     drawTTSplitChart(splitNames, athleteTimes, rank1Times, athleteName);
-                    // Build rows in order: 1st, 3rd, 5th, selected (if distinct from rank5)
+                    // Build rows: 1st (gold), 2nd (silver), 3rd (bronze), selected athlete (white if outside top 3), VBR
                     const rows = [];
-                    rows.push({ label: rank1Name, color: ttTableColors.rank1, times: rank1Times, total: rank1Total, rank: rank1Row?.Rank });
-                    rows.push({ label: rank3Name, color: ttTableColors.rank3, times: rank3Times, total: rank3Total, rank: rank3Row?.Rank });
-                    const rank5IsDistinct = rank5Name && rank5Name !== '—' && rank5Name !== athleteName;
-                    if (rank5IsDistinct) {
-                        rows.push({ label: rank5Name, color: ttTableColors.rank5, times: rank5Times, total: rank5Total, rank: rank5Row?.Rank });
+                    if (rank1Name !== '—') {
+                        rows.push({ label: rank1Name, color: ttTableColors.rank1, times: rank1Times, total: rank1Total, rank: rank1Row?.Rank });
                     }
-                    const athleteIsDistinctFrom5 = !rank5IsDistinct || athleteName !== rank5Name;
-                    if (athleteIsDistinctFrom5) {
+                    if (rank2Name !== '—' && rank2Name !== rank1Name) {
+                        rows.push({ label: rank2Name, color: ttTableColors.rank2, times: rank2Times, total: rank2Total, rank: rank2Row?.Rank });
+                    }
+                    if (rank3Name !== '—' && rank3Name !== rank1Name && rank3Name !== rank2Name) {
+                        rows.push({ label: rank3Name, color: ttTableColors.rank3, times: rank3Times, total: rank3Total, rank: rank3Row?.Rank });
+                    }
+                    const athleteInTop3 = athleteName === rank1Name || athleteName === rank2Name || athleteName === rank3Name;
+                    if (!athleteInTop3) {
                         rows.push({ label: athleteName, color: ttTableColors.athlete, times: athleteTimes, total: athleteTotal, rank: athleteRow.Rank });
                     }
+                    rows.push({ label: 'VBR', color: ttTableColors.vbr, times: vbr.times, total: vbr.total, rank: undefined });
                     const sectorLabels = getTTSectorLabelsForSelection(selected.year, selected.competition, selected.location);
                     drawTTSplitsTable(
                         splitNames,
