@@ -13676,3 +13676,5 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WCh,Oklahoma,M,SF1,Ramp,G,1,Assigned,,,,LONG Merle,,
 2026,WCh,Oklahoma,M,SF1,Ramp,B,4,Assigned,,,,PRINDIS Vit,,
 2026,WCh,Oklahoma,M,SF1,Ramp,Y,2,Assigned,,,,MARX Dimitri,,
+2026,WCh,Oklahoma,M,SF1,1,R,,Down-Through,1,,,,,
+2026,WCh,Oklahoma,M,SF1,1,Y,,Down-Through,2,,,,,
