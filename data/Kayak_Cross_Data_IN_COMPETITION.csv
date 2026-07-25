@@ -12572,3 +12572,6 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WCh,Oklahoma,M,R1,Finish,R,,Finish,1,1,,,,
 2026,WCh,Oklahoma,M,R1,Finish,G,,Finish,2,2,,,,
 2026,WCh,Oklahoma,M,R1,Finish,B,,Finish,3,3,,,,
+2026,WCh,Oklahoma,M,R2,Ramp,R,2,Assigned,,,,KREJCI Jakub,,
+2026,WCh,Oklahoma,M,R2,Ramp,G,3,Assigned,,,,MADORE Mathurin,,
+2026,WCh,Oklahoma,M,R2,Ramp,B,4,Assigned,,,,FERRAZZI Xabier,,
