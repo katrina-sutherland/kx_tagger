@@ -1334,15 +1334,61 @@
         }
 
         // --- DATA PARSING ---
+        /** True when the token is an uppercase surname segment (e.g. DORIA, VILARRUBLA). */
+        function isAllCapsSurnameToken(t) {
+            return /[A-Za-zÀ-ÖØ-öø-ÿ]/.test(t) && t === t.toUpperCase();
+        }
+
+        function titleWord(token) {
+            if (!token) return '';
+            return token.split('-').filter(Boolean).map(seg =>
+                seg.charAt(0).toUpperCase() + seg.slice(1).toLowerCase()
+            ).join('-');
+        }
+
+        /**
+         * Match athlete_name_format.normalize_athlete_name_for_save:
+         * leading all-caps tokens = last name(s) kept ALL CAPS (supports double surnames);
+         * remaining words = given names title-cased. Given-first names uppercase the last word.
+         */
         function formatAthleteName(name) {
             if (!name || typeof name !== 'string') return '';
-            const parts = name.trim().split(/\s+/);
-            if (parts.length >= 2) {
-                const lastName = parts[0].toUpperCase();
-                const firstName = parts.slice(1).map(part => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()).join(' ');
-                return `${lastName} ${firstName}`;
+            const parts = name.trim().split(/\s+/).filter(Boolean);
+            const n = parts.length;
+            if (!n) return '';
+
+            if (!isAllCapsSurnameToken(parts[0])) {
+                if (n === 1) return titleWord(parts[0]);
+                const given = parts.slice(0, -1).map(titleWord).join(' ');
+                return `${given} ${parts[n - 1].toUpperCase()}`;
             }
-            return name.toUpperCase();
+
+            let i = 0;
+            while (i < n && isAllCapsSurnameToken(parts[i])) i++;
+
+            if (i >= n) {
+                if (n === 1) return parts[0].toUpperCase();
+                if (n === 2) return `${parts[0].toUpperCase()} ${titleWord(parts[1])}`;
+                return `${parts[0].toUpperCase()} ${parts.slice(1).map(titleWord).join(' ')}`;
+            }
+
+            const surnames = parts.slice(0, i).map(p => p.toUpperCase()).join(' ');
+            const given = parts.slice(i).map(titleWord).join(' ');
+            return `${surnames} ${given}`.trim();
+        }
+
+        /** Last name(s) for chart labels: all leading all-caps surnames, or trailing family name. */
+        function athleteSurnameLabel(fullName) {
+            if (!fullName || typeof fullName !== 'string') return '';
+            const parts = fullName.trim().split(/\s+/).filter(Boolean);
+            if (!parts.length) return '';
+            let i = 0;
+            while (i < parts.length && isAllCapsSurnameToken(parts[i])) i++;
+            if (i > 0) return parts.slice(0, i).join(' ');
+            if (parts.length >= 2 && isAllCapsSurnameToken(parts[parts.length - 1])) {
+                return parts[parts.length - 1];
+            }
+            return parts[0];
         }
 
         function isDnsRow(d) {
@@ -1594,7 +1640,7 @@
 
         function appendRampPosChartLabel(chart, x, y, bib, pos, bibToNameMap) {
             const fullName = bibToNameMap.get(bib);
-            const lastName = fullName ? fullName.split(' ')[0] : (bibFullNames[bib] || bib);
+            const lastName = fullName ? athleteSurnameLabel(fullName) : (bibFullNames[bib] || bib);
             const textNode = chart.append("text")
                 .attr("x", x)
                 .attr("y", y)
