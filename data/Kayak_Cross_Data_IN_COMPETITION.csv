@@ -14342,3 +14342,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC4,Paris,M,QF4,Ramp,R,2,Assigned,,,,OCHOA Manuel,,
 2026,WC4,Paris,M,QF4,Ramp,G,3,Assigned,,,,LLORENTE David,,
 2026,WC4,Paris,M,QF4,Ramp,Y,4,Assigned,,,,DE GENNARO Giovanni,,
+2026,WC4,Paris,M,QF4,SG,B,,Down-Right,1,,Down-Right,,,
+2026,WC4,Paris,M,QF4,SG,R,,Down-Right,2,,FOLLOW,,,
+2026,WC4,Paris,M,QF4,SG,G,,Down-Left,3,,SPLIT,,,
+2026,WC4,Paris,M,QF4,SG,Y,,Down-Right,4,,SPLIT,,,
