@@ -14450,3 +14450,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC4,Paris,M,SF1,Finish,Y,,Finish,2,2,,,,
 2026,WC4,Paris,M,SF1,Finish,B,,Finish,3,3,,,,
 2026,WC4,Paris,M,SF1,Finish,G,,Finish,4,4,,,,
+2026,WC4,Paris,M,SF2,Ramp,B,1,Assigned,,,,DE GENNARO Giovanni,,
+2026,WC4,Paris,M,SF2,Ramp,R,2,Assigned,,,,HELLO Joris,,
+2026,WC4,Paris,M,SF2,Ramp,G,3,Assigned,,,,MADORE Mathurin,,
+2026,WC4,Paris,M,SF2,Ramp,Y,4,Assigned,,,,ECHANIZ Pau,,
