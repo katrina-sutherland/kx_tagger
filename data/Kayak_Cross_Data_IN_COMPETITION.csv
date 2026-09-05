@@ -14254,3 +14254,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC4,Paris,W,QF4,Finish,G,,Finish,2,2,,,,
 2026,WC4,Paris,W,QF4,Finish,Y,,Finish,3,3,,,,
 2026,WC4,Paris,W,QF4,Finish,R,,Finish,4,4,,,,
+2026,WC4,Paris,M,QF1,Ramp,G,1,Assigned,,,,NOVAK Matyas,,
+2026,WC4,Paris,M,QF1,Ramp,R,2,Assigned,,,,CLARKE Joseph,,
+2026,WC4,Paris,M,QF1,Ramp,B,3,Assigned,,,,KOZLOV Ivan,,
+2026,WC4,Paris,M,QF1,Ramp,Y,4,Assigned,,,,PRINDIS Vit,,
