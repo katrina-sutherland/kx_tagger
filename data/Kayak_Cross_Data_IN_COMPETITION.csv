@@ -14166,3 +14166,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC4,Paris,W,QF1,7,Y,,Down-Through,2,,,,,
 2026,WC4,Paris,W,QF1,7,G,,Down-Through,3,,,,,
 2026,WC4,Paris,W,QF1,7,B,,Down-Through,4,,,,,
+2026,WC4,Paris,W,QF1,Finish,R,,Finish,1,1,,,,
+2026,WC4,Paris,W,QF1,Finish,Y,,Finish,2,2,,,,
+2026,WC4,Paris,W,QF1,Finish,G,,Finish,3,3,,,,
+2026,WC4,Paris,W,QF1,Finish,B,,Finish,4,4,,,,
