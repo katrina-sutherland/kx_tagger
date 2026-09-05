@@ -14478,3 +14478,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC4,Paris,M,SF2,Finish,G,,Finish,2,2,,,,
 2026,WC4,Paris,M,SF2,Finish,B,,Finish,3,3,,,,
 2026,WC4,Paris,M,SF2,Finish,Y,,Finish,4,4,,,,
+2026,WC4,Paris,W,Final,Ramp,B,1,Assigned,,,,LEAVER Lois,,
+2026,WC4,Paris,W,Final,Ramp,R,2,Assigned,,,,PRIGENT Camille,,
+2026,WC4,Paris,W,Final,Ramp,G,3,Assigned,,,,FUNK Ricarda,,
+2026,WC4,Paris,W,Final,Ramp,Y,4,Assigned,,,,LEIBFARTH Evy,,
