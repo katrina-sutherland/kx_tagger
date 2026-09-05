@@ -14504,3 +14504,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC4,Paris,W,Final,Finish,R,,Finish,1,1,,,,
 2026,WC4,Paris,W,Final,Finish,G,,Finish,2,2,,,,
 2026,WC4,Paris,W,Final,Finish,B,,Finish,3,3,,,,
+2026,WC4,Paris,M,Final,Ramp,B,1,Assigned,,,,MADORE Mathurin,,
+2026,WC4,Paris,M,Final,Ramp,R,2,Assigned,,,,CLARKE Joseph,,
+2026,WC4,Paris,M,Final,Ramp,G,3,Assigned,,,,HELLO Joris,,
+2026,WC4,Paris,M,Final,Ramp,Y,4,Assigned,,,,KOZLOV Ivan,,
