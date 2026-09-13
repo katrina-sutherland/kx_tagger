@@ -15314,3 +15314,8 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC5,La Seu,W,H8,Finish,R,,Finish,2,2,,,,
 2026,WC5,La Seu,W,H8,Finish,B,,Finish,3,3,,,FLT,
 2026,WC5,La Seu,W,H8,Finish,Y,,Finish,4,4,,,FLT,
+2026,WC5,La Seu,M,H1,Ramp,Y,1,Assigned,,,,Eren YALKIN,,
+2026,WC5,La Seu,M,H1,Ramp,B,2,Assigned,,,,Zhaoshan HU,,
+2026,WC5,La Seu,M,H1,Ramp,R,3,Assigned,,,,Joseph CLARKE,,
+2026,WC5,La Seu,M,H1,Ramp,G,4,Assigned,,,,Djanibek TEMIRGALIEV,,
+2026,WC5,La Seu,M,H1,1st Up,R,,Right-Up,1,,Right-Up,,,
