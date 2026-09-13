@@ -14757,3 +14757,7 @@ Year,Competition,Location,Gender,Phase,Gate,BIB,Ramp Position,Action,Order,Final
 2026,WC5,La Seu,M,R1,Finish,R,,Finish,1,1,,,,
 2026,WC5,La Seu,M,R1,Finish,G,,Finish,2,2,,,,
 2026,WC5,La Seu,M,R1,Finish,B,,Finish,3,3,,,,
+2026,WC5,La Seu,M,R2,Ramp,B,1,Assigned,,,,Manuel TRIPANO,,
+2026,WC5,La Seu,M,R2,Ramp,B,2,Assigned,,,,Manuel TRIPANO,,
+2026,WC5,La Seu,M,R2,Ramp,R,3,Assigned,,,,Manuel OCHOA,,
+2026,WC5,La Seu,M,R2,Ramp,G,4,Assigned,,,,Lucien DELFOUR,,
